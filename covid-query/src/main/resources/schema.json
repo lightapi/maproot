@@ -1,0 +1,70 @@
+{
+  "lightapi.net/covid/getEntity/0.1.0": {
+    "schema": {
+      "title": "Service",
+      "type": "object",
+      "properties": {
+        "email": {
+          "type": "string",
+          "description": "email"
+        }
+      },
+      "required": [
+        "email"
+      ]
+    },
+    "scope": "portal.r"
+  },
+  "lightapi.net/covid/getCityMap/0.1.0": {
+    "schema": {
+      "title": "Service",
+      "type": "object",
+      "properties": {
+        "country": {
+          "type": "string",
+          "description": "country"
+        },
+        "province": {
+          "type": "string",
+          "description": "province"
+        },
+        "city": {
+          "type": "string",
+          "description": "city"
+        }
+      },
+      "required": [
+        "country",
+        "province",
+        "city"
+      ]
+    },
+    "scope": "portal.r"
+  },
+  "lightapi.net/covid/getCity/0.1.0": {
+    "schema": {
+      "title": "Service",
+      "type": "object",
+      "properties": {
+        "country": {
+          "type": "string",
+          "description": "country"
+        },
+        "province": {
+          "type": "string",
+          "description": "province"
+        },
+        "city": {
+          "type": "string",
+          "description": "city"
+        }
+      },
+      "required": [
+        "country",
+        "province",
+        "city"
+      ]
+    },
+    "scope": "portal.r"
+  }
+}
