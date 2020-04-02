@@ -8,6 +8,7 @@ import com.networknt.kafka.common.EventNotification;
 import com.networknt.kafka.streams.KafkaStreamsConfig;
 import com.networknt.kafka.streams.LightStreams;
 import com.networknt.utility.HashUtil;
+import net.lightapi.portal.ByteUtil;
 import net.lightapi.portal.covid.*;
 import net.lightapi.portal.user.*;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
@@ -20,6 +21,8 @@ import org.apache.kafka.streams.processor.*;
 import org.apache.kafka.streams.state.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 public class CovidQueryStreams implements LightStreams {
@@ -57,36 +60,27 @@ public class CovidQueryStreams implements LightStreams {
 
     private void startCovidStreams() {
 
-        final StreamsBuilder builder = new StreamsBuilder();
-
         StoreBuilder<KeyValueStore<String, String>> keyValueCityStoreBuilder =
                 Stores.keyValueStoreBuilder(Stores.persistentKeyValueStore(city),
                         Serdes.String(),
                         Serdes.String());
-        builder.addStateStore(keyValueCityStoreBuilder);
 
         StoreBuilder<KeyValueStore<String, String>> keyValueMapStoreBuilder =
                 Stores.keyValueStoreBuilder(Stores.persistentKeyValueStore(map),
                         Serdes.String(),
                         Serdes.String());
-        builder.addStateStore(keyValueMapStoreBuilder);
 
         StoreBuilder<KeyValueStore<String, String>> keyValueEntityStoreBuilder =
                 Stores.keyValueStoreBuilder(Stores.persistentKeyValueStore(entity),
                         Serdes.String(),
                         Serdes.String());
-        builder.addStateStore(keyValueEntityStoreBuilder);
 
-        builder.stream("portal-event").process(new ProcessorSupplier() {
-            @Override
-            public Processor get() {
-                return new CovidQueryStreams.CovidEventProcessor();
-            }
-        }, city, map, entity);
-
-        final Topology topology = builder.build();
+        final Topology topology = new Topology();
         topology.addSource("SourceTopicProcessor", "portal-event");
         topology.addProcessor("CovidEventProcessor", CovidEventProcessor::new, "SourceTopicProcessor");
+        topology.addStateStore(keyValueCityStoreBuilder, "CovidEventProcessor");
+        topology.addStateStore(keyValueMapStoreBuilder, "CovidEventProcessor");
+        topology.addStateStore(keyValueEntityStoreBuilder, "CovidEventProcessor");
         topology.addSink("NonceProcessor", "portal-nonce", "CovidEventProcessor");
         topology.addSink("NotificationProcessor", "portal-notification", "CovidEventProcessor");
         streamsProps.put(StreamsConfig.APPLICATION_ID_CONFIG, "covid-query");
@@ -151,9 +145,9 @@ public class CovidQueryStreams implements LightStreams {
                 cityMap.put("timestamp", timestamp);
                 cityMap.put("email", email);
                 cityStore.put(location,  JsonMapper.toJson(cityMap));
-                pc.forward(email, nonce + 1, To.child("NonceProcessor"));
-                EventNotification notification = new EventNotification(nonce, true, null, AvroConverter.toJson(cityMapCreatedEvent, false));
-                pc.forward(email, notification.toString(), To.child("NotificationProcessor"));
+                pc.forward(email.getBytes(StandardCharsets.UTF_8), ByteUtil.longToBytes(nonce + 1), To.child("NonceProcessor"));
+                EventNotification notification = new EventNotification(nonce, true, null, cityMapCreatedEvent);
+                pc.forward(email.getBytes(StandardCharsets.UTF_8), notification.toString().getBytes(StandardCharsets.UTF_8), To.child("NotificationProcessor"));
             } else if(object instanceof CityMapUpdatedEvent) {
                 CityMapUpdatedEvent cityMapUpdatedEvent = (CityMapUpdatedEvent)object;
                 if(logger.isTraceEnabled()) logger.trace("Event = " + cityMapUpdatedEvent);
@@ -172,9 +166,9 @@ public class CovidQueryStreams implements LightStreams {
                 cityMap.put("longitude", longitude);
                 cityMap.put("zoom", zoom);
                 cityStore.put(location, JsonMapper.toJson(cityMap));
-                pc.forward(email, nonce + 1, To.child("NonceProcessor"));
-                EventNotification notification = new EventNotification(nonce, true, null, AvroConverter.toJson(cityMapUpdatedEvent, false));
-                pc.forward(email, notification.toString(), To.child("NotificationProcessor"));
+                pc.forward(email.getBytes(StandardCharsets.UTF_8), ByteUtil.longToBytes(nonce + 1), To.child("NonceProcessor"));
+                EventNotification notification = new EventNotification(nonce, true, null, cityMapUpdatedEvent);
+                pc.forward(email.getBytes(StandardCharsets.UTF_8), notification.toString().getBytes(StandardCharsets.UTF_8), To.child("NotificationProcessor"));
             } else if(object instanceof CityMapDeletedEvent) {
                 CityMapDeletedEvent cityMapDeletedEvent = (CityMapDeletedEvent)object;
                 if(logger.isTraceEnabled()) logger.trace("Event = " + cityMapDeletedEvent);
@@ -185,9 +179,9 @@ public class CovidQueryStreams implements LightStreams {
                 String city = cityMapDeletedEvent.getCity();
                 String location = country + "|" + province + "|" + city;
                 cityStore.delete(location);
-                pc.forward(email, nonce + 1, To.child("NonceProcessor"));
-                EventNotification notification = new EventNotification(nonce, true, null, AvroConverter.toJson(cityMapDeletedEvent, false));
-                pc.forward(email, notification.toString(), To.child("NotificationProcessor"));
+                pc.forward(email.getBytes(StandardCharsets.UTF_8), ByteUtil.longToBytes(nonce + 1), To.child("NonceProcessor"));
+                EventNotification notification = new EventNotification(nonce, true, null, cityMapDeletedEvent);
+                pc.forward(email.getBytes(StandardCharsets.UTF_8), notification.toString().getBytes(StandardCharsets.UTF_8), To.child("NotificationProcessor"));
             } else if(object instanceof CovidEntityCreatedEvent) {
                 CovidEntityCreatedEvent covidEntityCreatedEvent = (CovidEntityCreatedEvent)object;
                 if(logger.isTraceEnabled()) logger.trace("Event = " + covidEntityCreatedEvent);
@@ -215,10 +209,9 @@ public class CovidQueryStreams implements LightStreams {
                 // TODO populate map store here.
 
 
-                pc.forward(email, nonce + 1, To.child("NonceProcessor"));
-                EventNotification notification = new EventNotification(nonce, true, null, AvroConverter.toJson(covidEntityCreatedEvent, false));
-                pc.forward(email, notification.toString(), To.child("NotificationProcessor"));
-
+                pc.forward(email.getBytes(StandardCharsets.UTF_8), ByteUtil.longToBytes(nonce + 1), To.child("NonceProcessor"));
+                EventNotification notification = new EventNotification(nonce, true, null, covidEntityCreatedEvent);
+                pc.forward(email.getBytes(StandardCharsets.UTF_8), notification.toString().getBytes(StandardCharsets.UTF_8), To.child("NotificationProcessor"));
             } else if(object instanceof CovidEntityUpdatedEvent) {
                 CovidEntityUpdatedEvent covidEntityUpdatedEvent = (CovidEntityUpdatedEvent)object;
                 if(logger.isTraceEnabled()) logger.trace("Event = " + covidEntityUpdatedEvent);
@@ -239,9 +232,9 @@ public class CovidQueryStreams implements LightStreams {
                 entityMap.put("introduction", introduction);
                 entityMap.put(location, JsonMapper.toJson(entityMap));
 
-                pc.forward(email, nonce + 1, To.child("NonceProcessor"));
-                EventNotification notification = new EventNotification(nonce, true, null, AvroConverter.toJson(covidEntityUpdatedEvent, false));
-                pc.forward(email, notification.toString(), To.child("NotificationProcessor"));
+                pc.forward(email.getBytes(StandardCharsets.UTF_8), ByteUtil.longToBytes(nonce + 1), To.child("NonceProcessor"));
+                EventNotification notification = new EventNotification(nonce, true, null, covidEntityUpdatedEvent);
+                pc.forward(email.getBytes(StandardCharsets.UTF_8), notification.toString().getBytes(StandardCharsets.UTF_8), To.child("NotificationProcessor"));
             } else if(object instanceof CovidEntityDeletedEvent) {
                 CovidEntityDeletedEvent covidEntityDeletedEvent = (CovidEntityDeletedEvent)object;
                 if(logger.isTraceEnabled()) logger.trace("Event = " + covidEntityDeletedEvent);
@@ -251,9 +244,9 @@ public class CovidQueryStreams implements LightStreams {
                 String location = covidEntityDeletedEvent.getKey();
 
                 entityStore.delete(location);
-                pc.forward(email, nonce + 1, To.child("NonceProcessor"));
-                EventNotification notification = new EventNotification(nonce, true, null, AvroConverter.toJson(covidEntityDeletedEvent, false));
-                pc.forward(email, notification.toString(), To.child("NotificationProcessor"));
+                pc.forward(email.getBytes(StandardCharsets.UTF_8), ByteUtil.longToBytes(nonce + 1), To.child("NonceProcessor"));
+                EventNotification notification = new EventNotification(nonce, true, null, covidEntityDeletedEvent);
+                pc.forward(email.getBytes(StandardCharsets.UTF_8), notification.toString().getBytes(StandardCharsets.UTF_8), To.child("NotificationProcessor"));
             } else {
                 if(logger.isDebugEnabled()) logger.warn("Unknown Covid Event " + object.getClass().getName());
             }
