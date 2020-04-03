@@ -40,7 +40,7 @@ public class UpdateCityMap implements Handler {
 
         Map<String, Object> auditInfo = exchange.getAttachment(AttachmentConstants.AUDIT_INFO);
         // the auditInfo won't be null as it passes the Jwt verification
-        String email = (String)auditInfo.get("userId");
+        String email = (String)auditInfo.get("user_id");
         String roles = (String)auditInfo.get("roles");
         if(roles == null || !roles.contains("admin")) {
             return NioUtils.toByteBuffer(getStatus(exchange, PERMISSION_DENIED, roles));
@@ -63,8 +63,8 @@ public class UpdateCityMap implements Handler {
                 .setCountry((String)map.get("country"))
                 .setProvince((String)map.get("province"))
                 .setCity((String)map.get("city"))
-                .setLatitude(Float.valueOf((String)map.get("latitude")))
-                .setLongitude(Float.valueOf((String)map.get("longitude")))
+                .setLatitude((Double)map.get("latitude"))
+                .setLongitude((Double)map.get("longitude"))
                 .setZoom((Integer)map.get("zoom"))
                 .setTimestamp(System.currentTimeMillis())
                 .build();

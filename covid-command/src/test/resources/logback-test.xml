@@ -59,11 +59,11 @@
         </triggeringPolicy>
     </appender>
 
-    <root level="debug">
+    <root level="error">
         <appender-ref ref="stdout"/>
     </root>
 
-    <logger name="com.networknt" level="error" additivity="false">
+    <logger name="com.networknt" level="debug" additivity="false">
         <appender-ref ref="log"/>
     </logger>
 

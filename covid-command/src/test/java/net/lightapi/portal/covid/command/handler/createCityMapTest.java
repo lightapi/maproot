@@ -12,6 +12,7 @@ import io.undertow.util.Headers;
 import io.undertow.util.Methods;
 import org.junit.Assert;
 import org.junit.ClassRule;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,6 +23,7 @@ import java.net.URI;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicReference;
 
+@Ignore
 public class createCityMapTest {
     @ClassRule
     public static TestServer server = TestServer.getInstance();
@@ -44,7 +46,7 @@ public class createCityMapTest {
             throw new ClientException(e);
         }
         final AtomicReference<ClientResponse> reference = new AtomicReference<>();
-        final String s = "{\"host\":\"lightapi.net\",\"service\":\"covid\",\"action\":\"createCityMap\",\"version\":\"0.1.0\",\"data\":{\"country\":\"Canada\",\"province\":\"ON\",\"city\":\"Mississauga\",\"latitude\":\"43.593466\",\"longitude\":\"-79.642362\",\"zoom\":10}}";
+        final String s = "{\"host\":\"lightapi.net\",\"service\":\"covid\",\"action\":\"createCityMap\",\"version\":\"0.1.0\",\"data\":{\"country\":\"Canada\",\"province\":\"ON\",\"city\":\"Mississauga\",\"latitude\":43.593466,\"longitude\":-79.642362,\"zoom\":10}}";
         try {
             ClientRequest request = new ClientRequest().setPath("/api/json").setMethod(Methods.POST);
             request.getRequestHeaders().put(Headers.CONTENT_TYPE, "application/json");

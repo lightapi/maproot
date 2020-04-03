@@ -44,11 +44,14 @@ public class UpdateEntity implements Handler {
         // make sure that country, province and city are populated in the user profile.
         Result<String> resultUser = HybridQueryClient.getUserByEmail(exchange, email);
         String key = null;
+        String country = null;
+        String province = null;
+        String city = null;
         if(resultUser.isSuccess()) {
             Map<String, Object> userMap = JsonMapper.string2Map(resultUser.getResult());
-            String country = (String)userMap.get("country");
-            String province = (String)userMap.get("province");
-            String city = (String)userMap.get("city");
+            country = (String)userMap.get("country");
+            province = (String)userMap.get("province");
+            city = (String)userMap.get("city");
             if(country == null || province == null || city == null) {
                 return NioUtils.toByteBuffer(getStatus(exchange, PROFILE_LOCATION_INCOMPLETE));
             }
@@ -59,11 +62,11 @@ public class UpdateEntity implements Handler {
         Map<String, Object> map = (Map<String, Object>)input;
         String category = (String)map.get("category");
         String subcategory = (String)map.get("subcategory");
-        String sLat = (String)map.get("latitude");
-        String sLon = (String)map.get("longitude");
+        double latitude = (Double)map.get("latitude");
+        double longitude = (Double)map.get("longitude");
         String introduction = (String)map.get("introduction");
         // check if the key is in the cityMap store
-        Result<String> resultCity = HybridQueryClient.getCityByKey(exchange, key);
+        Result<String> resultCity = HybridQueryClient.getCity(exchange, country, province, city);
         if(resultCity.isFailure()) {
             if(resultCity.getError().getStatusCode() == 404) {
                 return NioUtils.toByteBuffer(getStatus(exchange, CITY_NOT_REGISTERED, key));
@@ -83,8 +86,8 @@ public class UpdateEntity implements Handler {
                     .setKey(key)
                     .setCategory(category)
                     .setSubcategory(subcategory)
-                    .setLatitude(Float.valueOf(sLat))
-                    .setLongitude(Float.valueOf(sLon))
+                    .setLatitude(latitude)
+                    .setLongitude(longitude)
                     .setIntroduction(introduction)
                     .setTimestamp(System.currentTimeMillis())
                     .build();

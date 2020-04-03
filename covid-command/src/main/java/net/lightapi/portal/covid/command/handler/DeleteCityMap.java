@@ -39,7 +39,7 @@ public class DeleteCityMap implements Handler {
 
         Map<String, Object> auditInfo = exchange.getAttachment(AttachmentConstants.AUDIT_INFO);
         // the auditInfo won't be null as it passes the Jwt verification
-        String email = (String)auditInfo.get("userId");
+        String email = (String)auditInfo.get("user_id");
         String roles = (String)auditInfo.get("roles");
         if(roles == null || !roles.contains("admin")) {
             return NioUtils.toByteBuffer(getStatus(exchange, PERMISSION_DENIED, roles));

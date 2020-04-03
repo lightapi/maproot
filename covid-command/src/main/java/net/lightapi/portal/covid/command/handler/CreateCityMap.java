@@ -55,15 +55,13 @@ public class CreateCityMap implements Handler {
         String country = (String)map.get("country");
         String province = (String)map.get("province");
         String city = (String)map.get("city");
-        String sLat = (String)map.get("latitude");
-        String sLon = (String)map.get("longitude");
+        double latitude = (Double)map.get("latitude");
+        double longitude = (Double)map.get("longitude");
         Integer zoom = (Integer)map.get("zoom");
 
-        String key = country + "|" + province + "|" + city;
-        // check if the key is in the cityMap store
-        Result<String> resultCity = HybridQueryClient.getCityByKey(exchange, key);
+        Result<String> resultCity = HybridQueryClient.getCity(exchange, country, province, city);
         if(resultCity.isSuccess()) {
-            return NioUtils.toByteBuffer(getStatus(exchange, CITY_REGISTERED, key));
+            return NioUtils.toByteBuffer(getStatus(exchange, CITY_REGISTERED, country, province, city));
         } else {
             if(resultCity.getError().getStatusCode() != 404) {
                 return NioUtils.toByteBuffer(getStatus(exchange, resultCity.getError()));
@@ -80,8 +78,8 @@ public class CreateCityMap implements Handler {
                     .setCountry(country)
                     .setProvince(province)
                     .setCity(city)
-                    .setLatitude(Float.valueOf(sLat))
-                    .setLongitude(Float.valueOf(sLon))
+                    .setLatitude(latitude)
+                    .setLongitude(longitude)
                     .setZoom(zoom)
                     .setTimestamp(System.currentTimeMillis())
                     .build();

@@ -132,13 +132,16 @@ public class CovidQueryStreams implements LightStreams {
                 String country = cityMapCreatedEvent.getCountry();
                 String province = cityMapCreatedEvent.getProvince();
                 String city = cityMapCreatedEvent.getCity();
-                float latitude = cityMapCreatedEvent.getLatitude();
-                float longitude = cityMapCreatedEvent.getLongitude();
+                double latitude = cityMapCreatedEvent.getLatitude();
+                double longitude = cityMapCreatedEvent.getLongitude();
                 int zoom = cityMapCreatedEvent.getZoom();
                 long timestamp = cityMapCreatedEvent.getTimestamp();
                 String location = country + "|" + province + "|" + city;
 
                 Map<String, Object> cityMap = new HashMap<>();
+                cityMap.put("country", country);
+                cityMap.put("province", province);
+                cityMap.put("city", city);
                 cityMap.put("latitude", latitude);
                 cityMap.put("longitude", longitude);
                 cityMap.put("zoom", zoom);
@@ -157,8 +160,8 @@ public class CovidQueryStreams implements LightStreams {
                 String country = cityMapUpdatedEvent.getCountry();
                 String province = cityMapUpdatedEvent.getProvince();
                 String city = cityMapUpdatedEvent.getCity();
-                float latitude = cityMapUpdatedEvent.getLatitude();
-                float longitude = cityMapUpdatedEvent.getLongitude();
+                double latitude = cityMapUpdatedEvent.getLatitude();
+                double longitude = cityMapUpdatedEvent.getLongitude();
                 int zoom = cityMapUpdatedEvent.getZoom();
                 String location = country + "|" + province + "|" + city;
                 Map<String, Object> cityMap = JsonMapper.string2Map(cityStore.get(location));
@@ -191,8 +194,8 @@ public class CovidQueryStreams implements LightStreams {
                 String location = covidEntityCreatedEvent.getKey();
                 String category = covidEntityCreatedEvent.getCategory();
                 String subcategory = covidEntityCreatedEvent.getSubcategory();
-                float latitude = covidEntityCreatedEvent.getLatitude();
-                float longitude = covidEntityCreatedEvent.getLongitude();
+                double latitude = covidEntityCreatedEvent.getLatitude();
+                double longitude = covidEntityCreatedEvent.getLongitude();
                 String introduction = covidEntityCreatedEvent.getIntroduction();
                 long timestamp = covidEntityCreatedEvent.getTimestamp();
 
@@ -221,8 +224,8 @@ public class CovidQueryStreams implements LightStreams {
                 String location = covidEntityUpdatedEvent.getKey();
                 String category = covidEntityUpdatedEvent.getCategory();
                 String subcategory = covidEntityUpdatedEvent.getSubcategory();
-                float latitude = covidEntityUpdatedEvent.getLatitude();
-                float longitude = covidEntityUpdatedEvent.getLongitude();
+                double latitude = covidEntityUpdatedEvent.getLatitude();
+                double longitude = covidEntityUpdatedEvent.getLongitude();
                 String introduction = covidEntityUpdatedEvent.getIntroduction();
                 Map<String, Object> entityMap = JsonMapper.string2Map(entityStore.get(location));
                 entityMap.put("category", category);
