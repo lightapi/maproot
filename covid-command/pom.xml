@@ -65,6 +65,11 @@
         </dependency>
         <dependency>
             <groupId>net.lightapi</groupId>
+            <artifactId>common-util</artifactId>
+            <version>${version.light-4j}</version>
+        </dependency>
+        <dependency>
+            <groupId>net.lightapi</groupId>
             <artifactId>command-common</artifactId>
             <version>${version.light-4j}</version>
         </dependency>

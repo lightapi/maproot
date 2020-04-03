@@ -233,7 +233,7 @@ public class CovidQueryStreams implements LightStreams {
                 entityMap.put("latitude", latitude);
                 entityMap.put("longitude", longitude);
                 entityMap.put("introduction", introduction);
-                entityMap.put(location, JsonMapper.toJson(entityMap));
+                entityStore.put(location, JsonMapper.toJson(entityMap));
 
                 pc.forward(email.getBytes(StandardCharsets.UTF_8), ByteUtil.longToBytes(nonce + 1), To.child("NonceProcessor"));
                 EventNotification notification = new EventNotification(nonce, true, null, covidEntityUpdatedEvent);

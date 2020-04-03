@@ -17,7 +17,7 @@ import java.util.Map;
 import java.util.concurrent.BlockingQueue;
 
 import io.undertow.server.HttpServerExchange;
-import net.lightapi.portal.command.HybridQueryClient;
+import net.lightapi.portal.HybridQueryClient;
 import net.lightapi.portal.covid.CityMapCreatedEvent;
 import net.lightapi.portal.covid.command.CovidCommandConfig;
 import org.apache.kafka.clients.producer.ProducerRecord;

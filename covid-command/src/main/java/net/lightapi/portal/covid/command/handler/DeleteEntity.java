@@ -18,8 +18,7 @@ import java.util.Map;
 import java.util.concurrent.BlockingQueue;
 
 import io.undertow.server.HttpServerExchange;
-import net.lightapi.portal.command.HybridQueryClient;
-import net.lightapi.portal.covid.CovidEntityCreatedEvent;
+import net.lightapi.portal.HybridQueryClient;
 import net.lightapi.portal.covid.CovidEntityDeletedEvent;
 import net.lightapi.portal.covid.command.CovidCommandConfig;
 import org.apache.kafka.clients.producer.ProducerRecord;
@@ -39,7 +38,7 @@ public class DeleteEntity implements Handler {
         if(logger.isTraceEnabled()) logger.trace("input = " + input);
         Map<String, Object> auditInfo = exchange.getAttachment(AttachmentConstants.AUDIT_INFO);
         // the auditInfo won't be null as it passes the Jwt verification
-        String email = (String)auditInfo.get("userId");
+        String email = (String)auditInfo.get("user_id");
         // make sure that country, province and city are pupulated in the user profile.
         Result<String> resultUser = HybridQueryClient.getUserByEmail(exchange, email);
         String key = null;
