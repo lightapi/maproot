@@ -46,11 +46,13 @@ public class UpdateEntity implements Handler {
         String country = null;
         String province = null;
         String city = null;
+        String userId = null;
         if(resultUser.isSuccess()) {
             Map<String, Object> userMap = JsonMapper.string2Map(resultUser.getResult());
             country = (String)userMap.get("country");
             province = (String)userMap.get("province");
             city = (String)userMap.get("city");
+            userId = (String)userMap.get("userId");
             if(country == null || province == null || city == null) {
                 return NioUtils.toByteBuffer(getStatus(exchange, PROFILE_LOCATION_INCOMPLETE));
             }
@@ -83,6 +85,7 @@ public class UpdateEntity implements Handler {
             CovidEntityUpdatedEvent event = CovidEntityUpdatedEvent.newBuilder()
                     .setEventId(eventId)
                     .setKey(key)
+                    .setUserId(userId)
                     .setCategory(category)
                     .setSubcategory(subcategory)
                     .setLatitude(latitude)

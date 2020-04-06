@@ -1,7 +1,6 @@
 
 package net.lightapi.portal.covid.query.handler;
 
-import com.networknt.httpstring.AttachmentConstants;
 import com.networknt.utility.NioUtils;
 import com.networknt.rpc.Handler;
 import com.networknt.rpc.router.ServiceHandler;
@@ -18,7 +17,6 @@ import org.slf4j.LoggerFactory;
 public class GetCity implements Handler {
     private static final Logger logger = LoggerFactory.getLogger(GetCity.class);
     static final String CITY_NOT_FOUND = "ERR11623";
-    static final String PERMISSION_DENIED = "ERR11620";
 
     @Override
     public ByteBuffer handle(HttpServerExchange exchange, Object input)  {
@@ -27,22 +25,7 @@ public class GetCity implements Handler {
         String country = map.get("country");
         String province = map.get("province");
         String city = map.get("city");
-        Map<String, Object> auditInfo = exchange.getAttachment(AttachmentConstants.AUDIT_INFO);
-        if(auditInfo != null) {
-            String userId = (String)auditInfo.get("user_id");
-            if(userId != null) {
-                // authorization code token make sure the userId is match or roles contains admin
-                String roles = (String)auditInfo.get("roles");
-                if(roles == null || !roles.contains("admin")) {
-                    return NioUtils.toByteBuffer(getStatus(exchange, PERMISSION_DENIED, userId));
-                }
-            } else {
-                return NioUtils.toByteBuffer(getStatus(exchange, PERMISSION_DENIED, "unknown user"));
-            }
-        } else {
-            return NioUtils.toByteBuffer(getStatus(exchange, PERMISSION_DENIED, "unknown user"));
-        }
-        // email shouldn't be null as the schema validation is done.
+
         String key = country + "|" + province + "|" + city;
 
         ReadOnlyKeyValueStore<String, String> keyValueStore = CovidQueryStartup.streams.getCityStore();

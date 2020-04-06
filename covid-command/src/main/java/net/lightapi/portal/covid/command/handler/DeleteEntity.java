@@ -42,6 +42,7 @@ public class DeleteEntity implements Handler {
         // make sure that country, province and city are pupulated in the user profile.
         Result<String> resultUser = HybridQueryClient.getUserByEmail(exchange, email);
         String key = null;
+        String userId = null;
         if(resultUser.isSuccess()) {
             Map<String, Object> userMap = JsonMapper.string2Map(resultUser.getResult());
             String country = (String)userMap.get("country");
@@ -51,6 +52,7 @@ public class DeleteEntity implements Handler {
                 return NioUtils.toByteBuffer(getStatus(exchange, PROFILE_LOCATION_INCOMPLETE));
             }
             key = country + "|" + province + "|" + city;
+            userId = (String)userMap.get("userId");
         } else {
             return NioUtils.toByteBuffer(getStatus(exchange, resultUser.getError()));
         }
@@ -64,6 +66,7 @@ public class DeleteEntity implements Handler {
             CovidEntityDeletedEvent event = CovidEntityDeletedEvent.newBuilder()
                     .setEventId(eventId)
                     .setKey(key)
+                    .setUserId(userId)
                     .setTimestamp(System.currentTimeMillis())
                     .build();
 

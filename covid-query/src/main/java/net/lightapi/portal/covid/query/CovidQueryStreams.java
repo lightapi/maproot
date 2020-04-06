@@ -2,19 +2,15 @@ package net.lightapi.portal.covid.query;
 
 import com.networknt.config.Config;
 import com.networknt.config.JsonMapper;
-import com.networknt.kafka.common.AvroConverter;
 import com.networknt.kafka.common.AvroDeserializer;
 import com.networknt.kafka.common.EventNotification;
 import com.networknt.kafka.streams.KafkaStreamsConfig;
 import com.networknt.kafka.streams.LightStreams;
-import com.networknt.utility.HashUtil;
 import net.lightapi.portal.ByteUtil;
 import net.lightapi.portal.covid.*;
-import net.lightapi.portal.user.*;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.common.serialization.Serdes;
 import org.apache.kafka.streams.KafkaStreams;
-import org.apache.kafka.streams.StreamsBuilder;
 import org.apache.kafka.streams.StreamsConfig;
 import org.apache.kafka.streams.Topology;
 import org.apache.kafka.streams.processor.*;
@@ -36,8 +32,8 @@ public class CovidQueryStreams implements LightStreams {
         streamsProps.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
     }
 
-    private static final String city = "covid-city-store";
-    private static final String map = "covid-map-store";
+    private static final String city = "covid-city-store"; // this is a global store
+    private static final String map = "covid-map-store"; // this is a global store
     private static final String entity = "covid-entity-store";
 
     KafkaStreams covidStreams;
@@ -60,15 +56,15 @@ public class CovidQueryStreams implements LightStreams {
 
     private void startCovidStreams() {
 
-        StoreBuilder<KeyValueStore<String, String>> keyValueCityStoreBuilder =
+        StoreBuilder<KeyValueStore<String, String>> globalCityStoreBuilder =
                 Stores.keyValueStoreBuilder(Stores.persistentKeyValueStore(city),
                         Serdes.String(),
-                        Serdes.String());
+                        Serdes.String()).withLoggingDisabled();
 
-        StoreBuilder<KeyValueStore<String, String>> keyValueMapStoreBuilder =
+        StoreBuilder<KeyValueStore<String, String>> globalMapStoreBuilder =
                 Stores.keyValueStoreBuilder(Stores.persistentKeyValueStore(map),
                         Serdes.String(),
-                        Serdes.String());
+                        Serdes.String()).withLoggingDisabled();
 
         StoreBuilder<KeyValueStore<String, String>> keyValueEntityStoreBuilder =
                 Stores.keyValueStoreBuilder(Stores.persistentKeyValueStore(entity),
@@ -76,19 +72,70 @@ public class CovidQueryStreams implements LightStreams {
                         Serdes.String());
 
         final Topology topology = new Topology();
+        topology.addGlobalStore(globalCityStoreBuilder, "from-portal-city",  Serdes.String().deserializer(), Serdes.String().deserializer(), "portal-city", "global-city-processor", GlobalCityProcessor::new);
+        topology.addGlobalStore(globalMapStoreBuilder, "from-portal-map",  Serdes.String().deserializer(), Serdes.String().deserializer(), "portal-map", "global-map-processor", GlobalMapProcessor::new);
         topology.addSource("SourceTopicProcessor", "portal-event");
         topology.addProcessor("CovidEventProcessor", CovidEventProcessor::new, "SourceTopicProcessor");
-        topology.addStateStore(keyValueCityStoreBuilder, "CovidEventProcessor");
-        topology.addStateStore(keyValueMapStoreBuilder, "CovidEventProcessor");
         topology.addStateStore(keyValueEntityStoreBuilder, "CovidEventProcessor");
         topology.addSink("NonceProcessor", "portal-nonce", "CovidEventProcessor");
         topology.addSink("NotificationProcessor", "portal-notification", "CovidEventProcessor");
+        topology.addSink("CityProcessor", "portal-city", "CovidEventProcessor");
+        topology.addSink("MapProcessor", "portal-map", "CovidEventProcessor");
+
         streamsProps.put(StreamsConfig.APPLICATION_ID_CONFIG, "covid-query");
         covidStreams = new KafkaStreams(topology, streamsProps);
         if(config.isCleanUp()) {
             covidStreams.cleanUp();
         }
         covidStreams.start();
+    }
+
+    public static class GlobalCityProcessor extends AbstractProcessor<String, String> {
+        private KeyValueStore<String, String> globalCityStore;
+
+        public GlobalCityProcessor() {
+
+        }
+
+        @Override
+        @SuppressWarnings("unchecked")
+        public void init(ProcessorContext context) {
+            globalCityStore = (KeyValueStore<String, String>) context.getStateStore(city);
+        }
+
+        @Override
+        public void process(String key, String value) {
+            globalCityStore.put(key, value);
+        }
+
+        @Override
+        public void close() {
+            globalCityStore = null;
+        }
+    }
+
+    public static class GlobalMapProcessor extends AbstractProcessor<String, String> {
+        private KeyValueStore<String, String> globalMapStore;
+
+        public GlobalMapProcessor() {
+
+        }
+
+        @Override
+        @SuppressWarnings("unchecked")
+        public void init(ProcessorContext context) {
+            globalMapStore = (KeyValueStore<String, String>) context.getStateStore(map);
+        }
+
+        @Override
+        public void process(String key, String value) {
+            globalMapStore.put(key, value);
+        }
+
+        @Override
+        public void close() {
+            globalMapStore = null;
+        }
     }
 
     public static class CovidEventProcessor extends AbstractProcessor<byte[], byte[]> {
@@ -147,7 +194,7 @@ public class CovidQueryStreams implements LightStreams {
                 cityMap.put("zoom", zoom);
                 cityMap.put("timestamp", timestamp);
                 cityMap.put("email", email);
-                cityStore.put(location,  JsonMapper.toJson(cityMap));
+                pc.forward(location.getBytes(StandardCharsets.UTF_8), JsonMapper.toJson(cityMap).getBytes(StandardCharsets.UTF_8), To.child("CityProcessor"));
                 pc.forward(email.getBytes(StandardCharsets.UTF_8), ByteUtil.longToBytes(nonce + 1), To.child("NonceProcessor"));
                 EventNotification notification = new EventNotification(nonce, true, null, cityMapCreatedEvent);
                 pc.forward(email.getBytes(StandardCharsets.UTF_8), notification.toString().getBytes(StandardCharsets.UTF_8), To.child("NotificationProcessor"));
@@ -168,7 +215,7 @@ public class CovidQueryStreams implements LightStreams {
                 cityMap.put("latitude", latitude);
                 cityMap.put("longitude", longitude);
                 cityMap.put("zoom", zoom);
-                cityStore.put(location, JsonMapper.toJson(cityMap));
+                pc.forward(location.getBytes(StandardCharsets.UTF_8), JsonMapper.toJson(cityMap).getBytes(StandardCharsets.UTF_8), To.child("CityProcessor"));
                 pc.forward(email.getBytes(StandardCharsets.UTF_8), ByteUtil.longToBytes(nonce + 1), To.child("NonceProcessor"));
                 EventNotification notification = new EventNotification(nonce, true, null, cityMapUpdatedEvent);
                 pc.forward(email.getBytes(StandardCharsets.UTF_8), notification.toString().getBytes(StandardCharsets.UTF_8), To.child("NotificationProcessor"));
@@ -177,13 +224,8 @@ public class CovidQueryStreams implements LightStreams {
                 if(logger.isTraceEnabled()) logger.trace("Event = " + cityMapDeletedEvent);
                 String email = cityMapDeletedEvent.getEventId().getId();
                 long nonce = cityMapDeletedEvent.getEventId().getNonce();
-                String country = cityMapDeletedEvent.getCountry();
-                String province = cityMapDeletedEvent.getProvince();
-                String city = cityMapDeletedEvent.getCity();
-                String location = country + "|" + province + "|" + city;
-                cityStore.delete(location);
                 pc.forward(email.getBytes(StandardCharsets.UTF_8), ByteUtil.longToBytes(nonce + 1), To.child("NonceProcessor"));
-                EventNotification notification = new EventNotification(nonce, true, null, cityMapDeletedEvent);
+                EventNotification notification = new EventNotification(nonce, false, "Cannot delete a city in a changelog topic.", cityMapDeletedEvent);
                 pc.forward(email.getBytes(StandardCharsets.UTF_8), notification.toString().getBytes(StandardCharsets.UTF_8), To.child("NotificationProcessor"));
             } else if(object instanceof CovidEntityCreatedEvent) {
                 CovidEntityCreatedEvent covidEntityCreatedEvent = (CovidEntityCreatedEvent)object;
@@ -192,12 +234,14 @@ public class CovidQueryStreams implements LightStreams {
                 String email = covidEntityCreatedEvent.getEventId().getId();
                 long nonce = covidEntityCreatedEvent.getEventId().getNonce();
                 String location = covidEntityCreatedEvent.getKey();
+                String userId = covidEntityCreatedEvent.getUserId();
                 String category = covidEntityCreatedEvent.getCategory();
                 String subcategory = covidEntityCreatedEvent.getSubcategory();
                 double latitude = covidEntityCreatedEvent.getLatitude();
                 double longitude = covidEntityCreatedEvent.getLongitude();
                 String introduction = covidEntityCreatedEvent.getIntroduction();
                 long timestamp = covidEntityCreatedEvent.getTimestamp();
+                String entityId = location + "|" + userId;
 
                 Map<String, Object> entityMap = new HashMap<>();
                 entityMap.put("category", category);
@@ -207,11 +251,50 @@ public class CovidQueryStreams implements LightStreams {
                 entityMap.put("introduction", introduction);
                 entityMap.put("timestamp", timestamp);
                 entityMap.put("email", email);
-                entityStore.put(location, JsonMapper.toJson(entityMap));
+                entityMap.put("userId", userId);
+                entityStore.put(entityId, JsonMapper.toJson(entityMap));
 
-                // TODO populate map store here.
+                // city must be there as it cannot be deleted in the global store backed with a compact topic portal-city
+                String cityString = cityStore.get(location);
 
+                Map<String, Object> point = createPoint(userId, category, subcategory, introduction, longitude, latitude);
+                String keyCategory = location + "|" + category;
+                String keySubCategory = keyCategory + "|" + subcategory;
 
+                String catString = mapStore.get(keyCategory);
+                if(catString == null) {
+                    // we need to create the entries.
+                    Map<String, Object> catMap = new HashMap<>();
+                    catMap.put("map", JsonMapper.string2Map(cityString));
+                    List<Map<String, Object>> points = new ArrayList<>();
+                    points.add(point);
+                    catMap.put("points", points);
+                    pc.forward(keyCategory.getBytes(StandardCharsets.UTF_8), JsonMapper.toJson(catMap).getBytes(StandardCharsets.UTF_8), To.child("MapProcessor"));
+                } else {
+                    // we need to update the entry to add userId only if it doesn't exist.
+                    Map<String, Object> catMap = JsonMapper.string2Map(catString);
+                    List<Map<String, Object>> points = (List<Map<String, Object>>)catMap.get("points");
+                    // remove the same userId entry to prevent duplication
+                    points.removeIf(p -> userId.equals(((Map<String, Object>)p.get("properties")).get("id")));
+                    points.add(point);
+                    pc.forward(keyCategory.getBytes(StandardCharsets.UTF_8), JsonMapper.toJson(catMap).getBytes(StandardCharsets.UTF_8), To.child("MapProcessor"));
+                }
+
+                String subString = mapStore.get(keySubCategory);
+                if(subString == null) {
+                    Map<String, Object> subMap = new HashMap<>();
+                    subMap.put("map", JsonMapper.string2Map(cityString));
+                    List<Map<String, Object>> points = new ArrayList<>();
+                    points.add(point);
+                    subMap.put("points", points);
+                    pc.forward(keySubCategory.getBytes(StandardCharsets.UTF_8), JsonMapper.toJson(subMap).getBytes(StandardCharsets.UTF_8), To.child("MapProcessor"));
+                } else {
+                    Map<String, Object> subMap = JsonMapper.string2Map(subString);
+                    List<Map<String, Object>> points = (List<Map<String, Object>>)subMap.get("points");
+                    points.removeIf(p -> userId.equals(((Map<String, Object>)p.get("properties")).get("id")));
+                    points.add(point);
+                    pc.forward(keySubCategory.getBytes(StandardCharsets.UTF_8), JsonMapper.toJson(subMap).getBytes(StandardCharsets.UTF_8), To.child("MapProcessor"));
+                }
                 pc.forward(email.getBytes(StandardCharsets.UTF_8), ByteUtil.longToBytes(nonce + 1), To.child("NonceProcessor"));
                 EventNotification notification = new EventNotification(nonce, true, null, covidEntityCreatedEvent);
                 pc.forward(email.getBytes(StandardCharsets.UTF_8), notification.toString().getBytes(StandardCharsets.UTF_8), To.child("NotificationProcessor"));
@@ -222,18 +305,42 @@ public class CovidQueryStreams implements LightStreams {
                 long nonce = covidEntityUpdatedEvent.getEventId().getNonce();
 
                 String location = covidEntityUpdatedEvent.getKey();
+                String userId = covidEntityUpdatedEvent.getUserId();
                 String category = covidEntityUpdatedEvent.getCategory();
                 String subcategory = covidEntityUpdatedEvent.getSubcategory();
                 double latitude = covidEntityUpdatedEvent.getLatitude();
                 double longitude = covidEntityUpdatedEvent.getLongitude();
                 String introduction = covidEntityUpdatedEvent.getIntroduction();
-                Map<String, Object> entityMap = JsonMapper.string2Map(entityStore.get(location));
+                String entityId = location + "|" + userId;
+                Map<String, Object> entityMap = JsonMapper.string2Map(entityStore.get(entityId));
                 entityMap.put("category", category);
                 entityMap.put("subcategory", subcategory);
                 entityMap.put("latitude", latitude);
                 entityMap.put("longitude", longitude);
                 entityMap.put("introduction", introduction);
-                entityStore.put(location, JsonMapper.toJson(entityMap));
+                entityStore.put(entityId, JsonMapper.toJson(entityMap));
+
+                // update the mapStore point.
+                Map<String, Object> point = createPoint(userId, category, subcategory, introduction, longitude, latitude);
+                String keyCategory = location + "|" + category;
+                String keySubCategory = keyCategory + "|" + subcategory;
+                String catString = mapStore.get(keyCategory);
+                if(catString != null) {
+                    Map<String, Object> catMap = JsonMapper.string2Map(catString);
+                    List<Map<String, Object>> catPoints = (List<Map<String, Object>>)catMap.get("points");
+                    catPoints.removeIf(p -> userId.equals(((Map<String, Object>)p.get("properties")).get("id")));
+                    catPoints.add(point);
+                    pc.forward(keyCategory.getBytes(StandardCharsets.UTF_8), JsonMapper.toJson(catMap).getBytes(StandardCharsets.UTF_8), To.child("MapProcessor"));
+                }
+
+                String subString = mapStore.get(keySubCategory);
+                if(subString != null) {
+                    Map<String, Object> subMap = JsonMapper.string2Map(subString);
+                    List<Map<String, Object>> subPoints = (List<Map<String, Object>>)subMap.get("points");
+                    subPoints.removeIf(p -> userId.equals(((Map<String, Object>)p.get("properties")).get("id")));
+                    subPoints.add(point);
+                    pc.forward(keySubCategory.getBytes(StandardCharsets.UTF_8), JsonMapper.toJson(subMap).getBytes(StandardCharsets.UTF_8), To.child("MapProcessor"));
+                }
 
                 pc.forward(email.getBytes(StandardCharsets.UTF_8), ByteUtil.longToBytes(nonce + 1), To.child("NonceProcessor"));
                 EventNotification notification = new EventNotification(nonce, true, null, covidEntityUpdatedEvent);
@@ -245,14 +352,64 @@ public class CovidQueryStreams implements LightStreams {
                 String email = covidEntityDeletedEvent.getEventId().getId();
                 long nonce = covidEntityDeletedEvent.getEventId().getNonce();
                 String location = covidEntityDeletedEvent.getKey();
+                String userId = covidEntityDeletedEvent.getUserId();
+                String entityId = location + "|" + userId;
+                String entityString = entityStore.delete(entityId);
+                if(entityString == null) {
+                    // could not find the entity.
+                    EventNotification notification = new EventNotification(nonce, false, "entity not found for " + location, covidEntityDeletedEvent);
+                    pc.forward(email.getBytes(StandardCharsets.UTF_8), notification.toString().getBytes(StandardCharsets.UTF_8), To.child("NotificationProcessor"));
+                    return;
+                }
+                Map<String, Object> entityMap = JsonMapper.string2Map(entityString);
+                String category = (String)entityMap.get("category");
+                String subcategory = (String)entityMap.get("subcategory");
 
-                entityStore.delete(location);
+                // delete the entry from the mapStore.
+                String keyCategory = location + "|" + category;
+                String keySubCategory = keyCategory + "|" + subcategory;
+                String catString = mapStore.get(keyCategory);
+                if(catString != null) {
+                    Map<String, Object> catMap = JsonMapper.string2Map(catString);
+                    List<Map<String, Object>> catPoints = (List<Map<String, Object>>)catMap.get("points");
+                    catPoints.removeIf(p -> userId.equals(((Map<String, Object>)p.get("properties")).get("id")));
+                    pc.forward(keyCategory.getBytes(StandardCharsets.UTF_8), JsonMapper.toJson(catMap).getBytes(StandardCharsets.UTF_8), To.child("MapProcessor"));
+                }
+
+                String subString = mapStore.get(keySubCategory);
+                if(subString != null) {
+                    Map<String, Object> subMap = JsonMapper.string2Map(subString);
+                    List<Map<String, Object>> subPoints = (List<Map<String, Object>>)subMap.get("points");
+                    subPoints.removeIf(p -> userId.equals(((Map<String, Object>)p.get("properties")).get("id")));
+                    pc.forward(keySubCategory.getBytes(StandardCharsets.UTF_8), JsonMapper.toJson(subMap).getBytes(StandardCharsets.UTF_8), To.child("MapProcessor"));
+                }
+
                 pc.forward(email.getBytes(StandardCharsets.UTF_8), ByteUtil.longToBytes(nonce + 1), To.child("NonceProcessor"));
                 EventNotification notification = new EventNotification(nonce, true, null, covidEntityDeletedEvent);
                 pc.forward(email.getBytes(StandardCharsets.UTF_8), notification.toString().getBytes(StandardCharsets.UTF_8), To.child("NotificationProcessor"));
-            } else {
-                if(logger.isDebugEnabled()) logger.warn("Unknown Covid Event " + object.getClass().getName());
             }
+        }
+
+        public Map<String, Object> createPoint(String userId, String category, String subcategory, String introduction, double longitude, double latitude) {
+            Map<String, Object> point = new HashMap<>();
+            point.put("type", "Feature");
+
+            Map<String, Object> properties = new HashMap<>();
+            properties.put("cluster", false);
+            properties.put("id", userId);
+            properties.put("category", category);
+            properties.put("subcategory", subcategory);
+            properties.put("introduction", introduction);
+            point.put("properties", properties);
+
+            Map<String, Object> geometry = new HashMap<>();
+            geometry.put("type", "Point");
+            List<Double> coordinates = new ArrayList<>();
+            coordinates.add(longitude);
+            coordinates.add(latitude);
+            geometry.put("coordinates", coordinates);
+            point.put("geometry", geometry);
+            return point;
         }
 
         @Override

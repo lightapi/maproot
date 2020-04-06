@@ -53,10 +53,11 @@ public class GetEntity implements Handler {
         String country = (String)userMap.get("country");
         String province = (String)userMap.get("province");
         String city = (String)userMap.get("city");
+        String userId = (String)userMap.get("userId");
         if(country == null || province == null || city == null) {
             return NioUtils.toByteBuffer(getStatus(exchange, COUNTRY_PROVINCE_CITY_EMPTY, country, province, city));
         }
-        String key = country + "|" + province + "|" + city;
+        String key = country + "|" + province + "|" + city + "|" + userId;
         ReadOnlyKeyValueStore<String, String> keyValueStore = CovidQueryStartup.streams.getEntityStore();
         String data = keyValueStore.get(key);
         if(data != null) {

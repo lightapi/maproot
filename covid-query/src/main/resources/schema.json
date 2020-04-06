@@ -31,15 +31,24 @@
         "city": {
           "type": "string",
           "description": "city"
+        },
+        "category": {
+          "type": "string",
+          "description": "category"
+        },
+        "subcategory": {
+          "type": "string",
+          "description": "subcategory"
         }
       },
       "required": [
         "country",
         "province",
-        "city"
+        "city",
+        "category"
       ]
     },
-    "scope": "portal.r"
+    "skipAuth": true
   },
   "lightapi.net/covid/getCity/0.1.0": {
     "schema": {
