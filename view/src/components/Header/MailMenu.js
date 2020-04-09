@@ -12,13 +12,16 @@ import {
 import { Badge, Typography } from "../Wrappers/Wrappers";
 import UserAvatar from "../UserAvatar/UserAvatar";
 import classNames from "classnames";
+import { useUserState } from "../../context/UserContext";
+import { useApiGet } from '../../hooks/useApiGet';
+import CircularProgress from '@material-ui/core/CircularProgress';
 
 const messages = [
   {
     id: 0,
     variant: "warning",
     name: "Jane Hew",
-    message: "Hey! How is it going?",
+    message: "Hey! How is it going? I am at home and everything looks normal. Call me if you have time. Thanks.",
     time: "9:32",
   },
   {
@@ -44,14 +47,52 @@ const messages = [
   },
 ];
 
+function timeConversion(millisec) {
 
+  var seconds = (millisec / 1000).toFixed(1);
+
+  var minutes = (millisec / (1000 * 60)).toFixed(1);
+
+  var hours = (millisec / (1000 * 60 * 60)).toFixed(1);
+
+  var days = (millisec / (1000 * 60 * 60 * 24)).toFixed(1);
+
+  if (seconds < 60) {
+      return seconds + " S";
+  } else if (minutes < 60) {
+      return minutes + " M";
+  } else if (hours < 24) {
+      return hours + " H";
+  } else {
+      return days + " D"
+  }
+}
 
 export default function MailMenu(props) {
     var [mailMenu, setMailMenu] = useState(null);
     var [isMailsUnread, setIsMailsUnread] = useState(true);
     var classes = props.classes;
+    var { userId } = useUserState();
+    const cmd = {
+      host: 'lightapi.net',
+      service: 'user',
+      action: 'getPrivateMessage',
+      version: '0.1.0',
+      data: { email: userId }
+    };
 
-    return (
+    const url = '/portal/query?cmd=' + encodeURIComponent(JSON.stringify(cmd));
+    const headers = {};
+    const { isLoading, data, error } = useApiGet({url, headers});
+    console.log("data", data);
+    console.log("error", error);
+    console.log("isLoading", isLoading);
+
+    let wait;
+    if(isLoading) {
+      wait = <div><CircularProgress/></div>;
+    } else {
+      wait = (
         <React.Fragment>
         <IconButton
           color="inherit"
@@ -64,7 +105,7 @@ export default function MailMenu(props) {
           className={classes.headerMenuButton}
         >
           <Badge
-            badgeContent={isMailsUnread ? messages.length : null}
+            badgeContent={isMailsUnread ? data.length : null}
             color="secondary"
           >
             <MailIcon classes={{ root: classes.headerIcon }} />
@@ -89,15 +130,15 @@ export default function MailMenu(props) {
               component="a"
               color="secondary"
             >
-              {messages.length} New Messages
+              {data.length} New Messages
             </Typography>
           </div>
-          {messages.map(message => (
-            <MenuItem key={message.id} className={classes.messageNotification}>
+          {data.map((message, index) => (
+            <MenuItem key={index} className={classes.messageNotification}>
               <div className={classes.messageNotificationSide}>
-                <UserAvatar color={message.variant} name={message.name} />
+                <UserAvatar color="primary" name={message.fromId} />
                 <Typography size="sm" color="text" colorBrightness="secondary">
-                  {message.time}
+                  {timeConversion((new Date()).getTime() - message.timestamp)}
                 </Typography>
               </div>
               <div
@@ -107,10 +148,10 @@ export default function MailMenu(props) {
                 )}
               >
                 <Typography weight="medium" gutterBottom>
-                  {message.name}
+                  {message.fromId} -> {message.subject}
                 </Typography>
                 <Typography color="text" colorBrightness="secondary">
-                  {message.message}
+                  {message.content}
                 </Typography>
               </div>
             </MenuItem>
@@ -126,5 +167,11 @@ export default function MailMenu(props) {
           </Fab>
         </Menu>
         </React.Fragment>
+      )  
+    }    
+    return (
+      <div>
+        {wait}  
+      </div>
     )
 }
