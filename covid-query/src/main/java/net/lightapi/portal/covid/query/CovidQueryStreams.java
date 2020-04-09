@@ -54,7 +54,7 @@ public class CovidQueryStreams implements LightStreams {
         return covidStreams.store(entity, QueryableStoreTypes.keyValueStore());
     }
 
-    private void startCovidStreams() {
+    private void startCovidStreams(String ip, int port) {
 
         StoreBuilder<KeyValueStore<String, String>> globalCityStoreBuilder =
                 Stores.keyValueStoreBuilder(Stores.persistentKeyValueStore(city),
@@ -83,6 +83,7 @@ public class CovidQueryStreams implements LightStreams {
         topology.addSink("MapProcessor", "portal-map", "CovidEventProcessor");
 
         streamsProps.put(StreamsConfig.APPLICATION_ID_CONFIG, "covid-query");
+        streamsProps.put(StreamsConfig.APPLICATION_SERVER_CONFIG, ip + ":" + port);
         covidStreams = new KafkaStreams(topology, streamsProps);
         if(config.isCleanUp()) {
             covidStreams.cleanUp();
@@ -420,7 +421,7 @@ public class CovidQueryStreams implements LightStreams {
     @Override
     public void start(String ip, int port) {
         if(logger.isDebugEnabled()) logger.debug("CovidStreams is starting...");
-        startCovidStreams();
+        startCovidStreams(ip, port);
     }
 
     @Override
