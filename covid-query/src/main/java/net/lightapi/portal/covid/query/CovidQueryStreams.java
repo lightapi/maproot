@@ -23,7 +23,7 @@ import java.util.*;
 
 public class CovidQueryStreams implements LightStreams {
     static private final Logger logger = LoggerFactory.getLogger(CovidQueryStreams.class);
-
+    private static final String APP = "covid";
     static private Properties streamsProps;
     static final KafkaStreamsConfig config = (KafkaStreamsConfig) Config.getInstance().getJsonObjectConfig(KafkaStreamsConfig.CONFIG_NAME, KafkaStreamsConfig.class);
     static {
@@ -52,6 +52,14 @@ public class CovidQueryStreams implements LightStreams {
 
     public ReadOnlyKeyValueStore<String, String> getEntityStore() {
         return covidStreams.store(entity, QueryableStoreTypes.keyValueStore());
+    }
+
+    public StreamsMetadata getEntityStreamsMetadata(String key) {
+        return covidStreams.metadataForKey(entity, key, Serdes.String().serializer());
+    }
+
+    public Collection<StreamsMetadata> getAllEntityStreamsMetadata() {
+        return covidStreams.allMetadataForStore(entity);
     }
 
     private void startCovidStreams(String ip, int port) {
@@ -197,7 +205,7 @@ public class CovidQueryStreams implements LightStreams {
                 cityMap.put("email", email);
                 pc.forward(location.getBytes(StandardCharsets.UTF_8), JsonMapper.toJson(cityMap).getBytes(StandardCharsets.UTF_8), To.child("CityProcessor"));
                 pc.forward(email.getBytes(StandardCharsets.UTF_8), ByteUtil.longToBytes(nonce + 1), To.child("NonceProcessor"));
-                EventNotification notification = new EventNotification(nonce, true, null, cityMapCreatedEvent);
+                EventNotification notification = new EventNotification(nonce, APP, cityMapCreatedEvent.getClass().getSimpleName(), true, null, cityMapCreatedEvent);
                 pc.forward(email.getBytes(StandardCharsets.UTF_8), notification.toString().getBytes(StandardCharsets.UTF_8), To.child("NotificationProcessor"));
             } else if(object instanceof CityMapUpdatedEvent) {
                 CityMapUpdatedEvent cityMapUpdatedEvent = (CityMapUpdatedEvent)object;
@@ -218,7 +226,7 @@ public class CovidQueryStreams implements LightStreams {
                 cityMap.put("zoom", zoom);
                 pc.forward(location.getBytes(StandardCharsets.UTF_8), JsonMapper.toJson(cityMap).getBytes(StandardCharsets.UTF_8), To.child("CityProcessor"));
                 pc.forward(email.getBytes(StandardCharsets.UTF_8), ByteUtil.longToBytes(nonce + 1), To.child("NonceProcessor"));
-                EventNotification notification = new EventNotification(nonce, true, null, cityMapUpdatedEvent);
+                EventNotification notification = new EventNotification(nonce, APP, cityMapUpdatedEvent.getClass().getSimpleName(), true, null, cityMapUpdatedEvent);
                 pc.forward(email.getBytes(StandardCharsets.UTF_8), notification.toString().getBytes(StandardCharsets.UTF_8), To.child("NotificationProcessor"));
             } else if(object instanceof CityMapDeletedEvent) {
                 CityMapDeletedEvent cityMapDeletedEvent = (CityMapDeletedEvent)object;
@@ -226,7 +234,7 @@ public class CovidQueryStreams implements LightStreams {
                 String email = cityMapDeletedEvent.getEventId().getId();
                 long nonce = cityMapDeletedEvent.getEventId().getNonce();
                 pc.forward(email.getBytes(StandardCharsets.UTF_8), ByteUtil.longToBytes(nonce + 1), To.child("NonceProcessor"));
-                EventNotification notification = new EventNotification(nonce, false, "Cannot delete a city in a changelog topic.", cityMapDeletedEvent);
+                EventNotification notification = new EventNotification(nonce, APP, cityMapDeletedEvent.getClass().getSimpleName(), false, "Cannot delete a city in a changelog topic.", cityMapDeletedEvent);
                 pc.forward(email.getBytes(StandardCharsets.UTF_8), notification.toString().getBytes(StandardCharsets.UTF_8), To.child("NotificationProcessor"));
             } else if(object instanceof CovidEntityCreatedEvent) {
                 CovidEntityCreatedEvent covidEntityCreatedEvent = (CovidEntityCreatedEvent)object;
@@ -297,7 +305,7 @@ public class CovidQueryStreams implements LightStreams {
                     pc.forward(keySubCategory.getBytes(StandardCharsets.UTF_8), JsonMapper.toJson(subMap).getBytes(StandardCharsets.UTF_8), To.child("MapProcessor"));
                 }
                 pc.forward(email.getBytes(StandardCharsets.UTF_8), ByteUtil.longToBytes(nonce + 1), To.child("NonceProcessor"));
-                EventNotification notification = new EventNotification(nonce, true, null, covidEntityCreatedEvent);
+                EventNotification notification = new EventNotification(nonce, APP, covidEntityCreatedEvent.getClass().getSimpleName(), true, null, covidEntityCreatedEvent);
                 pc.forward(email.getBytes(StandardCharsets.UTF_8), notification.toString().getBytes(StandardCharsets.UTF_8), To.child("NotificationProcessor"));
             } else if(object instanceof CovidEntityUpdatedEvent) {
                 CovidEntityUpdatedEvent covidEntityUpdatedEvent = (CovidEntityUpdatedEvent)object;
@@ -344,7 +352,7 @@ public class CovidQueryStreams implements LightStreams {
                 }
 
                 pc.forward(email.getBytes(StandardCharsets.UTF_8), ByteUtil.longToBytes(nonce + 1), To.child("NonceProcessor"));
-                EventNotification notification = new EventNotification(nonce, true, null, covidEntityUpdatedEvent);
+                EventNotification notification = new EventNotification(nonce, APP, covidEntityUpdatedEvent.getClass().getSimpleName(), true, null, covidEntityUpdatedEvent);
                 pc.forward(email.getBytes(StandardCharsets.UTF_8), notification.toString().getBytes(StandardCharsets.UTF_8), To.child("NotificationProcessor"));
             } else if(object instanceof CovidEntityDeletedEvent) {
                 CovidEntityDeletedEvent covidEntityDeletedEvent = (CovidEntityDeletedEvent)object;
@@ -358,7 +366,7 @@ public class CovidQueryStreams implements LightStreams {
                 String entityString = entityStore.delete(entityId);
                 if(entityString == null) {
                     // could not find the entity.
-                    EventNotification notification = new EventNotification(nonce, false, "entity not found for " + location, covidEntityDeletedEvent);
+                    EventNotification notification = new EventNotification(nonce, APP, covidEntityDeletedEvent.getClass().getSimpleName(), false, "entity not found for " + location, covidEntityDeletedEvent);
                     pc.forward(email.getBytes(StandardCharsets.UTF_8), notification.toString().getBytes(StandardCharsets.UTF_8), To.child("NotificationProcessor"));
                     return;
                 }
@@ -386,7 +394,7 @@ public class CovidQueryStreams implements LightStreams {
                 }
 
                 pc.forward(email.getBytes(StandardCharsets.UTF_8), ByteUtil.longToBytes(nonce + 1), To.child("NonceProcessor"));
-                EventNotification notification = new EventNotification(nonce, true, null, covidEntityDeletedEvent);
+                EventNotification notification = new EventNotification(nonce, APP, covidEntityDeletedEvent.getClass().getSimpleName(), true, null, covidEntityDeletedEvent);
                 pc.forward(email.getBytes(StandardCharsets.UTF_8), notification.toString().getBytes(StandardCharsets.UTF_8), To.child("NotificationProcessor"));
             }
         }

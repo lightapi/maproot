@@ -4,16 +4,21 @@ package net.lightapi.portal.covid.query.handler;
 import com.networknt.config.JsonMapper;
 import com.networknt.httpstring.AttachmentConstants;
 import com.networknt.monad.Result;
+import com.networknt.server.Server;
+import com.networknt.utility.NetUtils;
 import com.networknt.utility.NioUtils;
 import com.networknt.rpc.Handler;
 import com.networknt.rpc.router.ServiceHandler;
 import java.nio.ByteBuffer;
+import java.util.Collection;
+import java.util.Iterator;
 import java.util.Map;
 
 import io.undertow.server.HttpServerExchange;
 import net.lightapi.portal.HybridQueryClient;
 import net.lightapi.portal.covid.query.CovidQueryStartup;
 import org.apache.kafka.streams.state.ReadOnlyKeyValueStore;
+import org.apache.kafka.streams.state.StreamsMetadata;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -63,6 +68,25 @@ public class GetEntity implements Handler {
         if(data != null) {
             return NioUtils.toByteBuffer(data);
         } else {
+            Collection<StreamsMetadata> collection = CovidQueryStartup.streams.getAllEntityStreamsMetadata();
+            if(logger.isDebugEnabled()) logger.debug("connection size = " + collection.size());
+            Iterator<StreamsMetadata> iterator = collection.iterator();
+            while(iterator.hasNext()) {
+                StreamsMetadata metadata = iterator.next();
+                String url = "https://" + metadata.host() + ":" + metadata.port();
+                if(NetUtils.getLocalAddressByDatagram().equals(metadata.host()) && Server.config.getHttpsPort() == metadata.port()) {
+                    if(logger.isDebugEnabled()) logger.debug("skip same host with url = " + url);
+                    continue;
+                } else {
+                    if(logger.isDebugEnabled()) logger.debug("iterate url = " + url);
+                    Result<String> resultEntity = HybridQueryClient.getEntity(exchange, url, email);
+                    if(resultEntity.isSuccess()) {
+                        return NioUtils.toByteBuffer(resultEntity.getResult());
+                    } else {
+                        logger.error(resultEntity.getError().toString());
+                    }
+                }
+            }
             return NioUtils.toByteBuffer(getStatus(exchange, ENTITY_NOT_FOUND, country, province, city));
         }
     }
