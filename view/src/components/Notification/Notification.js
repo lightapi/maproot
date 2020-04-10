@@ -14,6 +14,7 @@ import {
   AccountBox as CustomerIcon,
   Done as ShippedIcon,
   Publish as UploadIcon,
+  AcUnit as CovidIcon,
 } from "@material-ui/icons";
 import { useTheme } from "@material-ui/styles";
 import classnames from "classnames";
@@ -24,12 +25,13 @@ import useStyles from "./styles";
 
 // components
 import { Typography } from "../Wrappers";
+import { timeConversion } from '../../Utils';
 
 const typesIcons = {
   "e-commerce": <ShoppingCartIcon />,
   notification: <NotificationsIcon />,
-  offer: <TicketIcon />,
-  info: <ThumbUpIcon />,
+  user: <CustomerIcon />,
+  covid: <CovidIcon />,
   message: <MessageIcon />,
   feedback: <FeedbackIcon />,
   customer: <CustomerIcon />,
@@ -42,10 +44,11 @@ const typesIcons = {
 };
 
 export default function Notification({ variant, ...props }) {
+  console.log("variant = ", variant);
   var classes = useStyles();
   var theme = useTheme();
-
-  const icon = getIconByType(props.type);
+  const color = props.success ? "success" : "error";
+  const icon = getIconByType(props.app || "user");
   const iconWithStyles = React.cloneElement(icon, {
     classes: {
       root: classes.notificationIcon,
@@ -53,8 +56,8 @@ export default function Notification({ variant, ...props }) {
     style: {
       color:
         variant !== "contained" &&
-        theme.palette[props.color] &&
-        theme.palette[props.color].main,
+        theme.palette[color] &&
+        theme.palette[color].main,
     },
   });
 
@@ -95,7 +98,7 @@ export default function Notification({ variant, ...props }) {
           variant={props.typographyVariant}
           size={variant !== "contained" && !props.typographyVariant && "md"}
         >
-          {props.message}
+          {props.name} {timeConversion((new Date()).getTime() - props.event.timestamp)}
         </Typography>
         {props.extraButton && props.extraButtonClick && (
           <Button

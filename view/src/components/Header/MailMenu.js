@@ -15,58 +15,7 @@ import classNames from "classnames";
 import { useUserState } from "../../context/UserContext";
 import { useApiGet } from '../../hooks/useApiGet';
 import CircularProgress from '@material-ui/core/CircularProgress';
-
-const messages = [
-  {
-    id: 0,
-    variant: "warning",
-    name: "Jane Hew",
-    message: "Hey! How is it going? I am at home and everything looks normal. Call me if you have time. Thanks.",
-    time: "9:32",
-  },
-  {
-    id: 1,
-    variant: "success",
-    name: "Lloyd Brown",
-    message: "Check out my new Dashboard",
-    time: "9:18",
-  },
-  {
-    id: 2,
-    variant: "primary",
-    name: "Mark Winstein",
-    message: "I want rearrange the appointment",
-    time: "9:15",
-  },
-  {
-    id: 3,
-    variant: "secondary",
-    name: "Liana Dutti",
-    message: "Good news from sale department",
-    time: "9:09",
-  },
-];
-
-function timeConversion(millisec) {
-
-  var seconds = (millisec / 1000).toFixed(1);
-
-  var minutes = (millisec / (1000 * 60)).toFixed(1);
-
-  var hours = (millisec / (1000 * 60 * 60)).toFixed(1);
-
-  var days = (millisec / (1000 * 60 * 60 * 24)).toFixed(1);
-
-  if (seconds < 60) {
-      return seconds + " S";
-  } else if (minutes < 60) {
-      return minutes + " M";
-  } else if (hours < 24) {
-      return hours + " H";
-  } else {
-      return days + " D"
-  }
-}
+import { timeConversion } from '../../Utils';
 
 export default function MailMenu(props) {
     var [mailMenu, setMailMenu] = useState(null);

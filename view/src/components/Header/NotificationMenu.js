@@ -9,35 +9,67 @@ import {
 } from "@material-ui/icons";
 import { Badge } from "../Wrappers/Wrappers";
 import Notification from "../Notification/Notification";
+import { useUserState } from "../../context/UserContext";
+import { useApiGet } from '../../hooks/useApiGet';
+import CircularProgress from '@material-ui/core/CircularProgress';
 
+/*
 const notifications = [
-  { id: 0, color: "warning", message: "Check out this awesome ticket" },
+  { 
+    nonce: 0, 
+    app: "user",
+    name: "UserCreatedEvent",
+    success: true,
+    timestamp: 1586491620047
+  },  
   {
-    id: 1,
-    color: "success",
-    type: "info",
-    message: "What is the best way to get ...",
+    nonce: 1,
+    app: "user",
+    name: "UserUpdatedEvent",
+    success: false,
+    timestamp: 1586491620047
   },
   {
-    id: 2,
-    color: "secondary",
-    type: "notification",
-    message: "This is just a simple notification",
+    nonce: 2,
+    app: "covid",
+    name: "CovidEntityUpdatedEvent",
+    success: true,
+    timestamp: 1586491620047
   },
   {
-    id: 3,
-    color: "primary",
-    type: "e-commerce",
-    message: "12 new orders has arrived today",
+    nonce: 3,
+    app: "covid",
+    name: "CovidEntityUpdatedEvent",
+    success: false,
+    timestamp: 1586491620047
   },
 ];
+*/
 
 export default function NotificationMenu(props) {
     var [notificationsMenu, setNotificationsMenu] = useState(null);
     var [isNotificationsUnread, setIsNotificationsUnread] = useState(true);
     var classes = props.classes;
+    var { userId } = useUserState();
+    const cmd = {
+      host: 'lightapi.net',
+      service: 'user',
+      action: 'getNotification',
+      version: '0.1.0',
+      data: { email: userId }
+    };
 
-    return (
+    const url = '/portal/query?cmd=' + encodeURIComponent(JSON.stringify(cmd));
+    const headers = {};
+    const { isLoading, data, error } = useApiGet({url, headers});
+    console.log("data", data);
+    console.log("error", error);
+    console.log("isLoading", isLoading);
+    let wait;
+    if(isLoading) {
+      wait = <div><CircularProgress/></div>;
+    } else {
+      wait = (
         <React.Fragment>
         <IconButton
           color="inherit"
@@ -50,7 +82,7 @@ export default function NotificationMenu(props) {
           className={classes.headerMenuButton}
         >
           <Badge
-            badgeContent={isNotificationsUnread ? notifications.length : null}
+            badgeContent={isNotificationsUnread ? data.length : null}
             color="warning"
           >
             <NotificationsIcon classes={{ root: classes.headerIcon }} />
@@ -64,9 +96,9 @@ export default function NotificationMenu(props) {
           className={classes.headerMenu}
           disableAutoFocusItem
         >
-          {notifications.map(notification => (
+          {data.map(notification => (
             <MenuItem
-              key={notification.id}
+              key={notification.nonce}
               onClick={() => setNotificationsMenu(null)}
               className={classes.headerMenuItem}
             >
@@ -75,5 +107,12 @@ export default function NotificationMenu(props) {
           ))}
         </Menu>
         </React.Fragment>
+       
+      )    
+    }  
+    return (
+      <div>
+        {wait}  
+      </div>
     )
 }
