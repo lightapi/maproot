@@ -32,8 +32,9 @@ public class GetEntity implements Handler {
     @Override
     public ByteBuffer handle(HttpServerExchange exchange, Object input)  {
         if(logger.isTraceEnabled()) logger.trace("input = " + input);
-        Map<String, String> map = (Map<String, String>)input;
-        String email = map.get("email");
+        Map<String, Object> map = (Map<String, Object>)input;
+        String email = (String)map.get("email");
+        Boolean indirect = (Boolean)map.get("indirect");
         Map<String, Object> auditInfo = exchange.getAttachment(AttachmentConstants.AUDIT_INFO);
         if(auditInfo != null) {
             String userId = (String)auditInfo.get("user_id");
@@ -68,22 +69,24 @@ public class GetEntity implements Handler {
         if(data != null) {
             return NioUtils.toByteBuffer(data);
         } else {
-            Collection<StreamsMetadata> collection = CovidQueryStartup.streams.getAllEntityStreamsMetadata();
-            if(logger.isDebugEnabled()) logger.debug("connection size = " + collection.size());
-            Iterator<StreamsMetadata> iterator = collection.iterator();
-            while(iterator.hasNext()) {
-                StreamsMetadata metadata = iterator.next();
-                String url = "https://" + metadata.host() + ":" + metadata.port();
-                if(NetUtils.getLocalAddressByDatagram().equals(metadata.host()) && Server.config.getHttpsPort() == metadata.port()) {
-                    if(logger.isDebugEnabled()) logger.debug("skip same host with url = " + url);
-                    continue;
-                } else {
-                    if(logger.isDebugEnabled()) logger.debug("iterate url = " + url);
-                    Result<String> resultEntity = HybridQueryClient.getEntity(exchange, url, email);
-                    if(resultEntity.isSuccess()) {
-                        return NioUtils.toByteBuffer(resultEntity.getResult());
+            if(indirect == null || !indirect.booleanValue()) {
+                Collection<StreamsMetadata> collection = CovidQueryStartup.streams.getAllEntityStreamsMetadata();
+                if(logger.isDebugEnabled()) logger.debug("connection size = " + collection.size());
+                Iterator<StreamsMetadata> iterator = collection.iterator();
+                while(iterator.hasNext()) {
+                    StreamsMetadata metadata = iterator.next();
+                    String url = "https://" + metadata.host() + ":" + metadata.port();
+                    if(NetUtils.getLocalAddressByDatagram().equals(metadata.host()) && Server.config.getHttpsPort() == metadata.port()) {
+                        if(logger.isDebugEnabled()) logger.debug("skip same host with url = " + url);
+                        continue;
                     } else {
-                        logger.error(resultEntity.getError().toString());
+                        if(logger.isDebugEnabled()) logger.debug("iterate url = " + url);
+                        Result<String> resultEntity = HybridQueryClient.getEntity(exchange, url, email);
+                        if(resultEntity.isSuccess()) {
+                            return NioUtils.toByteBuffer(resultEntity.getResult());
+                        } else {
+                            logger.error(resultEntity.getError().toString());
+                        }
                     }
                 }
             }
