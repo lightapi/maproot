@@ -15,6 +15,22 @@
     },
     "scope": "portal.r"
   },
+  "lightapi.net/covid/getStatusByEmail/0.1.0": {
+    "schema": {
+      "title": "Service",
+      "type": "object",
+      "properties": {
+        "email": {
+          "type": "string",
+          "description": "email"
+        }
+      },
+      "required": [
+        "email"
+      ]
+    },
+    "scope": "portal.r"
+  },
   "lightapi.net/covid/getCityMap/0.1.0": {
     "schema": {
       "title": "Service",
@@ -46,6 +62,22 @@
         "province",
         "city",
         "category"
+      ]
+    },
+    "skipAuth": true
+  },
+  "lightapi.net/covid/getStatusByUserId/0.1.0": {
+    "schema": {
+      "title": "Service",
+      "type": "object",
+      "properties": {
+        "userId": {
+          "type": "string",
+          "description": "userId"
+        }
+      },
+      "required": [
+        "userId"
       ]
     },
     "skipAuth": true
