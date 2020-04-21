@@ -10,19 +10,15 @@ export const useApiGet = ({ url, headers }) => {
     data: null,
     error: null,
   });
-  const cookies = new Cookies();
-
-  //console.log(cookies);
-  Object.assign(headers, {'X-CSRF-TOKEN': cookies.get('csrf')})
-  //console.log(headers);
 
   useEffect(() => {
     const abortController = new AbortController();
 
     const fetchData = async () => {
       dispatch(requestStarted());
-
       try {
+        const cookies = new Cookies();
+        Object.assign(headers, {'X-CSRF-TOKEN': cookies.get('csrf')})
         const response = await fetch(url, { headers, credentials: 'include', signal: abortController.signal });
         //console.log(response);
         if (!response.ok) {

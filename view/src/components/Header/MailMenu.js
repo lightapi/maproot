@@ -26,7 +26,6 @@ export default function MailMenu(props) {
     var [loading, setLoading] = useState(false);
     var classes = props.classes;
     var { userId } = useUserState();
-    const cookies = new Cookies();
 
     //console.log("csrf = ", csrf);
     const cmd = {
@@ -38,7 +37,6 @@ export default function MailMenu(props) {
     };
 
     const url = '/portal/query?cmd=' + encodeURIComponent(JSON.stringify(cmd));
-    const headers = {'X-CSRF-TOKEN': cookies.get('csrf')};
 
     const queryMessageFn = async (url, headers) => {
       try {
@@ -62,6 +60,8 @@ export default function MailMenu(props) {
     };
 
     useInterval(() => {
+      const cookies = new Cookies();
+      const headers = {'X-CSRF-TOKEN': cookies.get('csrf')};
       queryMessageFn(url, headers);
     }, 60000);
 

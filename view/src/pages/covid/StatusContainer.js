@@ -70,9 +70,9 @@ export default function StatusContainer(props) {
     };
 
     const submit = async (url, headers, action) => {
-      const cookies = new Cookies();
-      Object.assign(headers, {'X-CSRF-TOKEN': cookies.get('csrf')})
       try {
+        const cookies = new Cookies();
+        Object.assign(headers, {'X-CSRF-TOKEN': cookies.get('csrf')})
         const response = await fetch(url, { method: 'POST', body: JSON.stringify(action), headers, credentials: 'include'});
         const s = await response.text();
         console.log("submit response", s);
