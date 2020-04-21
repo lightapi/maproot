@@ -17,10 +17,7 @@ import Form from "../Form/Form";
 
 // pages
 import Dashboard from "../../pages/dashboard";
-import Typography from "../../pages/typography";
 import Notifications from "../../pages/notifications";
-import Icons from "../../pages/icons";
-import Charts from "../../pages/charts";
 import Failure from "../../pages/failure";
 import Success from "../../pages/success";
 import Profile from "../../pages/profile";
@@ -57,7 +54,6 @@ function Layout(props) {
             <Switch>
               <Route path="/app/dashboard" component={Dashboard} />
               <Route exact path="/app/form/:formId" component={Form} />
-              <Route path="/app/typography" component={Typography} />
               <Route path="/app/notifications" component={Notifications} />
               <Route path="/app/failure" component={Failure} />
               <Route path="/app/success" component={Success} />
@@ -77,8 +73,6 @@ function Layout(props) {
                 path="/app/ui"
                 render={() => <Redirect to="/app/ui/icons" />}
               />
-              <Route path="/app/ui/icons" component={Icons} />
-              <Route path="/app/ui/charts" component={Charts} />
             </Switch>
           </div>
         </>

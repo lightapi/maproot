@@ -2,17 +2,6 @@ import React from "react";
 import {
   Grid,
 } from "@material-ui/core";
-import { useTheme } from "@material-ui/styles";
-import {
-  ResponsiveContainer,
-  LineChart,
-  Line,
-  PieChart,
-  Pie,
-  Cell,
-} from "recharts";
-
-// styles
 import useStyles from "./styles";
 
 // components
@@ -21,16 +10,8 @@ import PageTitle from "../../components/PageTitle";
 import { Typography } from "../../components/Wrappers";
 import Dot from "../../components/Sidebar/components/Dot";
 
-const PieChartData = [
-  { name: "Group A", value: 400, color: "primary" },
-  { name: "Group B", value: 300, color: "secondary" },
-  { name: "Group C", value: 300, color: "warning" },
-  { name: "Group D", value: 200, color: "success" },
-];
-
 export default function Dashboard(props) {
   var classes = useStyles();
-  var theme = useTheme();
 
   return (
     <>
@@ -47,26 +28,6 @@ export default function Dashboard(props) {
               <Typography size="xl" weight="medium">
                 19
               </Typography>
-              <LineChart
-                width={55}
-                height={30}
-                data={[
-                  { value: 10 },
-                  { value: 15 },
-                  { value: 10 },
-                  { value: 17 },
-                  { value: 18 },
-                ]}
-                margin={{ left: theme.spacing(2) }}
-              >
-                <Line
-                  type="natural"
-                  dataKey="value"
-                  stroke={theme.palette.success.main}
-                  strokeWidth={2}
-                  dot={false}
-                />
-              </LineChart>
             </div>
             <Grid
               container
@@ -253,26 +214,7 @@ export default function Dashboard(props) {
         <Grid item lg={3} md={4} sm={6} xs={12}>
           <Widget title="Private Message" upperTitle className={classes.card}>
             <Grid container spacing={2}>
-              <Grid item xs={4}>
-                <ResponsiveContainer width="100%" height={144}>
-                  <PieChart margin={{ left: theme.spacing(2) }}>
-                    <Pie
-                      data={PieChartData}
-                      innerRadius={45}
-                      outerRadius={60}
-                      dataKey="value"
-                    >
-                      {PieChartData.map((entry, index) => (
-                        <Cell
-                          key={`cell-${index}`}
-                          fill={theme.palette[entry.color].main}
-                        />
-                      ))}
-                    </Pie>
-                  </PieChart>
-                </ResponsiveContainer>
-              </Grid>
-              <Grid item xs={8}>
+              <Grid item xs={12}>
                 <div className={classes.pieChartLegendWrapper}>
                   Users communicate through private messaging based on a unique userId selected during signup to protect the privaciy.
                 </div>
@@ -284,7 +226,7 @@ export default function Dashboard(props) {
           <Widget
             bodyClass={classes.mainChartBody}
           >
-            <ResponsiveContainer width="100%" minWidth={500} height={350}>
+            <div className={classes.performanceLegendWrapper}>
               <div>
               It seems that the entire world is locked down, and nobody knows when the situation will return to normal. Even we can reopen the country next month, we still need social distancing until the vaccine for COVID-19 is available. For the majority of people, they have to change their lifestyles; however, for some vulnerable people, it is about survival. 
               <p/>              
@@ -299,7 +241,7 @@ export default function Dashboard(props) {
               The project is open-sourced on Github.com, and developers are welcomed to join the effort to complete the UI and add more features. We also accept donations on GitHub and Paypal to deploy the service to the public cloud. Please forward this site to others, we are helping others and helping ourselves. Thank you and stay safe.  
               </div>
 
-            </ResponsiveContainer>
+            </div>
           </Widget>
         </Grid>
 
@@ -356,25 +298,6 @@ export default function Dashboard(props) {
                 </Grid>
               </div>  
             </Grid>
-            <Grid container spacing={2}>
-              <div className={classes.performanceLegendWrapper}>
-                
-                <Grid item xs={12}>
-                  <div className={classes.legendElement}>
-                  <Dot color="primary" />
-                  <Typography
-                    color="text"
-                    colorBrightness="secondary"
-                    className={classes.legendElementText}
-                  >
-                    <a href="https://github.com/networknt/light-portal" rel="noreferrer noopener" target="_blank">Light-portal Repository</a>
-                  </Typography>
-                  </div>
-
-                </Grid>
-              </div>  
-            </Grid>
-
           </Widget>
         </Grid>
         
