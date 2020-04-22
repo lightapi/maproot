@@ -45,7 +45,7 @@ export default function MailMenu(props) {
         //console.log(response);
         if (!response.ok) {
           const error = await response.json();
-          console.log(error);
+          //console.log(error);
           setMessages([]);
         } else {
           const data = await response.json();
