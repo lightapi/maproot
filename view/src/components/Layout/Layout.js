@@ -29,7 +29,7 @@ import EntityProfile from "../../pages/entity/EntityProfile";
 import DeleteEntity from "../../pages/entity/DeleteEntity";
 import LiveMap from "../../pages/covid/LiveMap";
 import Status from "../../pages/covid/Status";
-import PeerStatus from "../../pages/covid/PeerStatus";
+import PeerStatus from "../../pages/covid/UserIdStatus";
 
 // context
 import { useLayoutState } from "../../context/LayoutContext";

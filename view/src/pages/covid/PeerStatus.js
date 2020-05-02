@@ -8,24 +8,29 @@ import CircularProgress from '@material-ui/core/CircularProgress';
 
 export default function PeerStatus(props) {
   //const classes = useStyles();
-  const userId = props.location.state.data.userId;
   const cmd = {
     host: 'lightapi.net',
     service: 'covid',
     action: 'getStatusByUserId',
     version: '0.1.0',
-    data: { userId: userId }
+    data: { userId: props.userId }
   }
 
   const url = '/portal/query?cmd=' + encodeURIComponent(JSON.stringify(cmd));
   const headers = {};
 
-  const { isLoading, data } = useApiGet({url, headers});
+  const { isLoading, data, error } = useApiGet({url, headers});
   let subjects = data || {};
 
   let wait;
   if(isLoading) {
     wait = <div><CircularProgress/></div>;
+  } else if(error) {
+		wait = (
+      <div>
+	    	<pre>{JSON.stringify(error, null, 2)}</pre>
+      </div>
+    )  
   } else {
     wait = (
       <StatusContainer {...props} subjects = {subjects} isReadonly={true}/>
