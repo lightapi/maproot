@@ -73,7 +73,7 @@ export default function Header(props) {
           )}
         </IconButton>
         <Typography variant="h6" weight="medium" className={classes.logotype}>
-          Light Portal
+          MapRoot
         </Typography>
         <div className={classes.grow} />
         <div
