@@ -1,43 +1,1019 @@
 {
-  "longLivedTokenForm": {
-    "formId": "longLivedTokenForm",
+  "statusForm": {
+    "formId": "statusForm",
     "actions": [
       {
         "host": "lightapi.net",
-        "service": "playground",
-        "action": "generateJwt",
+        "service": "covid",
+        "action": "updateStatus",
         "version": "0.1.0",
-        "title": "Generate Long-Lived Token",
-        "success": "/playground/longLivedToken"
+        "title": "Status",
+        "success": "/app/success",
+        "failure": "/app/failure"
       }
     ],
     "schema": {
+      "title": "Update Status",
       "type": "object",
-      "required": [
-        "client_id",
-        "scope"
-      ],
-      "title": "JWT Claims",
       "properties": {
-        "exp": {
-          "type": "integer"
+        "component": {
+          "title": "Component",
+          "type": "string",
+          "default": "StatusComponent",
+          "readonly": true
         },
-        "client_id": {
-          "type": "string"
-        },
-        "user_id": {
-          "type": "string"
-        },
-        "scope": {
+        "subjects": {
           "type": "array",
+          "title": "Status",
+          "minItems": 1,
+          "maxItems": 10,
           "items": {
-            "type": "string"
+            "type": "object",
+            "properties": {
+              "timestamp": {
+                "title": "Timestamp",
+                "type": "timestamp"
+              },
+              "subject": {
+                "title": "Subject",
+                "type": "string"
+              },
+              "description": {
+                "title": "Description",
+                "type": "string"
+              },
+              "imageUrls": {
+                "type": "array",
+                "title": "Image Urls",
+                "minItems": 1,
+                "maxItems": 50,
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "imageUrl": {
+                      "title": "Image Url",
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "imageUrl"
+                  ]
+                } 
+              },
+              "videoUrls": {
+                "type": "array",
+                "title": "Video Urls",
+                "minItems": 1,
+                "maxItems": 5,
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "videoUrl": {
+                      "title": "Video Url",
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "videoUrl"
+                  ]
+                } 
+              }
+            },
+            "required": [
+              "timestamp",
+              "subject",
+              "description"
+            ]
           }
-        }
+        }  
       }
     },
     "form": [
-      "*"
+      "component",
+      {
+        "key": "subjects",
+        "add": "New",
+        "style": {
+          "add": "btn-success"
+        },
+        "items": [
+          "subjects[].timestamp",
+          "subjects[].subject",
+          {
+            "key": "subjects[].description",
+            "type": "textarea"
+          },
+          {
+            "key": "subjects[].imageUrls",
+            "add": "New URL",
+            "style": {
+              "add": "btn-success"
+            },
+            "items": [
+              "subjects[].imageUrls[].imageUrl"
+            ]
+          },
+          {
+            "key": "subjects[].videoUrls",
+            "add": "New URL",
+            "style": {
+              "add": "btn-success"
+            },
+            "items": [
+              "subjects[].videoUrls[].videoUrl"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+
+  "askForm": {
+    "formId": "askForm",
+    "actions": [
+      {
+        "host": "lightapi.net",
+        "service": "covid",
+        "action": "updateStatus",
+        "version": "0.1.0",
+        "title": "Ask for Help",
+        "success": "/app/success",
+        "failure": "/app/failure"
+      }
+    ],
+    "schema": {
+      "title": "Ask for Help",
+      "type": "object",
+      "properties": {
+        "component": {
+          "title": "Component",
+          "type": "string",
+          "default": "AskComponent",
+          "readonly": true
+        },
+        "asks": {
+          "type": "array",
+          "title": "Asks",
+          "maxItems": 10,
+          "items": {
+            "type": "object",
+            "properties": {
+              "timestamp": {
+                "title": "Timestamp",
+                "type": "timestamp"
+              },
+              "subject": {
+                "title": "Subject",
+                "type": "string"
+              },
+              "description": {
+                "title": "Description",
+                "type": "string"
+              }
+            }
+          }
+        }  
+      }
+    },
+    "form": [
+      "component",
+      {
+        "key": "asks",
+        "add": "New",
+        "style": {
+          "add": "btn-success"
+        },
+        "items": [
+          "asks[].timestamp",
+          "asks[].subject",
+          {
+            "key": "asks[].description",
+            "type": "textarea"
+          }
+        ]
+      }
+    ]
+  },
+  "giveForm": {
+    "formId": "giveForm",
+    "actions": [
+      {
+        "host": "lightapi.net",
+        "service": "covid",
+        "action": "updateStatus",
+        "version": "0.1.0",
+        "title": "Offer Help for Others",
+        "success": "/app/success",
+        "failure": "/app/failure"
+      }
+    ],
+    "schema": {
+      "title": "Offer Help",
+      "type": "object",
+      "properties": {
+        "component": {
+          "title": "Component",
+          "type": "string",
+          "default": "GiveComponent",
+          "readonly": true
+        },
+        "gives": {
+          "type": "array",
+          "title": "Gives",
+          "maxItems": 10,
+          "items": {
+            "type": "object",
+            "properties": {
+              "timestamp": {
+                "title": "Timestamp",
+                "type": "timestamp"
+              },
+              "subject": {
+                "title": "Subject",
+                "type": "string"
+              },
+              "description": {
+                "title": "Description",
+                "type": "string"
+              }
+            }
+          }
+        }  
+      }
+    },
+    "form": [
+      "component",
+      {
+        "key": "gives",
+        "add": "New",
+        "style": {
+          "add": "btn-success"
+        },
+        "items": [
+          "gives[].timestamp",
+          "gives[].subject",
+          {
+            "key": "gives[].description",
+            "type": "textarea"
+          }
+        ]
+      }
+    ]
+  },
+
+  "offerForm": {
+    "formId": "offerForm",
+    "actions": [
+      {
+        "host": "lightapi.net",
+        "service": "covid",
+        "action": "updateStatus",
+        "version": "0.1.0",
+        "title": "Freecycle Offer",
+        "success": "/app/success",
+        "failure": "/app/failure"
+      }
+    ],
+    "schema": {
+      "title": "Freecycle Offer",
+      "type": "object",
+      "properties": {
+        "component": {
+          "title": "Component",
+          "type": "string",
+          "default": "OfferComponent",
+          "readonly": true
+        },
+        "offers": {
+          "type": "array",
+          "title": "Offers",
+          "maxItems": 10,
+          "items": {
+            "type": "object",
+            "properties": {
+              "timestamp": {
+                "title": "Timestamp",
+                "type": "timestamp"
+              },
+              "subject": {
+                "title": "Subject",
+                "type": "string"
+              },
+              "description": {
+                "title": "Description",
+                "type": "string"
+              }
+            }
+          }
+        }  
+      }
+    },
+    "form": [
+      "component",
+      {
+        "key": "offers",
+        "add": "New",
+        "style": {
+          "add": "btn-success"
+        },
+        "items": [
+          "offers[].timestamp",
+          "offers[].subject",
+          {
+            "key": "offers[].description",
+            "type": "textarea"
+          }
+        ]
+      }
+    ]
+  },
+  "wantForm": {
+    "formId": "wantForm",
+    "actions": [
+      {
+        "host": "lightapi.net",
+        "service": "covid",
+        "action": "updateStatus",
+        "version": "0.1.0",
+        "title": "Freecycle Want",
+        "success": "/app/success",
+        "failure": "/app/failure"
+      }
+    ],
+    "schema": {
+      "title": "Freecycle Want",
+      "type": "object",
+      "properties": {
+        "component": {
+          "title": "Component",
+          "type": "string",
+          "default": "WantComponent",
+          "readonly": true
+        },
+        "wants": {
+          "type": "array",
+          "title": "Wants",
+          "maxItems": 10,
+          "items": {
+            "type": "object",
+            "properties": {
+              "timestamp": {
+                "title": "Timestamp",
+                "type": "timestamp"
+              },
+              "subject": {
+                "title": "Subject",
+                "type": "string"
+              },
+              "description": {
+                "title": "Description",
+                "type": "string"
+              }
+            }
+          }
+        }  
+      }
+    },
+    "form": [
+      "component",
+      {
+        "key": "wants",
+        "add": "New",
+        "style": {
+          "add": "btn-success"
+        },
+        "items": [
+          "wants[].timestamp",
+          "wants[].subject",
+          {
+            "key": "wants[].description",
+            "type": "textarea"
+          }
+        ]
+      }
+    ]
+  },
+  "goodsForm": {
+    "formId": "goodsForm",
+    "actions": [
+      {
+        "host": "lightapi.net",
+        "service": "covid",
+        "action": "updateStatus",
+        "version": "0.1.0",
+        "title": "Barter Goods",
+        "success": "/app/success",
+        "failure": "/app/failure"
+      }
+    ],
+    "schema": {
+      "title": "Barter Goods",
+      "type": "object",
+      "properties": {
+        "component": {
+          "title": "Component",
+          "type": "string",
+          "default": "GoodsComponent",
+          "readonly": true
+        },
+        "goods": {
+          "type": "array",
+          "title": "Goods",
+          "maxItems": 10,
+          "items": {
+            "type": "object",
+            "properties": {
+              "timestamp": {
+                "title": "Timestamp",
+                "type": "timestamp"
+              },
+              "subject": {
+                "title": "Subject",
+                "type": "string"
+              },
+              "description": {
+                "title": "Description",
+                "type": "string"
+              }
+            }
+          }
+        }  
+      }
+    },
+    "form": [
+      "component",
+      {
+        "key": "goods",
+        "add": "New",
+        "style": {
+          "add": "btn-success"
+        },
+        "items": [
+          "goods[].timestamp",
+          "goods[].subject",
+          {
+            "key": "goods[].description",
+            "type": "textarea"
+          }
+        ]
+      }
+    ]
+  },
+  "servicesForm": {
+    "formId": "servicesForm",
+    "actions": [
+      {
+        "host": "lightapi.net",
+        "service": "covid",
+        "action": "updateStatus",
+        "version": "0.1.0",
+        "title": "Barter Services",
+        "success": "/app/success",
+        "failure": "/app/failure"
+      }
+    ],
+    "schema": {
+      "title": "Barter Services",
+      "type": "object",
+      "properties": {
+        "component": {
+          "title": "Component",
+          "type": "string",
+          "default": "ServicesComponent",
+          "readonly": true
+        },
+        "wants": {
+          "type": "array",
+          "title": "Services",
+          "maxItems": 10,
+          "items": {
+            "type": "object",
+            "properties": {
+              "timestamp": {
+                "title": "Timestamp",
+                "type": "timestamp"
+              },
+              "subject": {
+                "title": "Subject",
+                "type": "string"
+              },
+              "description": {
+                "title": "Description",
+                "type": "string"
+              }
+            }
+          }
+        }  
+      }
+    },
+    "form": [
+      "component",
+      {
+        "key": "services",
+        "add": "New",
+        "style": {
+          "add": "btn-success"
+        },
+        "items": [
+          "services[].timestamp",
+          "services[].subject",
+          {
+            "key": "services[].description",
+            "type": "textarea"
+          }
+        ]
+      }
+    ]
+  },
+
+  "buyForm": {
+    "formId": "buyForm",
+    "actions": [
+      {
+        "host": "lightapi.net",
+        "service": "covid",
+        "action": "updateStatus",
+        "version": "0.1.0",
+        "title": "Want to Buy",
+        "success": "/app/success",
+        "failure": "/app/failure"
+      }
+    ],
+    "schema": {
+      "title": "Want to Buy",
+      "type": "object",
+      "properties": {
+        "component": {
+          "title": "Component",
+          "type": "string",
+          "default": "BuyComponent",
+          "readonly": true
+        },
+        "buys": {
+          "type": "array",
+          "title": "Want to Buy",
+          "maxItems": 10,
+          "items": {
+            "type": "object",
+            "properties": {
+              "timestamp": {
+                "title": "Timestamp",
+                "type": "timestamp"
+              },
+              "subject": {
+                "title": "Subject",
+                "type": "string"
+              },
+              "description": {
+                "title": "Description",
+                "type": "string"
+              }
+            }
+          }
+        }  
+      }
+    },
+    "form": [
+      "component",
+      {
+        "key": "buys",
+        "add": "New",
+        "style": {
+          "add": "btn-success"
+        },
+        "items": [
+          "buys[].timestamp",
+          "buys[].subject",
+          {
+            "key": "buys[].description",
+            "type": "textarea"
+          }
+        ]
+      }
+    ]
+  },
+  "sellForm": {
+    "formId": "sellForm",
+    "actions": [
+      {
+        "host": "lightapi.net",
+        "service": "covid",
+        "action": "updateStatus",
+        "version": "0.1.0",
+        "title": "Want to Sell",
+        "success": "/app/success",
+        "failure": "/app/failure"
+      }
+    ],
+    "schema": {
+      "title": "Barter Services",
+      "type": "object",
+      "properties": {
+        "component": {
+          "title": "Component",
+          "type": "string",
+          "default": "ServicesComponent",
+          "readonly": true
+        },
+        "sells": {
+          "type": "array",
+          "title": "Want to Sell",
+          "maxItems": 10,
+          "items": {
+            "type": "object",
+            "properties": {
+              "timestamp": {
+                "title": "Timestamp",
+                "type": "timestamp"
+              },
+              "subject": {
+                "title": "Subject",
+                "type": "string"
+              },
+              "description": {
+                "title": "Description",
+                "type": "string"
+              }
+            }
+          }
+        }  
+      }
+    },
+    "form": [
+      "component",
+      {
+        "key": "sells",
+        "add": "New",
+        "style": {
+          "add": "btn-success"
+        },
+        "items": [
+          "sells[].timestamp",
+          "sells[].subject",
+          {
+            "key": "sells[].description",
+            "type": "textarea"
+          }
+        ]
+      }
+    ]
+  },
+
+  "toRentForm": {
+    "formId": "toRentForm",
+    "actions": [
+      {
+        "host": "lightapi.net",
+        "service": "covid",
+        "action": "updateStatus",
+        "version": "0.1.0",
+        "title": "To Rent",
+        "success": "/app/success",
+        "failure": "/app/failure"
+      }
+    ],
+    "schema": {
+      "title": "To Rent",
+      "type": "object",
+      "properties": {
+        "component": {
+          "title": "Component",
+          "type": "string",
+          "default": "ToRentComponent",
+          "readonly": true
+        },
+        "toRents": {
+          "type": "array",
+          "title": "To Rent",
+          "maxItems": 10,
+          "items": {
+            "type": "object",
+            "properties": {
+              "timestamp": {
+                "title": "Timestamp",
+                "type": "timestamp"
+              },
+              "subject": {
+                "title": "Subject",
+                "type": "string"
+              },
+              "description": {
+                "title": "Description",
+                "type": "string"
+              }
+            }
+          }
+        }  
+      }
+    },
+    "form": [
+      "component",
+      {
+        "key": "toRents",
+        "add": "New",
+        "style": {
+          "add": "btn-success"
+        },
+        "items": [
+          "toRents[].timestamp",
+          "toRents[].subject",
+          {
+            "key": "toRents[].description",
+            "type": "textarea"
+          }
+        ]
+      }
+    ]
+  },
+  "toBuyForm": {
+    "formId": "toBuyForm",
+    "actions": [
+      {
+        "host": "lightapi.net",
+        "service": "covid",
+        "action": "updateStatus",
+        "version": "0.1.0",
+        "title": "To Buy",
+        "success": "/app/success",
+        "failure": "/app/failure"
+      }
+    ],
+    "schema": {
+      "title": "To Buy",
+      "type": "object",
+      "properties": {
+        "component": {
+          "title": "Component",
+          "type": "string",
+          "default": "ToBuyComponent",
+          "readonly": true
+        },
+        "toBuys": {
+          "type": "array",
+          "title": "To Buy",
+          "maxItems": 10,
+          "items": {
+            "type": "object",
+            "properties": {
+              "timestamp": {
+                "title": "Timestamp",
+                "type": "timestamp"
+              },
+              "subject": {
+                "title": "Subject",
+                "type": "string"
+              },
+              "description": {
+                "title": "Description",
+                "type": "string"
+              }
+            }
+          }
+        }  
+      }
+    },
+    "form": [
+      "component",
+      {
+        "key": "toBuys",
+        "add": "New",
+        "style": {
+          "add": "btn-success"
+        },
+        "items": [
+          "toBuys[].timestamp",
+          "toBuys[].subject",
+          {
+            "key": "toBuys[].description",
+            "type": "textarea"
+          }
+        ]
+      }
+    ]
+  },
+
+  "saleRentForm": {
+    "formId": "saleRentForm",
+    "actions": [
+      {
+        "host": "lightapi.net",
+        "service": "covid",
+        "action": "updateStatus",
+        "version": "0.1.0",
+        "title": "For Rent",
+        "success": "/app/success",
+        "failure": "/app/failure"
+      }
+    ],
+    "schema": {
+      "title": "Real Estate For Rent",
+      "type": "object",
+      "properties": {
+        "component": {
+          "title": "Component",
+          "type": "string",
+          "default": "SaleRentComponent",
+          "readonly": true
+        },
+        "timestamp": {
+          "title": "Timestamp",
+          "type": "timestamp"
+        },
+        "address": {
+          "type": "string"
+        },
+        "postalCode": {
+          "type": "string"
+        },
+        "price": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "propertyType": {
+          "type": "string",
+          "default": "Single Family",
+          "enum": [
+            "Single Family",
+            "Recreational",
+            "Condominium",
+            "Multi Family",
+            "Agriculture",
+            "Parking",
+            "Vacant Land"
+          ] 
+        },
+        "buildingType": {
+          "type": "string",
+          "default": "House",
+          "enum": [
+            "House",
+            "Apartment",
+            "Townhouse",
+            "Duplex",
+            "Triplex",
+            "Fourplex",
+            "Mobile Home",
+            "Sepcial Purpose"
+          ]
+        },
+        "communityName": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string",
+          "default": "Freehold",
+          "enum": [
+            "Freehold",
+            "Leasehold",
+            "Strata",
+            "Crosslease"
+          ]
+        },
+        "imageUrls": {
+          "type": "array",
+          "title": "Image Urls",
+          "maxItems": 50,
+          "items": {
+            "type": "object",
+            "properties": {
+              "imageUrl": {
+                "title": "Image Url",
+                "type": "string"
+              }
+            },
+            "required": [
+              "imageUrl"
+            ]
+          } 
+        },
+        "videoUrls": {
+          "type": "array",
+          "title": "Video Urls",
+          "maxItems": 5,
+          "items": {
+            "type": "object",
+            "properties": {
+              "videoUrl": {
+                "title": "Video Url",
+                "type": "string"
+              }
+            },
+            "required": [
+              "videoUrl"
+            ]
+          } 
+        },
+        "storeys": {
+          "type": "string"
+        },
+        "landSize": {
+          "type": "string"
+        },
+        "aboveGradeBedrooms": {
+          "type": "string"
+        },
+        "belowGradeBedrooms": {
+          "type": "string"
+        },
+        "bathrooms": {
+          "type": "string"
+        },
+        "basementType": {
+          "type": "string"
+        },
+        "buildingFeatures": {
+          "type": "string"
+        },
+        "buildingStyle": {
+          "type": "string"
+        },
+        "cooling": {
+          "type": "string"
+        },
+        "heating": {
+          "type": "string"
+        },
+        "exteriorFinish": {
+          "type": "string"
+        },
+        "amenitiesNearby": {
+          "type": "string"
+        },
+        "parkingType": {
+          "type": "string",
+          "default": "Attached garage",
+          "enum": [
+            "Attached",
+            "Detached",
+            "Underground",
+            "Visitor"
+          ]
+        },
+        "totalParkingSpaces": {
+          "type": "string"
+        }
+      },  
+      "required": [
+        "address",
+        "postalCode",
+        "price",
+        "description",
+        "propertyType",
+        "buildingType",
+        "communityName",
+        "title"
+      ]
+    },
+    "form": [
+      "component",
+      "timestamp",
+      "address",
+      "postalCode",
+      "price",
+      {
+        "key": "description",
+        "type": "textarea"
+      },
+      "propertyType",
+      "buildingType",
+      "communityName",
+      "title",
+      {
+        "key": "imageUrls",
+        "add": "New",
+        "style": {
+          "add": "btn-success"
+        },
+        "items": [
+          "imageUrls[].imageUrl"
+        ]
+      },  
+      {
+        "key": "videoUrls",
+        "add": "New",
+        "style": {
+          "add": "btn-success"
+        },
+        "items": [
+          "videoUrls[].videoUrl"
+        ]
+      },
+      "storeys",
+      "landSize",
+      "aboveGradeBedrooms",
+      "belowGradeBedrooms",
+      "bathrooms",
+      "basementType",
+      "buildingFeatures",
+      "buildingStyle",
+      "cooling",
+      "heating",
+      "exteriorFinish",
+      "amenitiesNearby",
+      "parkingType",
+      "totalParkingSpaces"
     ]
   },
   "signupForm": {

@@ -9417,10 +9417,10 @@ react-schema-form@^0.8.4:
     supports-color "^7.1.0"
     tv4 "^1.3.0"
 
-react-schema-form@^0.8.6:
-  version "0.8.6"
-  resolved "https://registry.yarnpkg.com/react-schema-form/-/react-schema-form-0.8.6.tgz#b2292029572e16ded12e7d551a8feb03363431ab"
-  integrity sha512-/UrsmmauG1q27HXbDCyA5/iqlOIx/JF70kLo7Qaq3kMM2XjcAC1OVUzv8jSC6yASa2OMVO6Jby8GXQgua4NaPA==
+react-schema-form@^0.8.7:
+  version "0.8.7"
+  resolved "https://registry.yarnpkg.com/react-schema-form/-/react-schema-form-0.8.7.tgz#0549e8b1ec41bdee2b25c4bd6fbe139ca1d7b81e"
+  integrity sha512-m30ayI4/I2Ne8SL5ycE6YX9R3tul6U98O5gvGPPGBBBmwi+BxwwBKBJeorsXenS8uCpAwrJQSmKhhHgall9Ifw==
   dependencies:
     classnames "^2.2.6"
     lodash "^4.17.15"

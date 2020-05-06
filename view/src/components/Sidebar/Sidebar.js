@@ -9,6 +9,7 @@ import AcUnitIcon from '@material-ui/icons/AcUnit';
 import LocationCity from '@material-ui/icons/LocationCity';
 import EmojiPeople from '@material-ui/icons/EmojiPeople';
 import AddAlert from '@material-ui/icons/AddAlert';
+import Business from '@material-ui/icons/Business';
 
 import { useTheme } from "@material-ui/styles";
 import { withRouter } from "react-router-dom";
@@ -33,6 +34,7 @@ const structure = [
   { id: 22, label: "Live Map", link: "/app/form/covidMapForm", icon: <AcUnitIcon />},
   { id: 23, label: "City", role: "admin", link: "/app/form/covidCity", icon: <LocationCity />, }, 
   { id: 24, label: "Entity", link: "/app/covid/entity", icon: <EmojiPeople/>, },
+  { id: 25, label: "Website", link: "/app/covid/publish", icon: <Business/>, },
   { id: 25, label: "Status", link: "/app/covid/status", icon: <AddAlert/>, },
 ];
 

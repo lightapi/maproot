@@ -29,6 +29,8 @@ import EntityProfile from "../../pages/entity/EntityProfile";
 import DeleteEntity from "../../pages/entity/DeleteEntity";
 import LiveMap from "../../pages/covid/LiveMap";
 import Status from "../../pages/covid/Status";
+import Publish from "../../pages/covid/Publish";
+import Website from "../../pages/covid/Website";
 import PeerStatus from "../../pages/covid/UserIdStatus";
 
 // context
@@ -67,7 +69,9 @@ function Layout(props) {
               <Route path="/app/covid/deleteEntity" component={DeleteEntity} />
               <Route path="/app/covid/map" component={LiveMap} />
               <Route path="/app/covid/status" component={Status} />
+              <Route path="/app/covid/publish" component={Publish} />
               <Route path="/app/covid/peerStatus" component={PeerStatus} />
+              <Route path="/app/covid/website" component={Website} />
               <Route
                 exact
                 path="/app/ui"
