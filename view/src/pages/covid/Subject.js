@@ -9,12 +9,13 @@ import StatusItem from './StatusItem';
 import Button from '@material-ui/core/Button';
 import DeleteIcon from '@material-ui/icons/Delete';
 import { timeConversion } from '../../Utils';
+import { useUserState } from "../../context/UserContext";
 
 export default function Subject(props) {
     const items = props.items;
     const category = props.category;
     const isReadonly = props.isReadonly;
-
+    const { isAuthenticated } = useUserState();
     const [expanded, setExpanded] = useState(false);
     const [currentItem, setCurrentItem] = useState('');
     const first = items.length > 0 ? timeConversion(Date.now() - Object.keys(items[0])[0]) + ' ' + items[0][Object.keys(items[0])[0]] : '';
@@ -33,7 +34,7 @@ export default function Subject(props) {
                         <StatusItem key={index} isReadonly={isReadonly} deleteItem={props.deleteItem} category={category} item={item}/>
                     )}
                 </List>
-                {isReadonly ? null : 
+                {!isAuthenticated ? null : 
                     <div>
                         <input
                             type="text"
