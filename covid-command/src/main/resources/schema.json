@@ -197,6 +197,13 @@
     },
     "scope": "portal.w"
   },
+  "lightapi.net/covid/updateWebsite/0.1.0": {
+    "schema": {
+      "title": "Service",
+      "type": "object"
+    },
+    "scope": "portal.w"
+  },
   "lightapi.net/covid/deleteCityMap/0.1.0": {
     "schema": {
       "title": "Service",

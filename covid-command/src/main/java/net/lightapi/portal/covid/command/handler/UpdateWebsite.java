@@ -19,20 +19,19 @@ import java.util.concurrent.BlockingQueue;
 
 import io.undertow.server.HttpServerExchange;
 import net.lightapi.portal.HybridQueryClient;
-import net.lightapi.portal.covid.CovidEntityUpdatedEvent;
+import net.lightapi.portal.covid.CovidStatusUpdatedEvent;
+import net.lightapi.portal.covid.CovidWebsiteUpdatedEvent;
 import net.lightapi.portal.covid.command.CovidCommandConfig;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@ServiceHandler(id="lightapi.net/covid/updateEntity/0.1.0")
-public class UpdateEntity implements Handler {
-    private static final Logger logger = LoggerFactory.getLogger(UpdateEntity.class);
+@ServiceHandler(id="lightapi.net/covid/updateWebsite/0.1.0")
+public class UpdateWebsite implements Handler {
+    private static final Logger logger = LoggerFactory.getLogger(UpdateWebsite.class);
     private static final CovidCommandConfig config = (CovidCommandConfig) Config.getInstance().getJsonObjectConfig(CovidCommandConfig.CONFIG_NAME, CovidCommandConfig.class);
 
-    private static final String PROFILE_LOCATION_INCOMPLETE = "ERR11622";
     private static final String SEND_MESSAGE_EXCEPITON = "ERR11605";
-    private static final String CITY_NOT_REGISTERED = "ERR11623";
 
     @Override
     public ByteBuffer handle(HttpServerExchange exchange, Object input)  {
@@ -40,63 +39,23 @@ public class UpdateEntity implements Handler {
         Map<String, Object> auditInfo = exchange.getAttachment(AttachmentConstants.AUDIT_INFO);
         // the auditInfo won't be null as it passes the Jwt verification
         String email = (String)auditInfo.get("user_id");
-        // make sure that country, province and city are populated in the user profile.
-        Result<String> resultUser = HybridQueryClient.getUserByEmail(exchange, email);
-        String key = null;
-        String country = null;
-        String province = null;
-        String city = null;
-        String userId = null;
-        if(resultUser.isSuccess()) {
-            Map<String, Object> userMap = JsonMapper.string2Map(resultUser.getResult());
-            country = (String)userMap.get("country");
-            province = (String)userMap.get("province");
-            city = (String)userMap.get("city");
-            userId = (String)userMap.get("userId");
-            if(country == null || province == null || city == null) {
-                return NioUtils.toByteBuffer(getStatus(exchange, PROFILE_LOCATION_INCOMPLETE));
-            }
-            key = country + "|" + province + "|" + city;
-        } else {
-            return NioUtils.toByteBuffer(getStatus(exchange, resultUser.getError()));
-        }
         Map<String, Object> map = (Map<String, Object>)input;
-        String category = (String)map.get("category");
-        String subcategory = (String)map.get("subcategory");
-        double latitude = (Double)map.get("latitude");
-        double longitude = (Double)map.get("longitude");
-        String introduction = (String)map.get("introduction");
-        // check if the key is in the cityMap store
-        Result<String> resultCity = HybridQueryClient.getCity(exchange, country, province, city);
-        if(resultCity.isFailure()) {
-            if(resultCity.getError().getStatusCode() == 404) {
-                return NioUtils.toByteBuffer(getStatus(exchange, CITY_NOT_REGISTERED, key));
-            } else {
-                return NioUtils.toByteBuffer(getStatus(exchange, resultCity.getError()));
-            }
-        }
-
+        // TODO limit number of categories and items in each category.
         Result<String> resultNonce = HybridQueryClient.getNonceByEmail(exchange, email);
         if(resultNonce.isSuccess()) {
             EventId eventId = EventId.newBuilder()
                     .setId(email)
                     .setNonce(Long.valueOf(resultNonce.getResult()))
                     .build();
-            CovidEntityUpdatedEvent event = CovidEntityUpdatedEvent.newBuilder()
+            CovidWebsiteUpdatedEvent event = CovidWebsiteUpdatedEvent.newBuilder()
                     .setEventId(eventId)
-                    .setKey(key)
-                    .setUserId(userId)
-                    .setCategory(category)
-                    .setSubcategory(subcategory)
-                    .setLatitude(latitude)
-                    .setLongitude(longitude)
-                    .setIntroduction(introduction)
+                    .setWebsite(JsonMapper.toJson(map))
                     .setTimestamp(System.currentTimeMillis())
                     .build();
 
             AvroSerializer serializer = new AvroSerializer();
             byte[] bytes = serializer.serialize(event);
-            // make sure that email is used for the key to put the event into the right partition and query instance.
+
             ProducerRecord<byte[], byte[]> record = new ProducerRecord<>(config.getTopic(), email.getBytes(StandardCharsets.UTF_8), bytes);
             LightProducer producer = SingletonServiceFactory.getBean(LightProducer.class);
             BlockingQueue<ProducerRecord<byte[], byte[]>> txQueue = producer.getTxQueue();

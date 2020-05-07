@@ -64,7 +64,7 @@ public class UpdatePeerStatus implements Handler {
             if(resultJwt.isFailure()) {
                 return NioUtils.toByteBuffer(getStatus(exchange, resultJwt.getError()));
             }
-            Result<String> resultOwner = HybridQueryClient.getUserById(ownerId, resultJwt.getResult().getAccessToken(), false);
+            Result<String> resultOwner = HybridQueryClient.getUserById(ownerId, resultJwt.getResult().getAccessToken());
             if(resultOwner.isFailure()) {
                 return NioUtils.toByteBuffer(getStatus(exchange, resultOwner.getError()));
             }

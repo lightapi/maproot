@@ -72,7 +72,7 @@ public class DeleteEntity implements Handler {
 
             AvroSerializer serializer = new AvroSerializer();
             byte[] bytes = serializer.serialize(event);
-
+            // make sure that email is used as the key to put the event into the right partition and query instance.
             ProducerRecord<byte[], byte[]> record = new ProducerRecord<>(config.getTopic(), email.getBytes(StandardCharsets.UTF_8), bytes);
             LightProducer producer = SingletonServiceFactory.getBean(LightProducer.class);
             BlockingQueue<ProducerRecord<byte[], byte[]>> txQueue = producer.getTxQueue();

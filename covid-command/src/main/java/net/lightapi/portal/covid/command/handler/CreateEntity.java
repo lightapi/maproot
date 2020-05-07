@@ -96,7 +96,7 @@ public class CreateEntity implements Handler {
 
             AvroSerializer serializer = new AvroSerializer();
             byte[] bytes = serializer.serialize(event);
-
+            // make sure that we are using the email as the key to put the event into the right partition along with other user info.
             ProducerRecord<byte[], byte[]> record = new ProducerRecord<>(config.getTopic(), email.getBytes(StandardCharsets.UTF_8), bytes);
             LightProducer producer = SingletonServiceFactory.getBean(LightProducer.class);
             BlockingQueue<ProducerRecord<byte[], byte[]>> txQueue = producer.getTxQueue();

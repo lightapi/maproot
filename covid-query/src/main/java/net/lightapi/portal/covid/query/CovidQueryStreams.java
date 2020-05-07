@@ -34,8 +34,9 @@ public class CovidQueryStreams implements LightStreams {
 
     private static final String city = "covid-city-store"; // this is a global store
     private static final String map = "covid-map-store"; // this is a global store
-    private static final String entity = "covid-entity-store";
+    private static final String entity = "covid-entity-store";  // this is a local store
     private static final String status = "covid-status-store"; // this is a local store
+    private static final String website = "covid-website-store"; // this is a local store
 
     KafkaStreams covidStreams;
 
@@ -55,24 +56,27 @@ public class CovidQueryStreams implements LightStreams {
         return covidStreams.store(entity, QueryableStoreTypes.keyValueStore());
     }
 
-    public StreamsMetadata getEntityStreamsMetadata(String key) {
-        return covidStreams.metadataForKey(entity, key, Serdes.String().serializer());
-    }
-
-    public Collection<StreamsMetadata> getAllEntityStreamsMetadata() {
-        return covidStreams.allMetadataForStore(entity);
+    // the key must be email so that we can find the right partition for the status.
+    public StreamsMetadata getEntityStreamsMetadata(String email) {
+        return covidStreams.metadataForKey(entity, email, Serdes.String().serializer());
     }
 
     public ReadOnlyKeyValueStore<String, String> getStatusStore() {
         return covidStreams.store(status, QueryableStoreTypes.keyValueStore());
     }
 
-    public StreamsMetadata getStatusStreamsMetadata(String key) {
-        return covidStreams.metadataForKey(status, key, Serdes.String().serializer());
+    // the key must be email so that we can find the right partition for the status.
+    public StreamsMetadata getStatusStreamsMetadata(String email) {
+        return covidStreams.metadataForKey(status, email, Serdes.String().serializer());
     }
 
-    public Collection<StreamsMetadata> getAllStatusStreamsMetadata() {
-        return covidStreams.allMetadataForStore(status);
+    public ReadOnlyKeyValueStore<String, String> getWebsiteStore() {
+        return covidStreams.store(website, QueryableStoreTypes.keyValueStore());
+    }
+
+    // the key must be email so that we can find the right partition for the status.
+    public StreamsMetadata getWebsiteStreamsMetadata(String email) {
+        return covidStreams.metadataForKey(status, email, Serdes.String().serializer());
     }
 
     private void startCovidStreams(String ip, int port) {
@@ -97,6 +101,11 @@ public class CovidQueryStreams implements LightStreams {
                         Serdes.String(),
                         Serdes.String());
 
+        StoreBuilder<KeyValueStore<String, String>> keyValueWebsiteStoreBuilder =
+                Stores.keyValueStoreBuilder(Stores.persistentKeyValueStore(website),
+                        Serdes.String(),
+                        Serdes.String());
+
         final Topology topology = new Topology();
         topology.addGlobalStore(globalCityStoreBuilder, "from-portal-city",  Serdes.String().deserializer(), Serdes.String().deserializer(), "portal-city", "global-city-processor", GlobalCityProcessor::new);
         topology.addGlobalStore(globalMapStoreBuilder, "from-portal-map",  Serdes.String().deserializer(), Serdes.String().deserializer(), "portal-map", "global-map-processor", GlobalMapProcessor::new);
@@ -104,6 +113,7 @@ public class CovidQueryStreams implements LightStreams {
         topology.addProcessor("CovidEventProcessor", CovidEventProcessor::new, "SourceTopicProcessor");
         topology.addStateStore(keyValueEntityStoreBuilder, "CovidEventProcessor");
         topology.addStateStore(keyValueStatusStoreBuilder, "CovidEventProcessor");
+        topology.addStateStore(keyValueWebsiteStoreBuilder, "CovidEventProcessor");
         topology.addSink("NonceProcessor", "portal-nonce", "CovidEventProcessor");
         topology.addSink("NotificationProcessor", "portal-notification", "CovidEventProcessor");
         topology.addSink("CityProcessor", "portal-city", "CovidEventProcessor");
@@ -173,6 +183,7 @@ public class CovidQueryStreams implements LightStreams {
         private KeyValueStore<String, String> mapStore;
         private KeyValueStore<String, String> entityStore;
         private KeyValueStore<String, String> statusStore;
+        private KeyValueStore<String, String> websiteStore;
 
         public CovidEventProcessor() {
         }
@@ -185,6 +196,7 @@ public class CovidQueryStreams implements LightStreams {
             this.mapStore = (KeyValueStore<String, String>) pc.getStateStore(map);
             this.entityStore = (KeyValueStore<String, String>) pc.getStateStore(entity);
             this.statusStore = (KeyValueStore<String, String>) pc.getStateStore(status);
+            this.websiteStore = (KeyValueStore<String, String>) pc.getStateStore(website);
 
             if(logger.isInfoEnabled()) logger.info("Processor initialized");
         }
@@ -422,10 +434,20 @@ public class CovidQueryStreams implements LightStreams {
                 if (logger.isTraceEnabled()) logger.trace("Event = " + covidStatusUpdatedEvent);
                 String email = covidStatusUpdatedEvent.getEventId().getId();
                 long nonce = covidStatusUpdatedEvent.getEventId().getNonce();
-                String status = covidStatusUpdatedEvent.getStatus();
-                statusStore.put(email, status);
+                String s = covidStatusUpdatedEvent.getStatus();
+                statusStore.put(email, s);
                 pc.forward(email.getBytes(StandardCharsets.UTF_8), ByteUtil.longToBytes(nonce + 1), To.child("NonceProcessor"));
                 EventNotification notification = new EventNotification(nonce, APP, covidStatusUpdatedEvent.getClass().getSimpleName(), true, null, covidStatusUpdatedEvent);
+                pc.forward(email.getBytes(StandardCharsets.UTF_8), notification.toString().getBytes(StandardCharsets.UTF_8), To.child("NotificationProcessor"));
+            } else if(object instanceof CovidWebsiteUpdatedEvent) {
+                CovidWebsiteUpdatedEvent covidWebsiteUpdatedEvent = (CovidWebsiteUpdatedEvent) object;
+                if (logger.isTraceEnabled()) logger.trace("Event = " + covidWebsiteUpdatedEvent);
+                String email = covidWebsiteUpdatedEvent.getEventId().getId();
+                long nonce = covidWebsiteUpdatedEvent.getEventId().getNonce();
+                String w = covidWebsiteUpdatedEvent.getWebsite();
+                websiteStore.put(email, w);
+                pc.forward(email.getBytes(StandardCharsets.UTF_8), ByteUtil.longToBytes(nonce + 1), To.child("NonceProcessor"));
+                EventNotification notification = new EventNotification(nonce, APP, covidWebsiteUpdatedEvent.getClass().getSimpleName(), true, null, covidWebsiteUpdatedEvent);
                 pc.forward(email.getBytes(StandardCharsets.UTF_8), notification.toString().getBytes(StandardCharsets.UTF_8), To.child("NotificationProcessor"));
             } else if(object instanceof PeerStatusUpdatedEvent) {
                 PeerStatusUpdatedEvent peerStatusUpdatedEvent = (PeerStatusUpdatedEvent) object;
@@ -479,5 +501,4 @@ public class CovidQueryStreams implements LightStreams {
         if(logger.isDebugEnabled()) logger.debug("CovidStreams is closing...");
         covidStreams.close();
     }
-
 }
