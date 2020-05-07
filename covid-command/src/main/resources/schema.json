@@ -6,6 +6,27 @@
     },
     "scope": "portal.w"
   },
+  "lightapi.net/covid/updatePeerStatus/0.1.0": {
+    "schema": {
+      "title": "Service",
+      "type": "object",
+      "properties": {
+        "userId": {
+          "type": "string",
+          "description": "The userId of the status owner"
+        },
+        "subjects": {
+          "type": "object",
+          "description": "The subjects of the status"
+        }
+      },
+      "required": [
+        "userId",
+        "subjects"
+      ]
+    },
+    "scope": "portal.w"
+  },
   "lightapi.net/covid/deleteEntity/0.1.0": {
     "schema": {
       "title": "Service",
@@ -53,7 +74,7 @@
         "subcategory",
         "latitude",
         "longitude",
-        "intruduction"
+        "introduction"
       ]
     },
     "scope": "portal.w"
@@ -130,7 +151,7 @@
         "subcategory",
         "latitude",
         "longitude",
-        "intruduction"
+        "introduction"
       ]
     },
     "scope": "portal.w"

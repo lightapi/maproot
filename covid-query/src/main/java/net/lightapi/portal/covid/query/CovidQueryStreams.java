@@ -427,6 +427,17 @@ public class CovidQueryStreams implements LightStreams {
                 pc.forward(email.getBytes(StandardCharsets.UTF_8), ByteUtil.longToBytes(nonce + 1), To.child("NonceProcessor"));
                 EventNotification notification = new EventNotification(nonce, APP, covidStatusUpdatedEvent.getClass().getSimpleName(), true, null, covidStatusUpdatedEvent);
                 pc.forward(email.getBytes(StandardCharsets.UTF_8), notification.toString().getBytes(StandardCharsets.UTF_8), To.child("NotificationProcessor"));
+            } else if(object instanceof PeerStatusUpdatedEvent) {
+                PeerStatusUpdatedEvent peerStatusUpdatedEvent = (PeerStatusUpdatedEvent) object;
+                if (logger.isTraceEnabled()) logger.trace("Event = " + peerStatusUpdatedEvent);
+                String email = peerStatusUpdatedEvent.getEventId().getId();
+                long nonce = peerStatusUpdatedEvent.getEventId().getNonce();
+                String status = peerStatusUpdatedEvent.getStatus();
+                String ownerEmail = peerStatusUpdatedEvent.getEmail();
+                statusStore.put(ownerEmail, status);
+                pc.forward(email.getBytes(StandardCharsets.UTF_8), ByteUtil.longToBytes(nonce + 1), To.child("NonceProcessor"));
+                EventNotification notification = new EventNotification(nonce, APP, peerStatusUpdatedEvent.getClass().getSimpleName(), true, null, peerStatusUpdatedEvent);
+                pc.forward(email.getBytes(StandardCharsets.UTF_8), notification.toString().getBytes(StandardCharsets.UTF_8), To.child("NotificationProcessor"));
             }
         }
 
