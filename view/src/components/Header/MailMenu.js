@@ -25,7 +25,7 @@ export default function MailMenu(props) {
     var [messages, setMessages] = useState([]);
     var [loading, setLoading] = useState(false);
     var classes = props.classes;
-    var { userId } = useUserState();
+    var { email } = useUserState();
 
     //console.log("csrf = ", csrf);
     const cmd = {
@@ -33,7 +33,7 @@ export default function MailMenu(props) {
       service: 'user',
       action: 'getPrivateMessage',
       version: '0.1.0',
-      data: { email: userId }
+      data: { email }
     };
 
     const url = '/portal/query?cmd=' + encodeURIComponent(JSON.stringify(cmd));

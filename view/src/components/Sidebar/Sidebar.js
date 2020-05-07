@@ -35,7 +35,7 @@ const structure = [
   { id: 23, label: "City", role: "admin", link: "/app/form/covidCity", icon: <LocationCity />, }, 
   { id: 24, label: "Entity", link: "/app/covid/entity", icon: <EmojiPeople/>, },
   { id: 25, label: "Website", link: "/app/covid/publish", icon: <Business/>, },
-  { id: 25, label: "Status", link: "/app/covid/status", icon: <AddAlert/>, },
+  { id: 26, label: "Status", link: "/app/covid/status", icon: <AddAlert/>, },
 ];
 
 function Sidebar({ location }) {

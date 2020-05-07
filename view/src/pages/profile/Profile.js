@@ -9,14 +9,14 @@ import Button from '@material-ui/core/Button';
 
 export default function Profile(props) {
   const classes = useStyles();
-  const { userId } = useUserState();
+  const { email } = useUserState();
   //console.log("isAuthenticated = " + isAuthenticated + " userId = " + userId);
   const cmd = {
     host: 'lightapi.net',
     service: 'user',
     action: 'queryUserByEmail',
     version: '0.1.0',
-    data: { email: userId }
+    data: { email }
   }
 
   const url = '/portal/query?cmd=' + encodeURIComponent(JSON.stringify(cmd));

@@ -7,13 +7,13 @@ import FormDispatcher from './FormDispatcher';
 // This is the status entry point for users to update his/her status after logging in.
 
 export default function Publish(props) {
-  const { userId } = useUserState();
+  const { email } = useUserState();
   const statusCmd = {
     host: 'lightapi.net',
     service: 'covid',
     action: 'getStatusByEmail',
     version: '0.1.0',
-    data: { email: userId }
+    data: { email }
   }
   var url = '/portal/query?cmd=' + encodeURIComponent(JSON.stringify(statusCmd));
   var headers = {};
@@ -26,7 +26,7 @@ export default function Publish(props) {
     service: 'covid',
     action: 'getEntity',
     version: '0.1.0',
-    data: { email: userId }
+    data: { email }
   }
   var url = '/portal/query?cmd=' + encodeURIComponent(JSON.stringify(entityCmd));
   var headers = {};

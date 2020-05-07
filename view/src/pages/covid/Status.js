@@ -9,13 +9,13 @@ import CircularProgress from '@material-ui/core/CircularProgress';
 
 export default function Status(props) {
   //const classes = useStyles();
-  const { userId } = useUserState();
+  const { email } = useUserState();
   const cmd = {
     host: 'lightapi.net',
     service: 'covid',
     action: 'getStatusByEmail',
     version: '0.1.0',
-    data: { email: userId }
+    data: { email }
   }
   const url = '/portal/query?cmd=' + encodeURIComponent(JSON.stringify(cmd));
   const headers = {};

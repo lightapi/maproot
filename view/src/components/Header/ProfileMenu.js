@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useUserDispatch, signOut, signUp, changePassword, getProfile } from "../../context/UserContext";
+import { useUserDispatch, useUserState, signOut, signUp, changePassword, getProfile } from "../../context/UserContext";
 import {
   IconButton,
   Menu,
@@ -10,7 +10,6 @@ import {
 } from "@material-ui/icons";
 import { Typography } from "../Wrappers/Wrappers";
 import classNames from "classnames";
-import { useUserState } from "../../context/UserContext";
 
 export default function ProfileMenu(props) {
     var [profileMenu, setProfileMenu] = useState(null);

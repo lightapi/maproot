@@ -9,9 +9,11 @@ function userReducer(state, action) {
   console.log("action = ", action);
   switch (action.type) {
     case "LOGIN_SUCCESS":
-      return { ...state, isAuthenticated: action.isAuthenticated, userId: action.userId, roles: action.roles};
+      return { ...state, isAuthenticated: action.isAuthenticated, email: action.email, userId: null, roles: action.roles};
     case "SIGN_OUT_SUCCESS":
-      return { ...state, isAuthenticated: false, userId: null, roles: null };
+      return { ...state, isAuthenticated: false, email: null, userId: null, roles: null };
+    case "UPDATE_PROFILE":
+      return { ...state, userId: action.userId }
     default: {
       throw new Error(`Unhandled action type: ${action.type}`);
     }
@@ -21,17 +23,18 @@ function userReducer(state, action) {
 function UserProvider({ children }) {
   console.log("UserProvider is called...");
   const cookies = new Cookies();
-  const userId = cookies.get('userId');
+  const email = cookies.get('userId');
   var [state, dispatch] = React.useReducer(userReducer, {
-    isAuthenticated: !!userId,
-    userId: userId,
+    isAuthenticated: !!email,
+    email: email,
+    userId: null,
     roles: cookies.get('roles')
   });
 
-  if(userId == null) {
+  if(email == null) {
     // send a fake request to server to renew the access token from refreshToken 
     // in case you have set the remember me to true during login. 
-    console.log("userId is null, renew the token...");
+    console.log("email is null, renew the token...");
     const cmd = {
       host: 'lightapi.net',
       service: 'user',
@@ -51,7 +54,7 @@ function UserProvider({ children }) {
         if(data.statusCode === 404) {
           // if other errors, then there would be no cookies. Only 404 is the right response in this case.
           // if we don't check the status code and blindly dispatch, we will go into a dead loop as there is userId available.
-          dispatch({ type: "LOGIN_SUCCESS", isAuthenticated: !!cookies.get('userId'), userId: cookies.get('userId'), roles: cookies.get('roles') });
+          dispatch({ type: "LOGIN_SUCCESS", isAuthenticated: !!cookies.get('userId'), email: cookies.get('userId'), roles: cookies.get('roles') });
         }        
       } catch (e) {
         console.log(e);

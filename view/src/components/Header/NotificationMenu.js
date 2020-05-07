@@ -17,13 +17,13 @@ export default function NotificationMenu(props) {
     var [notificationsMenu, setNotificationsMenu] = useState(null);
     var [isNotificationsUnread, setIsNotificationsUnread] = useState(true);
     var classes = props.classes;
-    var { userId } = useUserState();
+    var { email } = useUserState();
     const cmd = {
       host: 'lightapi.net',
       service: 'user',
       action: 'getNotification',
       version: '0.1.0',
-      data: { email: userId }
+      data: { email }
     };
 
     const url = '/portal/query?cmd=' + encodeURIComponent(JSON.stringify(cmd));
