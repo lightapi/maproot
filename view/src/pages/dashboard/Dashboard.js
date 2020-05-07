@@ -1,17 +1,63 @@
-import React from "react";
+import React, { useEffect } from "react";
 import {
   Grid,
 } from "@material-ui/core";
 import useStyles from "./styles";
 
 // components
+import { useApiGet } from '../../hooks/useApiGet';
 import Widget from "../../components/Widget";
 import PageTitle from "../../components/PageTitle";
 import { Typography } from "../../components/Wrappers";
 import Dot from "../../components/Sidebar/components/Dot";
+import { useUserState, useUserDispatch } from "../../context/UserContext";
+import Cookies from 'universal-cookie'
 
 export default function Dashboard(props) {
   var classes = useStyles();
+  const { email } = useUserState();
+  const userDispatch = useUserDispatch();
+  const cmd = {
+    host: 'lightapi.net',
+    service: 'user',
+    action: 'queryUserByEmail',
+    version: '0.1.0',
+    data: { email }
+  }
+  const url = '/portal/query?cmd=' + encodeURIComponent(JSON.stringify(cmd));
+  const headers = {};
+
+  useEffect(() => {
+    const abortController = new AbortController();
+
+    const fetchData = async () => {
+      try {
+        const cookies = new Cookies();
+        Object.assign(headers, {'X-CSRF-TOKEN': cookies.get('csrf')})
+        const response = await fetch(url, { headers, credentials: 'include', signal: abortController.signal });
+        //console.log(response);
+        if (!response.ok) {
+          throw response;
+        }
+
+        const data = await response.json();
+        //console.log(data);
+        userDispatch({ type: "UPDATE_PROFILE", userId: data.userId });
+      } catch (e) {
+        // only call dispatch when we know the fetch was not aborted
+        if (!abortController.signal.aborted) {
+          const error = await e.json();
+          console.log(error);
+        }        
+      }
+    };
+
+    fetchData();
+
+    return () => {
+      abortController.abort();
+    };
+  }, []);
 
   return (
     <>

@@ -71,6 +71,25 @@ export default function StatusContainer(props) {
         submit(url, headers, action);
     };
 
+    const updatePeerStatus = () => {
+        console.log("update other user's status!");
+        const url = '/portal/command';
+        const headers = {
+           'Content-Type': 'application/json'
+        };
+        const action = {
+            host: 'lightapi.net',
+            service: 'covid',
+            action: 'updatePeerStatus',
+            version: '0.1.0',
+            data: {
+                subjects,
+                userId: props.userId
+            }    
+        }
+        submit(url, headers, action);
+    };
+
     const submit = async (url, headers, action) => {
       try {
         const cookies = new Cookies();
@@ -99,7 +118,11 @@ export default function StatusContainer(props) {
         { Object.keys(subjects).map((key) => ( <Subject key={key} isReadonly={props.isReadonly} category={key} delCategory={delCategory} createItem={createItem} deleteItem={deleteItem} items={subjects[key]}/> ))}
         { !isAuthenticated ? null :
         <div>
-            { props.isReadonly? null : 
+            { props.isReadonly ? 
+            <Button variant="contained" color="primary" onClick={updatePeerStatus}>
+                Update Peer Status
+            </Button>
+            : 
             <div>    
             <input
                 type="text"
@@ -112,11 +135,11 @@ export default function StatusContainer(props) {
             <Button variant="contained" color="primary" onClick={addCategory}>
                 Add Category
             </Button>
-            </div>
-            }
             <Button variant="contained" color="primary" onClick={submitStatus}>
                 Submit Status
             </Button>
+            </div>
+            }
         </div>
         } 
     </React.Fragment>

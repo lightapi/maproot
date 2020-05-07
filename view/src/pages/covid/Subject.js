@@ -15,7 +15,8 @@ export default function Subject(props) {
     const items = props.items;
     const category = props.category;
     const isReadonly = props.isReadonly;
-    const { isAuthenticated } = useUserState();
+    const { isAuthenticated, userId } = useUserState();
+    console.log("userId = ", userId);
     const [expanded, setExpanded] = useState(false);
     const [currentItem, setCurrentItem] = useState('');
     const first = items.length > 0 ? timeConversion(Date.now() - Object.keys(items[0])[0]) + ' ' + items[0][Object.keys(items[0])[0]] : '';
@@ -44,7 +45,7 @@ export default function Subject(props) {
                                setCurrentItem(e.target.value); 
                             }}
                         />            
-                        <Button variant="contained" color="primary" onClick={() => {props.createItem(category, currentItem)}}>
+                        <Button variant="contained" color="primary" onClick={() => {props.createItem(category, isReadonly? '[' + userId + ']:' + currentItem : currentItem)}}>
                             Create Item
                         </Button>
                     </div>
