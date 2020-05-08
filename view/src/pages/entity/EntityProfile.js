@@ -32,7 +32,9 @@ export default function EntityProfile(props) {
 
   const updateEntity = () => {
     //console.log("updateEntity is called");
-    props.history.push({pathname: '/app/form/updateCovidEntity', state: { data }});
+    if (window.confirm("Updating category and subcategory will remove the Website and Status.")) {
+      props.history.push({pathname: '/app/form/updateCovidEntity', state: { data }});
+    }  
   };
 
   const createEntity = () => {

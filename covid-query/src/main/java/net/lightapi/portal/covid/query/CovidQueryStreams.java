@@ -355,6 +355,11 @@ public class CovidQueryStreams implements LightStreams {
                 String introduction = covidEntityUpdatedEvent.getIntroduction();
                 String entityId = location + "|" + userId;
                 Map<String, Object> entityMap = JsonMapper.string2Map(entityStore.get(entityId));
+
+                // save the old category and old subcategory for comparision.
+                String oldCategory = (String)entityMap.get("category");
+                String oldSubcategory = (String)entityMap.get("subcategory");
+
                 entityMap.put("category", category);
                 entityMap.put("subcategory", subcategory);
                 entityMap.put("latitude", latitude);
@@ -362,26 +367,98 @@ public class CovidQueryStreams implements LightStreams {
                 entityMap.put("introduction", introduction);
                 entityStore.put(entityId, JsonMapper.toJson(entityMap));
 
+                // city must be there as it cannot be deleted in the global store backed with a compact topic portal-city
+                String cityString = cityStore.get(location);
+
                 // update the mapStore point.
                 Map<String, Object> point = createPoint(userId, category, subcategory, introduction, longitude, latitude);
                 String keyCategory = location + "|" + category;
+                String oldKeyCategory  = location + "|" + oldCategory;
                 String keySubCategory = keyCategory + "|" + subcategory;
-                String catString = mapStore.get(keyCategory);
-                if(catString != null) {
-                    Map<String, Object> catMap = JsonMapper.string2Map(catString);
-                    List<Map<String, Object>> catPoints = (List<Map<String, Object>>)catMap.get("points");
-                    catPoints.removeIf(p -> userId.equals(((Map<String, Object>)p.get("properties")).get("id")));
-                    catPoints.add(point);
-                    pc.forward(keyCategory.getBytes(StandardCharsets.UTF_8), JsonMapper.toJson(catMap).getBytes(StandardCharsets.UTF_8), To.child("MapProcessor"));
+                String oldKeySubCategory = oldKeyCategory + "|" + oldSubcategory;
+                if(keyCategory.equals(oldKeyCategory)) {
+                    String catString = mapStore.get(keyCategory);
+                    if(catString != null) {
+                        Map<String, Object> catMap = JsonMapper.string2Map(catString);
+                        List<Map<String, Object>> catPoints = (List<Map<String, Object>>)catMap.get("points");
+                        catPoints.removeIf(p -> userId.equals(((Map<String, Object>)p.get("properties")).get("id")));
+                        catPoints.add(point);
+                        pc.forward(keyCategory.getBytes(StandardCharsets.UTF_8), JsonMapper.toJson(catMap).getBytes(StandardCharsets.UTF_8), To.child("MapProcessor"));
+                    }
+                } else {
+                    if(logger.isTraceEnabled()) logger.trace("keyCategory is changed from old to new." + oldKeyCategory + " to " + keyCategory);
+                    statusStore.delete(email);
+                    websiteStore.delete(email);
+                    // delete the entry from the old map
+                    String oldCatString = mapStore.get(oldKeyCategory);
+                    if(oldCatString != null) {
+                        Map<String, Object> catMap = JsonMapper.string2Map((oldCatString));
+                        List<Map<String, Object>> catPoints = (List<Map<String, Object>>)catMap.get("points");
+                        catPoints.removeIf(p -> userId.equals(((Map<String, Object>)p.get("properties")).get("id")));
+                        pc.forward(oldKeyCategory.getBytes(StandardCharsets.UTF_8), JsonMapper.toJson(catMap).getBytes(StandardCharsets.UTF_8), To.child("MapProcessor"));
+                    }
+                    // add the point to the new map, create the map if it doesn't exist.
+                    String catString = mapStore.get(keyCategory);
+                    if(catString == null) {
+                        // we need to create the entries.
+                        Map<String, Object> catMap = new HashMap<>();
+                        catMap.put("map", JsonMapper.string2Map(cityString));
+                        List<Map<String, Object>> points = new ArrayList<>();
+                        points.add(point);
+                        catMap.put("points", points);
+                        pc.forward(keyCategory.getBytes(StandardCharsets.UTF_8), JsonMapper.toJson(catMap).getBytes(StandardCharsets.UTF_8), To.child("MapProcessor"));
+                    } else {
+                        // we need to update the entry to add userId only if it doesn't exist.
+                        Map<String, Object> catMap = JsonMapper.string2Map(catString);
+                        List<Map<String, Object>> points = (List<Map<String, Object>>)catMap.get("points");
+                        // remove the same userId entry to prevent duplication
+                        points.removeIf(p -> userId.equals(((Map<String, Object>)p.get("properties")).get("id")));
+                        points.add(point);
+                        pc.forward(keyCategory.getBytes(StandardCharsets.UTF_8), JsonMapper.toJson(catMap).getBytes(StandardCharsets.UTF_8), To.child("MapProcessor"));
+                    }
                 }
 
-                String subString = mapStore.get(keySubCategory);
-                if(subString != null) {
-                    Map<String, Object> subMap = JsonMapper.string2Map(subString);
-                    List<Map<String, Object>> subPoints = (List<Map<String, Object>>)subMap.get("points");
-                    subPoints.removeIf(p -> userId.equals(((Map<String, Object>)p.get("properties")).get("id")));
-                    subPoints.add(point);
-                    pc.forward(keySubCategory.getBytes(StandardCharsets.UTF_8), JsonMapper.toJson(subMap).getBytes(StandardCharsets.UTF_8), To.child("MapProcessor"));
+                if(keySubCategory.equals(oldKeySubCategory)) {
+                    // if key of subcategory is not changed, just do the normal update for the point in the map.
+                    String subString = mapStore.get(keySubCategory);
+                    if(subString != null) {
+                        Map<String, Object> subMap = JsonMapper.string2Map(subString);
+                        List<Map<String, Object>> subPoints = (List<Map<String, Object>>)subMap.get("points");
+                        subPoints.removeIf(p -> userId.equals(((Map<String, Object>)p.get("properties")).get("id")));
+                        subPoints.add(point);
+                        pc.forward(keySubCategory.getBytes(StandardCharsets.UTF_8), JsonMapper.toJson(subMap).getBytes(StandardCharsets.UTF_8), To.child("MapProcessor"));
+                    }
+                } else {
+                    if(logger.isTraceEnabled()) logger.trace("keySubCategory is changed from old to new." + oldKeySubCategory + " to " + keySubCategory);
+                    statusStore.delete(email);
+                    websiteStore.delete(email);
+                    // delete the entry from the old map
+                    String oldSubString = mapStore.get(oldKeySubCategory);
+                    if(oldSubString != null) {
+                        Map<String, Object> subMap = JsonMapper.string2Map((oldSubString));
+                        List<Map<String, Object>> subPoints = (List<Map<String, Object>>)subMap.get("points");
+                        subPoints.removeIf(p -> userId.equals(((Map<String, Object>)p.get("properties")).get("id")));
+                        pc.forward(oldKeySubCategory.getBytes(StandardCharsets.UTF_8), JsonMapper.toJson(subMap).getBytes(StandardCharsets.UTF_8), To.child("MapProcessor"));
+                    }
+                    // add the point to the new map, create the map if it doesn't exist.
+                    String subString = mapStore.get(keySubCategory);
+                    if(subString == null) {
+                        // we need to create the entries.
+                        Map<String, Object> subMap = new HashMap<>();
+                        subMap.put("map", JsonMapper.string2Map(cityString));
+                        List<Map<String, Object>> points = new ArrayList<>();
+                        points.add(point);
+                        subMap.put("points", points);
+                        pc.forward(keySubCategory.getBytes(StandardCharsets.UTF_8), JsonMapper.toJson(subMap).getBytes(StandardCharsets.UTF_8), To.child("MapProcessor"));
+                    } else {
+                        // we need to update the entry to remove the old and add new based on userId
+                        Map<String, Object> subMap = JsonMapper.string2Map(subString);
+                        List<Map<String, Object>> points = (List<Map<String, Object>>)subMap.get("points");
+                        // remove the same userId entry to prevent duplication
+                        points.removeIf(p -> userId.equals(((Map<String, Object>)p.get("properties")).get("id")));
+                        points.add(point);
+                        pc.forward(keySubCategory.getBytes(StandardCharsets.UTF_8), JsonMapper.toJson(subMap).getBytes(StandardCharsets.UTF_8), To.child("MapProcessor"));
+                    }
                 }
 
                 pc.forward(email.getBytes(StandardCharsets.UTF_8), ByteUtil.longToBytes(nonce + 1), To.child("NonceProcessor"));
@@ -425,6 +502,11 @@ public class CovidQueryStreams implements LightStreams {
                     subPoints.removeIf(p -> userId.equals(((Map<String, Object>)p.get("properties")).get("id")));
                     pc.forward(keySubCategory.getBytes(StandardCharsets.UTF_8), JsonMapper.toJson(subMap).getBytes(StandardCharsets.UTF_8), To.child("MapProcessor"));
                 }
+
+                // delete status if there is one
+                statusStore.delete(email);
+                // delete website if there is one
+                websiteStore.delete(email);
 
                 pc.forward(email.getBytes(StandardCharsets.UTF_8), ByteUtil.longToBytes(nonce + 1), To.child("NonceProcessor"));
                 EventNotification notification = new EventNotification(nonce, APP, covidEntityDeletedEvent.getClass().getSimpleName(), true, null, covidEntityDeletedEvent);
