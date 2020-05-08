@@ -3,7 +3,7 @@ import { useApiGet } from '../../hooks/useApiGet';
 //import useStyles from "./styles";
 import StatusContainer from './StatusContainer';
 import CircularProgress from '@material-ui/core/CircularProgress';
-
+import ComRender from '../../ComRender';
 // This is for other users to view the current readonly status by userId regardless if he/she logs in
 
 export default function Website(props) {
@@ -11,7 +11,7 @@ export default function Website(props) {
   const cmd = {
     host: 'lightapi.net',
     service: 'covid',
-    action: 'getStatusByUserId',
+    action: 'getWebsiteByUserId',
     version: '0.1.0',
     data: { userId: props.userId }
   }
@@ -20,7 +20,7 @@ export default function Website(props) {
   const headers = {};
 
   const { isLoading, data, error } = useApiGet({url, headers});
-  let subjects = data || {};
+  let site = data || {};
 
   let wait;
   if(isLoading) {
@@ -33,7 +33,9 @@ export default function Website(props) {
     )  
   } else {
     wait = (
-      <StatusContainer {...props} subjects = {subjects} isReadonly={true}/>
+      <div>
+	    	<ComRender site={site}/>
+      </div>
     )
   }
 

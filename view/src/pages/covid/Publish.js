@@ -4,14 +4,14 @@ import { useUserState } from "../../context/UserContext";
 import CircularProgress from '@material-ui/core/CircularProgress';
 import FormDispatcher from './FormDispatcher';
 
-// This is the status entry point for users to update his/her status after logging in.
+// This is the publish entry point for users to update his/her website after logging in.
 
 export default function Publish(props) {
   const { email } = useUserState();
   const statusCmd = {
     host: 'lightapi.net',
     service: 'covid',
-    action: 'getStatusByEmail',
+    action: 'getWebsiteByEmail',
     version: '0.1.0',
     data: { email }
   }
@@ -19,7 +19,7 @@ export default function Publish(props) {
   var headers = {};
   var { isLoading, data } = useApiGet({url, headers});
 
-  let subjects = data || {};
+  let site = data || {};
 
   const entityCmd = {
     host: 'lightapi.net',
@@ -46,7 +46,7 @@ export default function Publish(props) {
     )  
   } else {
     wait = (
-      <FormDispatcher {...props} category={entity.category} subcategory={entity.subcategory} subjects = {subjects}/>
+      <FormDispatcher {...props} category={entity.category} subcategory={entity.subcategory} site = {site}/>
     )
   }
 

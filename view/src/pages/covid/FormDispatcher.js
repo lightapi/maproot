@@ -54,21 +54,25 @@ export default function StatusContainer(props) {
 		    switch(props.subcategory) {
 		    	case 'forsale':
 		    	case 'forrent': 
-		            form = 'saleRentForm';
+		            form = 'realEstateForm';
 		            break;
-		    	default:
-		    		form = 'realEstateForm';
-		    		break;
+				case 'torent':
+					form = 'toRentForm';
+					break;
+				case 'tobuy':
+					form = 'toBuyForm';
+					break;
 		    }
 		    break;
 		default:
-		    form = 'statusForm';
+		    form = 'websiteForm';
 		    break;
 	}
+	console.log("form = ", form);
 
     return <div><Redirect to={{
-      			pathname: '/app/form/{form}',
-      			state: props.subjects
+      			pathname: '/app/form/' + form,
+      			state: {data: props.site}
   	  		}}/></div>
 }
 

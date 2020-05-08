@@ -30,7 +30,7 @@ import DeleteEntity from "../../pages/entity/DeleteEntity";
 import LiveMap from "../../pages/covid/LiveMap";
 import Status from "../../pages/covid/Status";
 import Publish from "../../pages/covid/Publish";
-import Website from "../../pages/covid/Website";
+import Website from "../../pages/covid/UserIdWebsite";
 import PeerStatus from "../../pages/covid/UserIdStatus";
 
 // context

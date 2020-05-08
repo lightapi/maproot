@@ -59,6 +59,11 @@ export default function LiveMap(props) {
     props.history.push({pathname: '/app/covid/peerStatus', state: { data: { userId: id }}});
   };
 
+  const site = (id) => {
+    //console.log("peer website is called", id);
+    props.history.push({pathname: '/app/covid/website', state: { data: { userId: id }}});
+  };
+
   return (
     <div>
       <ReactMapGL
@@ -158,6 +163,9 @@ export default function LiveMap(props) {
                 </Button>
                 <Button variant="contained" color="primary" onClick={() => ps(selectedEntity.properties.id)}>
                   Peer Status
+                </Button>
+                <Button variant="contained" color="primary" onClick={() => site(selectedEntity.properties.id)}>
+                  Peer Site
                 </Button>
               </div>  
               <p>{selectedEntity.properties.introduction}</p>
