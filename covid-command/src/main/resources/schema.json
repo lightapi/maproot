@@ -197,6 +197,13 @@
     },
     "scope": "portal.w"
   },
+  "lightapi.net/covid/deleteWebsite/0.1.0": {
+    "schema": {
+      "title": "Service",
+      "type": "object"
+    },
+    "scope": "portal.w"
+  },
   "lightapi.net/covid/updateWebsite/0.1.0": {
     "schema": {
       "title": "Service",
@@ -227,6 +234,13 @@
         "province",
         "city"
       ]
+    },
+    "scope": "portal.w"
+  },
+  "lightapi.net/covid/deleteStatus/0.1.0": {
+    "schema": {
+      "title": "Service",
+      "type": "object"
     },
     "scope": "portal.w"
   }

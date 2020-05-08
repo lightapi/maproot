@@ -439,6 +439,15 @@ public class CovidQueryStreams implements LightStreams {
                 pc.forward(email.getBytes(StandardCharsets.UTF_8), ByteUtil.longToBytes(nonce + 1), To.child("NonceProcessor"));
                 EventNotification notification = new EventNotification(nonce, APP, covidStatusUpdatedEvent.getClass().getSimpleName(), true, null, covidStatusUpdatedEvent);
                 pc.forward(email.getBytes(StandardCharsets.UTF_8), notification.toString().getBytes(StandardCharsets.UTF_8), To.child("NotificationProcessor"));
+            } else if(object instanceof CovidStatusDeletedEvent) {
+                CovidStatusDeletedEvent covidStatusDeletedEvent = (CovidStatusDeletedEvent) object;
+                if (logger.isTraceEnabled()) logger.trace("Event = " + covidStatusDeletedEvent);
+                String email = covidStatusDeletedEvent.getEmail();
+                long nonce = covidStatusDeletedEvent.getEventId().getNonce();
+                statusStore.delete(email);
+                pc.forward(email.getBytes(StandardCharsets.UTF_8), ByteUtil.longToBytes(nonce + 1), To.child("NonceProcessor"));
+                EventNotification notification = new EventNotification(nonce, APP, covidStatusDeletedEvent.getClass().getSimpleName(), true, null, covidStatusDeletedEvent);
+                pc.forward(email.getBytes(StandardCharsets.UTF_8), notification.toString().getBytes(StandardCharsets.UTF_8), To.child("NotificationProcessor"));
             } else if(object instanceof CovidWebsiteUpdatedEvent) {
                 CovidWebsiteUpdatedEvent covidWebsiteUpdatedEvent = (CovidWebsiteUpdatedEvent) object;
                 if (logger.isTraceEnabled()) logger.trace("Event = " + covidWebsiteUpdatedEvent);
@@ -448,6 +457,15 @@ public class CovidQueryStreams implements LightStreams {
                 websiteStore.put(email, w);
                 pc.forward(email.getBytes(StandardCharsets.UTF_8), ByteUtil.longToBytes(nonce + 1), To.child("NonceProcessor"));
                 EventNotification notification = new EventNotification(nonce, APP, covidWebsiteUpdatedEvent.getClass().getSimpleName(), true, null, covidWebsiteUpdatedEvent);
+                pc.forward(email.getBytes(StandardCharsets.UTF_8), notification.toString().getBytes(StandardCharsets.UTF_8), To.child("NotificationProcessor"));
+            } else if(object instanceof CovidWebsiteDeletedEvent) {
+                CovidWebsiteDeletedEvent covidWebsiteDeletedEvent = (CovidWebsiteDeletedEvent) object;
+                if (logger.isTraceEnabled()) logger.trace("Event = " + covidWebsiteDeletedEvent);
+                String email = covidWebsiteDeletedEvent.getEmail();
+                long nonce = covidWebsiteDeletedEvent.getEventId().getNonce();
+                websiteStore.delete(email);
+                pc.forward(email.getBytes(StandardCharsets.UTF_8), ByteUtil.longToBytes(nonce + 1), To.child("NonceProcessor"));
+                EventNotification notification = new EventNotification(nonce, APP, covidWebsiteDeletedEvent.getClass().getSimpleName(), true, null, covidWebsiteDeletedEvent);
                 pc.forward(email.getBytes(StandardCharsets.UTF_8), notification.toString().getBytes(StandardCharsets.UTF_8), To.child("NotificationProcessor"));
             } else if(object instanceof PeerStatusUpdatedEvent) {
                 PeerStatusUpdatedEvent peerStatusUpdatedEvent = (PeerStatusUpdatedEvent) object;
