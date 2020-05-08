@@ -520,6 +520,41 @@ public class CovidQueryStreams implements LightStreams {
                 long nonce = covidStatusUpdatedEvent.getEventId().getNonce();
                 String s = covidStatusUpdatedEvent.getStatus();
                 statusStore.put(email, s);
+                // update map store entry for the hasStatus property.
+                String location = covidStatusUpdatedEvent.getCountry() + "|" + covidStatusUpdatedEvent.getProvince() + "|" + covidStatusUpdatedEvent.getCity();
+                String userId = covidStatusUpdatedEvent.getUserId();
+                String entityId = location + "|" + userId;
+                String entityString = entityStore.get(entityId);
+                Map<String, Object> entityMap = JsonMapper.string2Map(entityString);
+                String category = (String)entityMap.get("category");
+                String subcategory = (String)entityMap.get("subcategory");
+                String keyCategory = location + "|" + category;
+                String keySubCategory = keyCategory + "|" + subcategory;
+                String catString = mapStore.get(keyCategory);
+                if(catString != null) {
+                    Map<String, Object> catMap = JsonMapper.string2Map(catString);
+                    List<Map<String, Object>> catPoints = (List<Map<String, Object>>)catMap.get("points");
+                    Map<String, Object> point = catPoints.stream()
+                            .filter(p -> userId.equals(((Map<String, Object>)p.get("properties")).get("id")))
+                            .findFirst()
+                            .get();
+                    Map<String, Object> properties = (Map<String, Object>)point.get("properties");
+                    properties.put("hasStatus", true);
+                    pc.forward(keyCategory.getBytes(StandardCharsets.UTF_8), JsonMapper.toJson(catMap).getBytes(StandardCharsets.UTF_8), To.child("MapProcessor"));
+                }
+
+                String subString = mapStore.get(keySubCategory);
+                if(subString != null) {
+                    Map<String, Object> subMap = JsonMapper.string2Map(subString);
+                    List<Map<String, Object>> subPoints = (List<Map<String, Object>>)subMap.get("points");
+                    Map<String, Object> point = subPoints.stream()
+                            .filter(p -> userId.equals(((Map<String, Object>)p.get("properties")).get("id")))
+                            .findFirst()
+                            .get();
+                    Map<String, Object> properties = (Map<String, Object>)point.get("properties");
+                    properties.put("hasStatus", true);
+                    pc.forward(keySubCategory.getBytes(StandardCharsets.UTF_8), JsonMapper.toJson(subMap).getBytes(StandardCharsets.UTF_8), To.child("MapProcessor"));
+                }
                 pc.forward(email.getBytes(StandardCharsets.UTF_8), ByteUtil.longToBytes(nonce + 1), To.child("NonceProcessor"));
                 EventNotification notification = new EventNotification(nonce, APP, covidStatusUpdatedEvent.getClass().getSimpleName(), true, null, covidStatusUpdatedEvent);
                 pc.forward(email.getBytes(StandardCharsets.UTF_8), notification.toString().getBytes(StandardCharsets.UTF_8), To.child("NotificationProcessor"));
@@ -539,6 +574,41 @@ public class CovidQueryStreams implements LightStreams {
                 long nonce = covidWebsiteUpdatedEvent.getEventId().getNonce();
                 String w = covidWebsiteUpdatedEvent.getWebsite();
                 websiteStore.put(email, w);
+                // update map store entry for the hasStatus property.
+                String location = covidWebsiteUpdatedEvent.getCountry() + "|" + covidWebsiteUpdatedEvent.getProvince() + "|" + covidWebsiteUpdatedEvent.getCity();
+                String userId = covidWebsiteUpdatedEvent.getUserId();
+                String entityId = location + "|" + userId;
+                String entityString = entityStore.get(entityId);
+                Map<String, Object> entityMap = JsonMapper.string2Map(entityString);
+                String category = (String)entityMap.get("category");
+                String subcategory = (String)entityMap.get("subcategory");
+                String keyCategory = location + "|" + category;
+                String keySubCategory = keyCategory + "|" + subcategory;
+                String catString = mapStore.get(keyCategory);
+                if(catString != null) {
+                    Map<String, Object> catMap = JsonMapper.string2Map(catString);
+                    List<Map<String, Object>> catPoints = (List<Map<String, Object>>)catMap.get("points");
+                    Map<String, Object> point = catPoints.stream()
+                            .filter(p -> userId.equals(((Map<String, Object>)p.get("properties")).get("id")))
+                            .findFirst()
+                            .get();
+                    Map<String, Object> properties = (Map<String, Object>)point.get("properties");
+                    properties.put("hasWebsite", true);
+                    pc.forward(keyCategory.getBytes(StandardCharsets.UTF_8), JsonMapper.toJson(catMap).getBytes(StandardCharsets.UTF_8), To.child("MapProcessor"));
+                }
+
+                String subString = mapStore.get(keySubCategory);
+                if(subString != null) {
+                    Map<String, Object> subMap = JsonMapper.string2Map(subString);
+                    List<Map<String, Object>> subPoints = (List<Map<String, Object>>)subMap.get("points");
+                    Map<String, Object> point = subPoints.stream()
+                            .filter(p -> userId.equals(((Map<String, Object>)p.get("properties")).get("id")))
+                            .findFirst()
+                            .get();
+                    Map<String, Object> properties = (Map<String, Object>)point.get("properties");
+                    properties.put("hasWebsite", true);
+                    pc.forward(keySubCategory.getBytes(StandardCharsets.UTF_8), JsonMapper.toJson(subMap).getBytes(StandardCharsets.UTF_8), To.child("MapProcessor"));
+                }
                 pc.forward(email.getBytes(StandardCharsets.UTF_8), ByteUtil.longToBytes(nonce + 1), To.child("NonceProcessor"));
                 EventNotification notification = new EventNotification(nonce, APP, covidWebsiteUpdatedEvent.getClass().getSimpleName(), true, null, covidWebsiteUpdatedEvent);
                 pc.forward(email.getBytes(StandardCharsets.UTF_8), notification.toString().getBytes(StandardCharsets.UTF_8), To.child("NotificationProcessor"));
@@ -743,6 +813,8 @@ public class CovidQueryStreams implements LightStreams {
             Map<String, Object> properties = new HashMap<>();
             properties.put("cluster", false);
             properties.put("id", userId);
+            properties.put("hasStatus", false);
+            properties.put("hasWebsite", false);
             properties.put("category", category);
             properties.put("subcategory", subcategory);
             properties.put("introduction", introduction);

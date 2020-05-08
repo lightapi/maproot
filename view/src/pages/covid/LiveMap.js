@@ -161,12 +161,16 @@ export default function LiveMap(props) {
                 <Button variant="contained" color="primary" onClick={() => pm(selectedEntity.properties.id)}>
                   Private Message
                 </Button>
+                { selectedEntity.properties.hasStatus ? (
                 <Button variant="contained" color="primary" onClick={() => ps(selectedEntity.properties.id)}>
                   Peer Status
                 </Button>
+                ) : null }
+                { selectedEntity.properties.hasWebsite ? (
                 <Button variant="contained" color="primary" onClick={() => site(selectedEntity.properties.id)}>
                   Peer Site
                 </Button>
+                ) : null }
               </div>  
               <p>{selectedEntity.properties.introduction}</p>
             </div>

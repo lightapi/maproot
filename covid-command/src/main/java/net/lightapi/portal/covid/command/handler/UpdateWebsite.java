@@ -41,6 +41,12 @@ public class UpdateWebsite implements Handler {
         String email = (String)auditInfo.get("user_id");
         Map<String, Object> map = (Map<String, Object>)input;
         // TODO limit number of categories and items in each category.
+        Result<String> resultUser = HybridQueryClient.getUserByEmail(exchange, email);
+        if(resultUser.isFailure()) {
+            return NioUtils.toByteBuffer(getStatus(exchange, resultUser.getError()));
+        }
+        Map<String, Object> userMap = JsonMapper.string2Map(resultUser.getResult());
+
         Result<String> resultNonce = HybridQueryClient.getNonceByEmail(exchange, email);
         if(resultNonce.isSuccess()) {
             EventId eventId = EventId.newBuilder()
@@ -50,6 +56,10 @@ public class UpdateWebsite implements Handler {
             CovidWebsiteUpdatedEvent event = CovidWebsiteUpdatedEvent.newBuilder()
                     .setEventId(eventId)
                     .setWebsite(JsonMapper.toJson(map))
+                    .setUserId((String)userMap.get("userId"))
+                    .setCountry((String)userMap.get("country"))
+                    .setProvince((String)userMap.get("province"))
+                    .setCity((String)userMap.get("city"))
                     .setTimestamp(System.currentTimeMillis())
                     .build();
 
