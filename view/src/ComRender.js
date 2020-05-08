@@ -1,6 +1,16 @@
 import React from "react";
 import Generic from "./com/Generic";
 import Ask from "./com/Ask";
+import Give from "./com/Give";
+import Offer from "./com/Offer";
+import Want from "./com/Want";
+import Goods from "./com/Goods";
+import Services from "./com/Services";
+import Buy from "./com/Buy";
+import Sell from "./com/Sell";
+import ToRent from "./com/ToRent";
+import ToBuy from "./com/ToBuy";
+import RealEstate from "./com/RealEstate";
 
 const Components = {
   generic: Generic,
