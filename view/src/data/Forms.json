@@ -232,7 +232,7 @@
         "co": {
           "title": "Component",
           "type": "string",
-          "default": "GiveComponent",
+          "default": "give",
           "readonly": true
         },
         "ss": {
@@ -308,7 +308,7 @@
         "co": {
           "title": "Component",
           "type": "string",
-          "default": "OfferComponent",
+          "default": "offer",
           "readonly": true
         },
         "ss": {
@@ -383,7 +383,7 @@
         "co": {
           "title": "Component",
           "type": "string",
-          "default": "WantComponent",
+          "default": "want",
           "readonly": true
         },
         "ss": {
@@ -458,7 +458,7 @@
         "co": {
           "title": "Component",
           "type": "string",
-          "default": "GoodsComponent",
+          "default": "goods",
           "readonly": true
         },
         "ss": {
@@ -533,7 +533,7 @@
         "co": {
           "title": "Component",
           "type": "string",
-          "default": "ServicesComponent",
+          "default": "services",
           "readonly": true
         },
         "ss": {
@@ -609,7 +609,7 @@
         "co": {
           "title": "Component",
           "type": "string",
-          "default": "BuyComponent",
+          "default": "buy",
           "readonly": true
         },
         "ss": {
@@ -684,7 +684,7 @@
         "co": {
           "title": "Component",
           "type": "string",
-          "default": "ServicesComponent",
+          "default": "sell",
           "readonly": true
         },
         "ss": {
@@ -760,7 +760,7 @@
         "co": {
           "title": "Component",
           "type": "string",
-          "default": "ToRentComponent",
+          "default": "toRent",
           "readonly": true
         },
         "ss": {
@@ -835,7 +835,7 @@
         "co": {
           "title": "Component",
           "type": "string",
-          "default": "ToBuyComponent",
+          "default": "toBuy",
           "readonly": true
         },
         "ss": {
@@ -911,7 +911,7 @@
         "co": {
           "title": "Component",
           "type": "string",
-          "default": "RealEstateComponent",
+          "default": "realEstate",
           "readonly": true
         },
         "ss": {
