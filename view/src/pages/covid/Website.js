@@ -34,7 +34,7 @@ export default function Website(props) {
   } else {
     wait = (
       <div>
-	    	<ComRender site={site}/>
+	    	<ComRender {...props} site={site}/>
       </div>
     )
   }

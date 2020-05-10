@@ -136,7 +136,7 @@
         "service": "covid",
         "action": "updateWebsite",
         "version": "0.1.0",
-        "title": "Create Website",
+        "title": "Update Website",
         "success": "/app/success",
         "failure": "/app/failure"
       },
@@ -179,6 +179,40 @@
               "d": {
                 "title": "Description",
                 "type": "string"
+              },
+              "is": {
+                "type": "array",
+                "title": "Optional Image Urls",
+                "maxItems": 50,
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "u": {
+                      "title": "Image Url",
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "u"
+                  ]
+                } 
+              },
+              "vs": {
+                "type": "array",
+                "title": "Optional Video Urls",
+                "maxItems": 5,
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "u": {
+                      "title": "Video Url",
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "u"
+                  ]
+                } 
               }
             },
             "required": [
@@ -207,6 +241,26 @@
           {
             "key": "ss[].d",
             "type": "textarea"
+          },
+          {
+            "key": "ss[].is",
+            "add": "New URL",
+            "style": {
+              "add": "btn-success"
+            },
+            "items": [
+              "ss[].is[].u"
+            ]
+          },
+          {
+            "key": "ss[].vs",
+            "add": "New URL",
+            "style": {
+              "add": "btn-success"
+            },
+            "items": [
+              "ss[].vs[].u"
+            ]
           }
         ]
       }

@@ -27,9 +27,17 @@ const Components = {
   realEstate: RealEstate
 };
 
+
 export default props => {
+  const pm = (id) => {
+    //console.log("private message is called", id);
+    props.history.push({pathname: '/app/form/privateMessage', state: { data: { userId: id }}});
+  };
+  
   if (typeof Components[props.site.co] !== "undefined") {
     return React.createElement(Components[props.site.co], {
+      userId: props.userId,
+      pm: pm,
       ss: props.site.ss
     });
   }
