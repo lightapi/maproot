@@ -63,9 +63,9 @@ export default function NotificationMenu(props) {
           className={classes.headerMenu}
           disableAutoFocusItem
         >
-          {data.map(notification => (
+          {data.map((notification, index) => (
             <MenuItem
-              key={notification.nonce}
+              key={index}
               onClick={() => setNotificationsMenu(null)}
               className={classes.headerMenuItem}
             >
