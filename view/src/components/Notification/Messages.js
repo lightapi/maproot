@@ -20,14 +20,25 @@ const useRowStyles = makeStyles({
   });
 
   function Row(props) {
+      console.log(props);
     const { row } = props;
     const classes = useRowStyles();
-  
+
+    const replyMessage = (userId, subject) => {
+        props.history.push({pathname: '/app/form/privateMessage', state: { data : { userId, subject}}});
+    };
+
+    const deleteMessage = () => {
+        if (window.confirm("Are you sure you want to delete the message?")) {
+          console.log("delete the entry here");
+        } 
+    };
+
     return (
       <React.Fragment>
         <TableRow className={classes.root}>
           <TableCell component="th" scope="row">{timeConversion((new Date()).getTime() - row.timestamp)}</TableCell>
-          <TableCell align="left"><ReplyIcon onClick={() => console.log("reply")}/>{row.fromId}</TableCell>
+          <TableCell align="left"><ReplyIcon onClick={() => replyMessage(row.fromId, row.subject)}/>{row.fromId}</TableCell>
           <TableCell align="left">{row.subject}</TableCell>
           <TableCell align="right">
               <DeleteIcon onClick={() => console.log("delete is clicked", row.timestamp, row.fromId)} />
@@ -61,7 +72,7 @@ export default function Messages(props) {
                     </TableHead>
                     <TableBody>
                     {messages.map((msg, index) => (
-                        <Row key={index} row={msg} />
+                        <Row history={props.history} key={index} row={msg} />
                     ))}
                     </TableBody>
                 </Table>

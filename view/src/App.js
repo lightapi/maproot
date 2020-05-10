@@ -4,7 +4,8 @@ import Layout from "./components/Layout";
 import { createBrowserHistory } from 'history';
 import Error from "./pages/error";
 
-export const history = createBrowserHistory();
+// this history doesn't work. remove it later.
+//export const history = createBrowserHistory();
 
 const App = () => {
   return (
