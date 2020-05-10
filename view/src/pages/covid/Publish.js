@@ -17,10 +17,11 @@ export default function Publish(props) {
   }
   var url = '/portal/query?cmd=' + encodeURIComponent(JSON.stringify(statusCmd));
   var headers = {};
-  var { isLoading, data } = useApiGet({url, headers});
-
-  let site = data || {};
-
+  var siteLoading = false;
+  var site = null;
+  var siteError = null;
+  var { isLoading : siteLoading, data : site, error : siteError } = useApiGet({url, headers});
+  //console.log("siteLoading", siteLoading, site, siteError);
   const entityCmd = {
     host: 'lightapi.net',
     service: 'covid',
@@ -30,24 +31,28 @@ export default function Publish(props) {
   }
   var url = '/portal/query?cmd=' + encodeURIComponent(JSON.stringify(entityCmd));
   var headers = {};
-  var { isLoading, data, error } = useApiGet({url, headers});
-  let entity = data;
-  console.log("entity = ", entity);
+  var entityLoading = false;
+  var entity = null;
+  var { isLoading : entityLoading, data : entity, error } = useApiGet({url, headers});
+  //console.log("entity = ", entityLoading, entity, error);
 
   let wait;
-  if(isLoading) {
+  if(siteLoading || entityLoading) {
     wait = <div><CircularProgress/></div>;
-  } else if(error) {
-    wait = (      
-      <div>
-        <h2>Failure</h2>
-      <pre>{ JSON.stringify(error, null, 2) }</pre>
-      </div>
-    )  
   } else {
-    wait = (
-      <FormDispatcher {...props} category={entity.category} subcategory={entity.subcategory} site = {site}/>
-    )
+    // loading completed here.
+    if(error) {
+      wait = (      
+        <div>
+          <h2>Failure</h2>
+        <pre>{ JSON.stringify(error, null, 2) }</pre>
+        </div>
+      )  
+    } else {
+      wait = (
+        <FormDispatcher {...props} category={entity.category} subcategory={entity.subcategory} site = {site || {}}/>
+      )
+    }
   }
 
   return (
