@@ -3,8 +3,10 @@ import {
   IconButton,
   Menu,
   MenuItem,
+  Fab,
 } from "@material-ui/core";
 import {
+  Build as ManageIcon,
   NotificationsNone as NotificationsIcon,
 } from "@material-ui/icons";
 import { Badge } from "../Wrappers/Wrappers";
@@ -32,6 +34,12 @@ export default function NotificationMenu(props) {
     //console.log("data", data);
     //console.log("error", error);
     //console.log("isLoading", isLoading);
+
+    const notificationDetail = () => {
+      console.log("notificationDetail is called", data);
+      props.history.push({pathname: '/app/notificationDetail', state: { data }});
+    };
+
     let wait;
     if(isLoading) {
       wait = <div><CircularProgress/></div>;
@@ -63,6 +71,16 @@ export default function NotificationMenu(props) {
           className={classes.headerMenu}
           disableAutoFocusItem
         >
+          <Fab
+            variant="extended"
+            color="primary"
+            aria-label="Add"
+            onClick={notificationDetail}
+            className={classes.sendMessageButton}
+          >
+            Notification Detail
+            <ManageIcon className={classes.sendButtonIcon} />
+          </Fab>
           {data.map((notification, index) => (
             <MenuItem
               key={index}

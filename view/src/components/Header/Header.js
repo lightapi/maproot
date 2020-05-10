@@ -98,11 +98,11 @@ export default function Header(props) {
           />
         </div>
         { isAuthenticated ? (
-          <NotificationMenu classes = {classes} />
+          <NotificationMenu {...props} classes = {classes} />
         ) : null
         }
         { isAuthenticated ? (
-          <MailMenu classes = {classes} />
+          <MailMenu {...props} classes = {classes} />
         ) : null
         }
         <ProfileMenu classes = {classes } history = {props.history} />

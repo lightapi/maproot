@@ -32,6 +32,8 @@ import Status from "../../pages/covid/Status";
 import Publish from "../../pages/covid/Publish";
 import Website from "../../pages/covid/UserIdWebsite";
 import PeerStatus from "../../pages/covid/UserIdStatus";
+import NotificationDetail from "../../components/Notification/NotificationDetail";
+import Messages from "../Notification/Messages";
 
 // context
 import { useLayoutState } from "../../context/LayoutContext";
@@ -61,6 +63,8 @@ function Layout(props) {
               <Route path="/app/success" component={Success} />
               <Route path="/app/profile" component={Profile} />
               <Route path="/app/deleteProfile" component={DeleteProfile} />
+              <Route path="/app/notificationDetail" component={NotificationDetail} />
+              <Route path="/app/messages" component={Messages} />
 
               <Route path="/app/covid/cityRegistry" component={CityRegistry} />
               <Route path="/app/covid/cityProfile" component={CityProfile} />

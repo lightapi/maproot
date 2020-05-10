@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   IconButton,
   Menu,
@@ -8,6 +8,7 @@ import {
 import {
   MailOutline as MailIcon,
   Send as SendIcon,
+  Build as ManageIcon,
 } from "@material-ui/icons";
 import { Badge, Typography } from "../Wrappers/Wrappers";
 import UserAvatar from "../UserAvatar/UserAvatar";
@@ -59,12 +60,28 @@ export default function MailMenu(props) {
       }
     };
 
+    useEffect(() => {
+      const cookies = new Cookies();
+      const headers = {'X-CSRF-TOKEN': cookies.get('csrf')};
+      queryMessageFn(url, headers);
+    }, []);
+
     useInterval(() => {
       const cookies = new Cookies();
       const headers = {'X-CSRF-TOKEN': cookies.get('csrf')};
       queryMessageFn(url, headers);
     }, 60000);
 
+    const sendMessage = () => {
+      console.log("sendMessage is callled");
+      props.history.push('/app/form/privateMessage');
+    };
+
+    const manageMessages = () => {
+      console.log("manageMessages is callled");
+      props.history.push({pathname: '/app/messages', state: { data: messages }});
+    };
+    
     //const { isLoading, data, error } = useApiGet({url, headers});
     //console.log("messages", messages);
     //console.log("error", error);
@@ -142,10 +159,21 @@ export default function MailMenu(props) {
             variant="extended"
             color="primary"
             aria-label="Add"
+            onClick={sendMessage}
             className={classes.sendMessageButton}
           >
             Send New Message
             <SendIcon className={classes.sendButtonIcon} />
+          </Fab>
+          <Fab
+            variant="extended"
+            color="primary"
+            aria-label="Add"
+            onClick={manageMessages}
+            className={classes.sendMessageButton}
+          >
+            Manage Messages
+            <ManageIcon className={classes.sendButtonIcon} />
           </Fab>
         </Menu>
         </React.Fragment>
