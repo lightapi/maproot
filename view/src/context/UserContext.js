@@ -9,7 +9,7 @@ function userReducer(state, action) {
   console.log("action = ", action);
   switch (action.type) {
     case "LOGIN_SUCCESS":
-      return { ...state, isAuthenticated: action.isAuthenticated, email: action.email, userId: null, roles: action.roles};
+      return { ...state, isAuthenticated: action.isAuthenticated, email: action.email, roles: action.roles};
     case "SIGN_OUT_SUCCESS":
       return { ...state, isAuthenticated: false, email: null, userId: null, roles: null };
     case "UPDATE_PROFILE":
