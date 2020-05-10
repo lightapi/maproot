@@ -36,7 +36,7 @@ export default function RealEstate(props) {
                         <TableRow>
                             <TableCell colSpan={4} align="left">{subject.d}</TableCell>
                         </TableRow>
-                        {subject.is && subject.is.length > 0 || subject.vs && subject.vs.length > 0 ? 
+                        {(subject.is && subject.is.length > 0) || (subject.vs && subject.vs.length > 0) ? 
                         <TableRow>
                             <TableCell>Images:</TableCell>
                             <TableCell align="left">{subject.is && subject.is.length > 0 ? <ImagePopup images={subject.is}/> : null }</TableCell>

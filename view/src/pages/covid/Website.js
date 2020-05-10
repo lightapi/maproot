@@ -1,7 +1,6 @@
 import React from 'react';
 import { useApiGet } from '../../hooks/useApiGet';
 //import useStyles from "./styles";
-import StatusContainer from './StatusContainer';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import ComRender from '../../ComRender';
 // This is for other users to view the current readonly status by userId regardless if he/she logs in

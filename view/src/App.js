@@ -1,7 +1,6 @@
 import React from 'react';
 import { HashRouter, Route, Switch, Redirect } from "react-router-dom";
 import Layout from "./components/Layout";
-import { createBrowserHistory } from 'history';
 import Error from "./pages/error";
 
 // this history doesn't work. remove it later.

@@ -5,7 +5,6 @@ import {
 import useStyles from "./styles";
 
 // components
-import { useApiGet } from '../../hooks/useApiGet';
 import Widget from "../../components/Widget";
 import PageTitle from "../../components/PageTitle";
 import { Typography } from "../../components/Wrappers";

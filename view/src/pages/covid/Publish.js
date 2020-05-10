@@ -17,9 +17,6 @@ export default function Publish(props) {
   }
   var url = '/portal/query?cmd=' + encodeURIComponent(JSON.stringify(statusCmd));
   var headers = {};
-  var siteLoading = false;
-  var site = null;
-  var siteError = null;
   var { isLoading : siteLoading, data : site, error : siteError } = useApiGet({url, headers});
   //console.log("siteLoading", siteLoading, site, siteError);
   const entityCmd = {
@@ -29,11 +26,9 @@ export default function Publish(props) {
     version: '0.1.0',
     data: { email }
   }
-  var url = '/portal/query?cmd=' + encodeURIComponent(JSON.stringify(entityCmd));
-  var headers = {};
-  var entityLoading = false;
-  var entity = null;
-  var { isLoading : entityLoading, data : entity, error } = useApiGet({url, headers});
+  url = '/portal/query?cmd=' + encodeURIComponent(JSON.stringify(entityCmd));
+  headers = {};
+  var { isLoading : entityLoading, data : entity, error: entityError } = useApiGet({url, headers});
   //console.log("entity = ", entityLoading, entity, error);
 
   let wait;
@@ -41,11 +36,11 @@ export default function Publish(props) {
     wait = <div><CircularProgress/></div>;
   } else {
     // loading completed here.
-    if(error) {
+    if(entityError || siteError) {
       wait = (      
         <div>
           <h2>Failure</h2>
-        <pre>{ JSON.stringify(error, null, 2) }</pre>
+        <pre>{ JSON.stringify(entityError || siteError, null, 2) }</pre>
         </div>
       )  
     } else {

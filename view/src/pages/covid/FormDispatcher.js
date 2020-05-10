@@ -1,13 +1,8 @@
-import React, { useState } from 'react';
-import Subject from './Subject';
-import Button from '@material-ui/core/Button';
+import React from 'react';
 import { Redirect } from 'react-router';
 
-//import { makeStyles } from '@material-ui/core/styles';
-import Cookies from 'universal-cookie'
-
-export default function StatusContainer(props) {
-	console.log("props = ", props);
+export default function FormDispatcher(props) {
+	//console.log("props = ", props);
 	let form = '';
 	switch(props.category) {
 		case 'askandgive':
@@ -17,7 +12,10 @@ export default function StatusContainer(props) {
 				    break;
 				case 'give':
 				    form = 'giveForm';
-				    break;
+					break;
+				default:
+					form = 'websiteForm';
+					break;
 			}
 			break;
 		case 'freecycle':
@@ -28,7 +26,10 @@ export default function StatusContainer(props) {
 		    	case 'want':
 		    	    form = 'wantForm';
 		    	    break;
-		    }
+				default:
+					form = 'websiteForm';
+					break;
+			}
 			break;
 		case 'barter':
 		    switch(props.subcategory) {
@@ -38,7 +39,10 @@ export default function StatusContainer(props) {
 		    	case 'services': 
 		            form = 'servicesForm';
 		            break;
-		    }
+				default:
+					form = 'websiteForm';
+					break;
+			}
 		    break;
 		case 'buyandsell':
 		    switch(props.subcategory) {
@@ -48,7 +52,10 @@ export default function StatusContainer(props) {
 		    	case 'sell': 
 		            form = 'sellForm';
 		            break;
-		    }
+				default:
+					form = 'websiteForm';
+					break;
+			}
 		    break;
 		case 'realestate':
 		    switch(props.subcategory) {
@@ -61,6 +68,9 @@ export default function StatusContainer(props) {
 					break;
 				case 'tobuy':
 					form = 'toBuyForm';
+					break;
+				default:
+					form = 'websiteForm';
 					break;
 		    }
 		    break;

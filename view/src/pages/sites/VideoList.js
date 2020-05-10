@@ -22,7 +22,7 @@ export default function VideoList(props) {
         {vs.map((video, index) => (
             <div key={index}>
             <VideoCall onClick={() => setOpenPosition(index)}/>
-            <VideoPopup open={index == openPosition} reset={() => setOpenPosition(-1)} url={video.u}/>
+            <VideoPopup open={index === openPosition} reset={() => setOpenPosition(-1)} url={video.u}/>
             </div>
         ))}
         </Grid>

@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import 'react-responsive-modal/styles.css';
 import { Modal } from 'react-responsive-modal';
 import ReactPlayer from 'react-player';
-import { VideoCall } from '@material-ui/icons';
 
 export default function VideoPopup(props) {
     console.log("props = ", props);
