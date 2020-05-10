@@ -1,9 +1,10 @@
 import React from "react";
+import Common from "../pages/sites/Common";
+import Header from "../pages/sites/Header";
 
 export default props => (
   <div>
-    <hr />
-    <h2>Generic</h2>
-    <pre>{JSON.stringify(props.site, null, 2)}</pre>
+    <Header {...props} title="Generic Website"/>
+    <Common {...props}/>
   </div>
 );

@@ -1,9 +1,10 @@
 import React from "react";
+import SaleRent from "../pages/sites/SaleRent";
+import Header from "../pages/sites/Header";
 
 export default props => (
   <div>
-    <hr />
-    <h2>Real Estate</h2>
-    <pre>{JSON.stringify(props.ss, null, 2)}</pre>
+    <Header {...props} title="Real Estate Sale or Rent"/>
+    <SaleRent {...props}/>
   </div>
 );

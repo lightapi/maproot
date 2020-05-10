@@ -1,10 +1,10 @@
 import React from "react";
 import Common from "../pages/sites/Common";
+import Header from "../pages/sites/Header";
 
 export default props => (
-  <div>
-    <hr />
-    <h2>Give</h2>
-    <Common {...props}/>
-  </div>
+    <div>
+        <Header {...props} title="Offer Help"/>
+        <Common {...props}/>
+    </div>
 );

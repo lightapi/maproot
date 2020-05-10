@@ -4,12 +4,10 @@ import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
 import TableCell from '@material-ui/core/TableCell';
 import TableContainer from '@material-ui/core/TableContainer';
-import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
 import ImagePopup from './ImagePopup';
 import VideoList from './VideoList';
-import VideoPopup from './VideoPopup';
 
 const useStyles = makeStyles({
     table: {
@@ -38,12 +36,12 @@ export default function Common(props) {
                         <TableRow>
                             <TableCell colSpan={4} align="left">{subject.d}</TableCell>
                         </TableRow>
-                        {subject.is && subject.is.length > 0 || subject.vs && subject.is.length > 0 ? 
+                        {subject.is && subject.is.length > 0 || subject.vs && subject.vs.length > 0 ? 
                         <TableRow>
                             <TableCell>Images:</TableCell>
-                            <TableCell align="left"><ImagePopup images={subject.is}/></TableCell>
+                            <TableCell align="left">{subject.is && subject.is.length > 0 ? <ImagePopup images={subject.is}/> : null }</TableCell>
                             <TableCell align="left">Videos:</TableCell>
-                            <TableCell align="left"><VideoList vs={subject.vs}/></TableCell>
+                            <TableCell align="left">{subject.vs && subject.vs.length > 0 ? <VideoList vs={subject.vs}/> : null }</TableCell>
                         </TableRow>
                         : null }
                     </TableBody>                
