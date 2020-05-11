@@ -71,7 +71,12 @@ export default function Dashboard(props) {
           >
             <div className={classes.visitsNumberContainer}>
               <Typography size="xl" weight="medium">
-                19
+                72 Cities
+              </Typography>
+            </div>
+            <div className={classes.visitsNumberContainer}>
+              <Typography weight="medium">
+                Capital city to cover the entire province or state
               </Typography>
             </div>
             <Grid
@@ -82,21 +87,21 @@ export default function Dashboard(props) {
             >
               <Grid item>
                 <Typography color="text" colorBrightness="secondary">
-                  GTA
+                  Ontario
                 </Typography>
-                <Typography size="md">17</Typography>
+                <Typography size="md">10</Typography>
               </Grid>
               <Grid item>
                 <Typography color="text" colorBrightness="secondary">
-                  Vancouver
+                  Canada
                 </Typography>
-                <Typography size="md">1</Typography>
+                <Typography size="md">22</Typography>
               </Grid>
               <Grid item>
                 <Typography color="text" colorBrightness="secondary">
-                  New York City
+                  US
                 </Typography>
-                <Typography size="md">1</Typography>
+                <Typography size="md">50</Typography>
               </Grid>
             </Grid>
           </Widget>
@@ -128,6 +133,28 @@ export default function Dashboard(props) {
                   className={classes.legendElementText}
                 >
                   volunteer
+                </Typography>
+              </div>
+            </div>
+            <div className={classes.performanceLegendWrapper}>
+              <div className={classes.legendElement}>
+                <Dot color="warning" />
+                <Typography
+                  color="text"
+                  colorBrightness="secondary"
+                  className={classes.legendElementText}
+                >
+                  real estate
+                </Typography>
+              </div>
+              <div className={classes.legendElement}>
+                <Dot color="primary" />
+                <Typography
+                  color="text"
+                  colorBrightness="secondary"
+                  className={classes.legendElementText}
+                >
+                  buy and sell
                 </Typography>
               </div>
             </div>
@@ -226,11 +253,32 @@ export default function Dashboard(props) {
 
           </Widget>
         </Grid>
-        
+        <Grid item lg={3} md={4} sm={6} xs={12}>
+          <Widget title="Website Generator" upperTitle className={classes.card}>
+            <div className={classes.serverOverviewElement}>
+              <Typography
+                color="text"
+                colorBrightness="secondary"
+                className={classes.serverOverviewElementText}
+              >
+                  Each registered entity can create and publish a website based on the category and subcategory to sell goods or services. 
 
+              </Typography>
+            </div>
+            <div className={classes.serverOverviewElement}>
+              <Typography
+                color="text"
+                colorBrightness="secondary"
+                className={classes.serverOverviewElementText}
+              >
+                  For business, you can sell your products, make a reservation, or book an appointment. 
+              </Typography>
+            </div>
+          </Widget>
+        </Grid>
         <Grid item lg={3} md={8} sm={6} xs={12}>
           <Widget
-            title="Realtime Status"
+            title="Realtime Status & PM"
             upperTitle
             className={classes.card}
             bodyClass={classes.fullHeightBody}
@@ -250,21 +298,9 @@ export default function Dashboard(props) {
                 colorBrightness="secondary"
                 className={classes.serverOverviewElementText}
               >
-                For business you can update your realtime status to inform your customer how long you have to wait outside and what is restocked, etc.
-
+                For business you can update your realtime status to inform your customer how long they have to wait outside and what is restocked, etc.
               </Typography>
             </div>
-          </Widget>
-        </Grid>
-        <Grid item lg={3} md={4} sm={6} xs={12}>
-          <Widget title="Private Message" upperTitle className={classes.card}>
-            <Grid container spacing={2}>
-              <Grid item xs={12}>
-                <div className={classes.pieChartLegendWrapper}>
-                  Users communicate through private messaging based on a unique userId selected during signup to protect the privaciy.
-                </div>
-              </Grid>
-            </Grid>
           </Widget>
         </Grid>
         <Grid item xs={12}>
@@ -277,15 +313,14 @@ export default function Dashboard(props) {
               <p/>              
               I have heard people who had returned from another country forced to be self-isolated at home without food, and online order would be delivered two weeks later. Wouldn't it be wonderful if a neighbor can shop more at the grocery and drop it at the door?
               <p/>
-              I have seen people waiting at the local Costco for hours in the morning to get in. Wouldn't it be better for a Costco employee to publish the waiting time on a website so that shoppers can decide when to go there?
+              I have seen people waiting at the local Costco for hours in the morning to get in. Wouldn't it be better for a Costco employee or a person waiting in the line to publish the waiting time on a website so that shoppers can decide when to go there?
               <p/>  
-              Our government is helping poor people with financial aid; our doctors and nurses are fighting at the front line. We, as a community, need to be united, help each other, and grow stronger. To connect people in the same neighborhood, I have been working on an application in the last two weeks. 
+              To keep social distance, we need to travel less and avoid mass gatherings as much as possible. Is it a good idea for people to create websites and publish pictures and videos in real-time for hot spots to enable others to virtual travel at home?
               <p/>  
-              Below, you can find a Youtube video and a link to the test server. For businesses, you can register now for free, and your data will be carried to production. Once the production site is launched, we are planning to charge a small yearly fee for businesses. We also accept sponsors for a significant discount to highlight your business on the map. 
+              Our government is helping poor people with financial aid; our doctors and nurses are fighting at the front line. We, as a community, need to be united, help each other, and grow stronger. To connect people in the same neighborhood, I have been working on an application in the last four weeks. 
               <p/>
-              The project is open-sourced on Github.com, and developers are welcomed to join the effort to complete the UI and add more features. We also accept donations on GitHub and Paypal to deploy the service to the public cloud. Please forward this site to others, we are helping others and helping ourselves. Thank you and stay safe.  
+              The project is open-sourced on Github.com, and developers are welcomed to join the effort to enhance the UI and add more features. We also accept donations on GitHub and Paypal to develop more website templates for small businesses. Please forward this site to others, we are helping others and helping ourselves. Thank you, and stay safe. 
               </div>
-
             </div>
           </Widget>
         </Grid>
@@ -336,7 +371,7 @@ export default function Dashboard(props) {
                     colorBrightness="secondary"
                     className={classes.legendElementText}
                   >
-                    <a href="https://github.com/networknt/covid-19" rel="noreferrer noopener" target="_blank">Covid-19 Repository</a>
+                    <a href="https://github.com/networknt/maproot" rel="noreferrer noopener" target="_blank">MapRoot Repository</a>
                   </Typography>
                   </div>
 
@@ -365,7 +400,7 @@ export default function Dashboard(props) {
                     colorBrightness="secondary"
                     className={classes.legendElementText}
                   >
-                    <a href="https://doc.networknt.com/service/covid-19/" rel="noreferrer noopener" target="_blank">Documentation</a>                  
+                    <a href="https://doc.maproot.net" rel="noreferrer noopener" target="_blank">Documentation</a>                  
                   </Typography>
                   </div>
 
@@ -403,7 +438,7 @@ export default function Dashboard(props) {
                     colorBrightness="secondary"
                     className={classes.legendElementText}
                   >
-                    <a href="https://gitter.im/networknt/covid-19" rel="noreferrer noopener" target="_blank">Gitter Chat</a>
+                    <a href="https://gitter.im/networknt/maproot" rel="noreferrer noopener" target="_blank">Gitter Chat</a>
                   </Typography>
                   </div>
 
