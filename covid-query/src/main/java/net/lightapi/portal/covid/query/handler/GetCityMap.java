@@ -1,7 +1,6 @@
 
 package net.lightapi.portal.covid.query.handler;
 
-import com.networknt.httpstring.AttachmentConstants;
 import com.networknt.utility.NioUtils;
 import com.networknt.rpc.Handler;
 import com.networknt.rpc.router.ServiceHandler;
@@ -17,7 +16,7 @@ import org.slf4j.LoggerFactory;
 @ServiceHandler(id="lightapi.net/covid/getCityMap/0.1.0")
 public class GetCityMap implements Handler {
     private static final Logger logger = LoggerFactory.getLogger(GetCity.class);
-    static final String CITY_NOT_FOUND = "ERR11623";
+    static final String NO_ENTITY_REGISTERED = "ERR11631";
 
     @Override
     public ByteBuffer handle(HttpServerExchange exchange, Object input)  {
@@ -36,7 +35,7 @@ public class GetCityMap implements Handler {
         if(data != null) {
             return NioUtils.toByteBuffer(data);
         } else {
-            return NioUtils.toByteBuffer(getStatus(exchange, CITY_NOT_FOUND, country, province, city));
+            return NioUtils.toByteBuffer(getStatus(exchange, NO_ENTITY_REGISTERED, country, province, city, category, subcategory));
         }
     }
 }

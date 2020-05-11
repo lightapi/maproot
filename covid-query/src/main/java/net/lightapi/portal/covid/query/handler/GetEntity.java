@@ -10,8 +10,6 @@ import com.networknt.utility.NioUtils;
 import com.networknt.rpc.Handler;
 import com.networknt.rpc.router.ServiceHandler;
 import java.nio.ByteBuffer;
-import java.util.Collection;
-import java.util.Iterator;
 import java.util.Map;
 
 import io.undertow.server.HttpServerExchange;
@@ -74,14 +72,14 @@ public class GetEntity implements Handler {
             if(NetUtils.getLocalAddressByDatagram().equals(metadata.host()) && Server.config.getHttpsPort() == metadata.port()) {
                 // TODO remove this block if we never seen the following error.
                 logger.error("******Kafka returns the same instance!");
-                return NioUtils.toByteBuffer(getStatus(exchange, ENTITY_NOT_FOUND, email));
+                return NioUtils.toByteBuffer(getStatus(exchange, ENTITY_NOT_FOUND, email, country, province, city));
             } else {
                 Result<String> resultEntity = HybridQueryClient.getEntity(exchange, url, email);
                 if (resultEntity.isSuccess()) {
                     return NioUtils.toByteBuffer(resultEntity.getResult());
                 }
             }
-            return NioUtils.toByteBuffer(getStatus(exchange, ENTITY_NOT_FOUND, email));
+            return NioUtils.toByteBuffer(getStatus(exchange, ENTITY_NOT_FOUND, email, country, province, city));
         }
     }
 }
