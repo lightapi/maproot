@@ -3,8 +3,6 @@ import { HashRouter, Route, Switch, Redirect } from "react-router-dom";
 import Layout from "./components/Layout";
 import Error from "./pages/error";
 
-// this history doesn't work. remove it later.
-//export const history = createBrowserHistory();
 
 const App = () => {
   return (
