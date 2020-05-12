@@ -19,25 +19,16 @@ export default function Status(props) {
   }
   const url = '/portal/query?cmd=' + encodeURIComponent(JSON.stringify(cmd));
   const headers = {};
-  const { isLoading, data, error } = useApiGet({url, headers});
+  const { isLoading, data } = useApiGet({url, headers});
   let subjects = data || {};
 
   let wait;
   if(isLoading) {
     wait = <div><CircularProgress/></div>;
   } else {
-    if(error) {
-      wait = (      
-        <div>
-          <h2>Failure</h2>
-        <pre>{ JSON.stringify(error, null, 2) }</pre>
-        </div>
-      )  
-    } else {
-      wait = (
-        <StatusContainer {...props} subjects = {subjects} isReadonly={false}/>
-      )
-    }
+    wait = (
+      <StatusContainer {...props} subjects = {subjects} isReadonly={false}/>
+    )
   }
 
   return (

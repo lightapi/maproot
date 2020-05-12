@@ -17,7 +17,7 @@ export default function Publish(props) {
   }
   var url = '/portal/query?cmd=' + encodeURIComponent(JSON.stringify(statusCmd));
   var headers = {};
-  var { isLoading : siteLoading, data : site, error : siteError } = useApiGet({url, headers});
+  var { isLoading : siteLoading, data : site } = useApiGet({url, headers});
   //console.log("siteLoading", siteLoading, site, siteError);
   const entityCmd = {
     host: 'lightapi.net',
@@ -36,11 +36,11 @@ export default function Publish(props) {
     wait = <div><CircularProgress/></div>;
   } else {
     // loading completed here.
-    if(entityError || siteError) {
+    if(entityError) {
       wait = (      
         <div>
           <h2>Failure</h2>
-        <pre>{ JSON.stringify(entityError || siteError, null, 2) }</pre>
+        <pre>{ JSON.stringify(entityError, null, 2) }</pre>
         </div>
       )  
     } else {

@@ -33,9 +33,9 @@ const structure = [
   { id: 0, label: "Dashboard", link: "/app/dashboard", icon: <HomeIcon /> },
   { id: 22, label: "Live Map", link: "/app/form/covidMapForm", icon: <AcUnitIcon />},
   { id: 23, label: "City", role: "admin", link: "/app/form/covidCity", icon: <LocationCity />, }, 
-  { id: 24, label: "Entity", link: "/app/covid/entity", icon: <EmojiPeople/>, },
-  { id: 25, label: "Website", link: "/app/covid/publish", icon: <Business/>, },
-  { id: 26, label: "Status", link: "/app/covid/status", icon: <AddAlert/>, },
+  { id: 24, label: "Entity", role: "user", link: "/app/covid/entity", icon: <EmojiPeople/>, },
+  { id: 25, label: "Website", role: "user", link: "/app/covid/publish", icon: <Business/>, },
+  { id: 26, label: "Status", role: "user", link: "/app/covid/status", icon: <AddAlert/>, },
 ];
 
 function Sidebar({ location }) {
