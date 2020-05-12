@@ -10,6 +10,7 @@ import LocationCity from '@material-ui/icons/LocationCity';
 import EmojiPeople from '@material-ui/icons/EmojiPeople';
 import AddAlert from '@material-ui/icons/AddAlert';
 import Business from '@material-ui/icons/Business';
+import AccountBox from '@material-ui/icons/AccountBox'
 
 import { useTheme } from "@material-ui/styles";
 import { withRouter } from "react-router-dom";
@@ -36,6 +37,7 @@ const structure = [
   { id: 24, label: "Entity", role: "user", link: "/app/covid/entity", icon: <EmojiPeople/>, },
   { id: 25, label: "Website", role: "user", link: "/app/covid/publish", icon: <Business/>, },
   { id: 26, label: "Status", role: "user", link: "/app/covid/status", icon: <AddAlert/>, },
+  { id: 27, label: "User Id", link: "/app/covid/userId", icon: <AccountBox />},
 ];
 
 function Sidebar({ location }) {
