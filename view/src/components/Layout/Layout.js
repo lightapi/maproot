@@ -76,8 +76,9 @@ function Layout(props) {
               <Route path="/app/covid/status" component={Status} />
               <Route path="/app/covid/publish" component={Publish} />
               <Route path="/app/covid/peerStatus" component={PeerStatus} />
-              <Route path="/app/covid/website" component={Website} />
               <Route path="/app/covid/userId" component={UserId} />
+
+              <Route path="/app/website" component={Website} />
 
               <Route
                 exact

@@ -9,7 +9,7 @@ export default function UserIdWebsite(props) {
     if(userId == null && props.location.state) {
       userId = props.location.state.data.userId;
     }
-    console.log("userId = ", userId);
+    //console.log("userId = ", userId);
     let wait;
     if(userId) {
         wait = (

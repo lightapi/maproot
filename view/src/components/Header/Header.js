@@ -20,6 +20,7 @@ import { Typography } from "../Wrappers/Wrappers";
 import ProfileMenu from "./ProfileMenu";
 import NotificationMenu from "./NotificationMenu";
 import MailMenu from "./MailMenu";
+import HomeMenu from "./HomeMenu";
 
 // context
 import {
@@ -30,6 +31,8 @@ import {
 import { useUserState } from "../../context/UserContext";
 
 export default function Header(props) {
+  //console.log("props= ", props);
+
   var classes = useStyles();
 
   // global
@@ -97,6 +100,10 @@ export default function Header(props) {
             }}
           />
         </div>
+        { props.history.location.pathname.startsWith('/app/website') ? (
+          <HomeMenu {...props} classes = {classes} />
+        ) : null
+        }  
         { isAuthenticated ? (
           <NotificationMenu {...props} classes = {classes} />
         ) : null

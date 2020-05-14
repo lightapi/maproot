@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import Generic from "./com/Generic";
 import Ask from "./com/Ask";
 import Give from "./com/Give";
@@ -11,6 +11,8 @@ import Sell from "./com/Sell";
 import ToRent from "./com/ToRent";
 import ToBuy from "./com/ToBuy";
 import RealEstate from "./com/RealEstate";
+import Restaurant from "./com/Restaurant";
+import { useSiteDispatch, updateSite } from "./context/SiteContext";
 
 const Components = {
   generic: Generic,
@@ -24,11 +26,17 @@ const Components = {
   sell: Sell,
   toRent: ToRent,
   toBuy: ToBuy,
-  realEstate: RealEstate
+  realEstate: RealEstate,
+  restaurant: Restaurant
 };
 
-
 export default props => {
+  const siteDispatch = useSiteDispatch();
+
+  useEffect(() => {
+    updateSite(siteDispatch, props.site, props.userId);
+  });
+
   const pm = (id) => {
     //console.log("private message is called", id);
     props.history.push({pathname: '/app/form/privateMessage', state: { data: { userId: id }}});
@@ -38,7 +46,7 @@ export default props => {
     return React.createElement(Components[props.site.co], {
       userId: props.userId,
       pm: pm,
-      ss: props.site.ss
+      site: props.site
     });
   }
   return React.createElement(
