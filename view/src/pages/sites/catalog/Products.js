@@ -1,20 +1,15 @@
 import React, { useState } from 'react';
 import { makeStyles } from '@material-ui/styles';
+import Grid from "@material-ui/core/Grid";
 import Product from './Product';
 import NoResult from './NoResult';
 import { useSiteState } from "../../../context/SiteContext";
 
 const useStyles = makeStyles({
   productsWrapper: {
-    "paddingTop": "98px",
+    "paddingTop": "8px",
     "animation": "slideUp 300ms linear",
     "animationDelay": "150ms",
-    '@media (max-width: 991px)': {
-      "paddingTop": "68px",
-    },
-    '@media (max-width: 480px)': {
-      "paddingTop": "52px",
-    }
   },
 })
 
@@ -27,6 +22,7 @@ export default function Products(props) {
       <>
         {products
           .map(product => (
+          <Grid key={product.sku} item>
           <Product
             key={product.sku}
             price={product.price}
@@ -36,6 +32,7 @@ export default function Products(props) {
             maxOrderQty={product.maxOrderQty}
             onAddToCart={onAddToCart}
           />
+          </Grid>
         ))}
       </>
     );
@@ -48,5 +45,5 @@ export default function Products(props) {
         <ProductsView products={filteredProducts}/>
       );
     }
-    return <div className={classes.productsWrapper}>{view}</div>;
+    return <Grid container className={classes.productsWrapper}>{view}</Grid>;
 }
