@@ -22,11 +22,10 @@ export default function Products(props) {
     var classes = useStyles();
     const { products, onAddToCart } = props;
     const { filter } = useSiteState();
-
+    const filteredProducts = products.filter(product => product.name.toLowerCase().includes(filter) || !filter)
     const ProductsView = ({products}) => (
       <>
         {products
-          .filter(product => product.name.toLowerCase().includes(filter) || !filter )
           .map(product => (
           <Product
             key={product.sku}
@@ -42,11 +41,11 @@ export default function Products(props) {
     );
 
     let view;
-    if (products.length <= 0) {
+    if (filteredProducts.length <= 0) {
       view = <NoResult />;
     } else {
       view = (
-        <ProductsView products={products}/>
+        <ProductsView products={filteredProducts}/>
       );
     }
     return <div className={classes.productsWrapper}>{view}</div>;
