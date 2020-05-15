@@ -21,6 +21,7 @@ import ProfileMenu from "./ProfileMenu";
 import NotificationMenu from "./NotificationMenu";
 import MailMenu from "./MailMenu";
 import HomeMenu from "./HomeMenu";
+import CartMenu from './CartMenu';
 
 // context
 import {
@@ -108,6 +109,10 @@ export default function Header(props) {
         </div>
         { props.history.location.pathname.startsWith('/app/website') ? (
           <HomeMenu {...props} classes = {classes} />
+        ) : null
+        }  
+        { props.history.location.pathname.startsWith('/app/website') ? (
+          <CartMenu {...props} classes = {classes} />
         ) : null
         }  
         { isAuthenticated ? (
