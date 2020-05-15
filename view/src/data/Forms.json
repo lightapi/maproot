@@ -133,6 +133,10 @@
                                     "type": "number",
                                     "title": "Price"
                                 },
+                                "maxOrderQty": {
+                                    "type": "number",
+                                    "title": "Max quantity per order"
+                                },
                                 "image": {
                                     "type": "string",
                                     "title": "Image Url"

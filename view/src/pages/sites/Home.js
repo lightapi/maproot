@@ -1,6 +1,11 @@
 import React from 'react';
 import { makeStyles } from '@material-ui/styles';
 
+/*
+For independent compnent, use the makeStyles and have a chance to override the style using data from the
+API. 
+*/
+
 const useStyles = makeStyles({
   home: {
     height: "100vh",

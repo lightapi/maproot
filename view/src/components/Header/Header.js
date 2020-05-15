@@ -29,6 +29,7 @@ import {
   toggleSidebar,
 } from "../../context/LayoutContext";
 import { useUserState } from "../../context/UserContext";
+import { useSiteState, useSiteDispatch } from "../../context/SiteContext";
 
 export default function Header(props) {
   //console.log("props= ", props);
@@ -43,6 +44,10 @@ export default function Header(props) {
   var [isSearchOpen, setSearchOpen] = useState(false);
   var { isAuthenticated } = useUserState();
 
+  var siteDispatch = useSiteDispatch();
+  const changeFilter = (e) => {
+    siteDispatch({ type: "UPDATE_FILTER", filter: e.target.value }); 
+  }
 
   return (
     <AppBar position="fixed" className={classes.appBar}>
@@ -94,6 +99,7 @@ export default function Header(props) {
           </div>
           <InputBase
             placeholder="Search…"
+            onChange={changeFilter}
             classes={{
               root: classes.inputRoot,
               input: classes.inputInput,

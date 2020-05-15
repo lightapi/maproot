@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import { IconButton, Menu, MenuItem } from "@material-ui/core";
 import { Home as HomeIcon, Info, ShoppingBasket, EventSeat, Book, ContactMail } from "@material-ui/icons";
 import classNames from "classnames";
-import { Typography } from "../Wrappers/Wrappers";
 import { useSiteState, useSiteDispatch } from "../../context/SiteContext";
 
 
@@ -11,7 +10,7 @@ export default function MailMenu(props) {
     const [homeMenu, setHomeMenu] = useState(null);
     var siteDispatch = useSiteDispatch();
     const { site } = useSiteState();
-    console.log("site = ", site);
+    //console.log("site = ", site);
     const changeMenu = (menu) => {
        siteDispatch({ type: "UPDATE_MENU", menu }); 
     }

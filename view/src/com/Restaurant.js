@@ -1,10 +1,13 @@
 import React from 'react';
 import { useSiteState } from "../context/SiteContext";
 import Home from "../pages/sites/Home";
+import Catalog from "../pages/sites/Catalog";
 
 export default function Restaurant(props) {
-  const { menu} = useSiteState();
+  console.log("Restaurant props = ", props);
 
+  const { menu } = useSiteState();
+  //console.log("menu = ", menu);
   let comp;
   switch(menu) {
   	case 'home':
@@ -24,7 +27,7 @@ export default function Restaurant(props) {
  	case 'catalog':
  	  comp = (
 		<div>
-	    	<pre>{ JSON.stringify(props.site.catalog, null, 2) }</pre>
+	    	<Catalog products={props.site.catalog.products} storeName={props.site.home.name}/>
 		</div>
  	  )
  	  break;

@@ -11,10 +11,10 @@ function siteReducer(state, action) {
       return { ...state, site: action.site, owner: action.owner };
     case "UPDATE_MENU":
       return { ...state, menu: action.menu };
-    case "ADD_TO_CART":
-      return { ...state };
-    case "DELETE_FROM_CART":
-      return { ...state }
+    case "UPDATE_FILTER":
+      return { ...state, filter: action.filter.toLowerCase() };
+    case "UPDATE_CART":
+      return { ...state, cart: action.cart };
     default: {
       throw new Error(`Unhandled action type: ${action.type}`);
     }
@@ -27,6 +27,7 @@ function SiteProvider({ children }) {
     site: null,
     owner: null,
     cart: null,
+    filter: null,
     menu: 'home'
   });
 
