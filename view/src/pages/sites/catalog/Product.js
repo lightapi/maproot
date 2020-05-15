@@ -38,6 +38,7 @@ const useStyles = makeStyles({
     "color": "#666",
     "padding": "0 16px",
     "textAlign": "center",
+    height: "40px",
   },
   productPrice: {
     "fontSize": "22px",
