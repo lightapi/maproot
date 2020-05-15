@@ -18,6 +18,25 @@ export default function Products(props) {
     const { products, onAddToCart } = props;
     const { filter } = useSiteState();
     const filteredProducts = products.filter(product => product.name.toLowerCase().includes(filter) || !filter)
+
+    let productList = [];
+    for(let i= 0; i < filteredProducts.length; i++) {
+      productList.push(
+          <Grid key={filteredProducts[i].sku} item>
+          <Product
+            key={filteredProducts[i].sku}
+            price={filteredProducts[i].price}
+            name={filteredProducts[i].name}
+            image={filteredProducts[i].image}
+            sku={filteredProducts[i].sku}
+            maxOrderQty={filteredProducts[i].maxOrderQty}
+            onAddToCart={onAddToCart}
+          />
+          </Grid>
+      )
+    }
+    
+    /*
     const ProductsView = ({products}) => (
       <>
         {products
@@ -36,14 +55,13 @@ export default function Products(props) {
         ))}
       </>
     );
+    */      
 
     let view;
     if (filteredProducts.length <= 0) {
       view = <NoResult />;
     } else {
-      view = (
-        <ProductsView products={filteredProducts}/>
-      );
+      view = productList;
     }
     return <Grid container className={classes.productsWrapper}>{view}</Grid>;
 }
