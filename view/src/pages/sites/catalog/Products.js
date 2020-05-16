@@ -35,27 +35,6 @@ export default function Products(props) {
           </Grid>
       )
     }
-    
-    /*
-    const ProductsView = ({products}) => (
-      <>
-        {products
-          .map(product => (
-          <Grid key={product.sku} item>
-          <Product
-            key={product.sku}
-            price={product.price}
-            name={product.name}
-            image={product.image}
-            sku={product.sku}
-            maxOrderQty={product.maxOrderQty}
-            onAddToCart={onAddToCart}
-          />
-          </Grid>
-        ))}
-      </>
-    );
-    */      
 
     let view;
     if (filteredProducts.length <= 0) {
