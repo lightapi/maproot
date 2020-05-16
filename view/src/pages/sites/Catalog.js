@@ -1,6 +1,5 @@
 import React, {useState, useEffect} from 'react';
 import { makeStyles } from '@material-ui/styles';
-import Header from './catalog/Header';
 import Footer from './catalog/Footer';
 import Products from './catalog/Products';
 import { useSiteDispatch } from "../../context/SiteContext";
@@ -25,7 +24,7 @@ export default function Catalog(props) {
 
     const [cart, setCart] = useState([]);
     const siteDispatch = useSiteDispatch();
-    console.log("cart =", cart);
+    //console.log("cart =", cart);
     
     useEffect(() => {
       siteDispatch({ type: "UPDATE_CART", cart }); 

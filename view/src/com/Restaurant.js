@@ -4,7 +4,7 @@ import Home from "../pages/sites/Home";
 import Catalog from "../pages/sites/Catalog";
 
 export default function Restaurant(props) {
-  console.log("Restaurant props = ", props);
+  //console.log("Restaurant props = ", props);
 
   const { menu } = useSiteState();
   //console.log("menu = ", menu);

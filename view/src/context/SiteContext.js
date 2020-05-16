@@ -26,7 +26,7 @@ function SiteProvider({ children }) {
   var [state, dispatch] = React.useReducer(siteReducer, {
     site: null,
     owner: null,
-    cart: null,
+    cart: [],
     filter: null,
     menu: 'home'
   });

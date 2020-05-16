@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { IconButton, Menu, MenuItem, Fab } from "@material-ui/core";
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
@@ -19,14 +19,20 @@ export default function CartMenu(props) {
     const [cartMenu, setCartMenu] = useState(false);
     var siteDispatch = useSiteDispatch();
     const { cart, menu } = useSiteState();
-    //console.log("site = ", site);
-    const updateCart = (cart) => {
-       siteDispatch({ type: "UPDATE_CART", cart }); 
-    }
+    const [ cartItems, setCartItems] = useState([]);
+
+    useEffect(() => {
+      console.log("calling useEffect");
+      siteDispatch({ type: "UPDATE_CART", cart: cartItems }); 
+    }, [cartItems.length]);
 
     const deleteFromCart = (sku) => {
       console.log("deleteFromCart is called", sku);
+      console.log("cart = ", cart);
+      setCartItems(cart.filter( item => item.sku !== sku))
+      console.log("cartItems = ", cartItems);
     }
+
     const checkout = () => {
       console.log("Checkout is called");
     }
@@ -60,6 +66,8 @@ export default function CartMenu(props) {
             classes={{ paper: classes.profileMenu }}
             disableAutoFocusItem
           >
+            { cart && cart.length > 0 ? 
+            <React.Fragment>
             <TableContainer component={Paper}>
               <Table className={classes.table} aria-label="spanning table">
                 <TableHead>
@@ -108,7 +116,9 @@ export default function CartMenu(props) {
               CHECKOUT
               <VerifiedUser className={classes.sendButtonIcon} />
             </Fab>
-
+            </React.Fragment>
+            : <div className={classes.emptyCart}>Empty Cart!</div>
+          }
           </Menu>          
           </React.Fragment>
         )

@@ -163,4 +163,7 @@ export default makeStyles(theme => ({
     width: "48px",
     height: "48px",
   },
+  emptyCart: {
+    textAlign: "center",
+  },
 }));
