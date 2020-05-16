@@ -30,6 +30,7 @@ export default function CartMenu(props) {
     const checkout = () => {
       console.log("Checkout is called");
     }
+    const TAX_RATE = 0.13;
 
     return (
       <React.Fragment>
@@ -77,7 +78,23 @@ export default function CartMenu(props) {
                       <TableCell>{row.quantity}<Divider/>{row.quantity * row.price}</TableCell>
                       <TableCell><DeleteForever onClick={() => deleteFromCart(row.sku)}/></TableCell>
                     </TableRow>  
-                  ))}                
+                  ))}
+                  <TableRow>
+                    <TableCell rowSpan={3}/>
+                    <TableCell>Subtotal</TableCell>
+                    <TableCell align="left">{12}</TableCell>
+                    <TableCell/>
+                  </TableRow>
+                  <TableRow>
+                    <TableCell>Tax - {`${(TAX_RATE * 100).toFixed(0)} %`}</TableCell>
+                    <TableCell align="left">7.49</TableCell>
+                    <TableCell/>
+                  </TableRow>
+                  <TableRow>
+                    <TableCell>Total</TableCell>
+                    <TableCell align="left">200</TableCell>
+                    <TableCell/>
+                  </TableRow>  
                 </TableBody>
               </Table>
             </TableContainer>
