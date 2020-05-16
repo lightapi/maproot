@@ -58,7 +58,7 @@ export default function ProfileMenu(props) {
               classes.profileMenuItem,
               classes.headerMenuItem,
             )}
-            onClick={() => getProfile(userDispatch, props.history)}
+            onClick={() => {getProfile(userDispatch, props.history); setProfileMenu(false);}}
           >
             <AccountIcon className={classes.profileMenuIcon} /> Profile
           </MenuItem>
@@ -90,7 +90,7 @@ export default function ProfileMenu(props) {
             <Typography
               className={classes.profileMenuLink}
               color="primary"
-              onClick={() => changePassword(userDispatch, props.history)}
+              onClick={() => {changePassword(userDispatch, props.history); setProfileMenu(false);}}
             >
               Change Password
             </Typography>
@@ -120,7 +120,7 @@ export default function ProfileMenu(props) {
             <Typography
               className={classes.profileMenuLink}
               color="primary"
-              onClick={() => signUp(userDispatch, props.history)}
+              onClick={() => {signUp(userDispatch, props.history); setProfileMenu(false);}}
             >
               Sign Up
             </Typography>

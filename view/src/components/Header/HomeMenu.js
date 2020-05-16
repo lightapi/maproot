@@ -44,7 +44,7 @@ export default function MailMenu(props) {
                     classes.profileMenuItem,
                     classes.headerMenuItem,
                   )}
-                  onClick={() => changeMenu('home')}
+                  onClick={() => {changeMenu('home'); setHomeMenu(false);}}
                 >
                   <HomeIcon className={classes.profileMenuIcon} /> Home
                 </MenuItem>
@@ -57,7 +57,7 @@ export default function MailMenu(props) {
                     classes.profileMenuItem,
                     classes.headerMenuItem,
                   )}
-                  onClick={() => changeMenu('about')}
+                  onClick={() => {changeMenu('about'); setHomeMenu(false);}}
                 >
                   <Info className={classes.profileMenuIcon} /> About
                 </MenuItem>
@@ -70,7 +70,7 @@ export default function MailMenu(props) {
                     classes.profileMenuItem,
                     classes.headerMenuItem,
                   )}
-                  onClick={() => changeMenu('catalog')}
+                  onClick={() => {changeMenu('catalog'); setHomeMenu(false);}}
                 >
                   <ShoppingBasket className={classes.profileMenuIcon} /> Catalog
                 </MenuItem>
@@ -83,7 +83,7 @@ export default function MailMenu(props) {
                     classes.profileMenuItem,
                     classes.headerMenuItem,
                   )}
-                  onClick={() => changeMenu('reservation')}
+                  onClick={() => {changeMenu('reservation'); setHomeMenu(false);}}
                 >
                   <EventSeat className={classes.profileMenuIcon} /> Reservation
                 </MenuItem>
@@ -96,7 +96,7 @@ export default function MailMenu(props) {
                     classes.profileMenuItem,
                     classes.headerMenuItem,
                   )}
-                  onClick={() => changeMenu('blog')}
+                  onClick={() => {changeMenu('blog'); setHomeMenu(false);}}
                 >
                   <Book className={classes.profileMenuIcon} /> Blog
                 </MenuItem>
@@ -109,7 +109,7 @@ export default function MailMenu(props) {
                     classes.profileMenuItem,
                     classes.headerMenuItem,
                   )}
-                  onClick={() => changeMenu('contact')}
+                  onClick={() => {changeMenu('contact'); setHomeMenu(false);}}
                 >
                   <ContactMail className={classes.profileMenuIcon} /> Contact
                 </MenuItem>
