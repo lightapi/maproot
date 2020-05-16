@@ -36,7 +36,23 @@ export default function CartMenu(props) {
     const checkout = () => {
       console.log("Checkout is called");
     }
+
+    const ccyFormat = (num) => {
+      return `${num.toFixed(2)}`;
+    }
+
+    const subtotal = (items) => {
+      let total = 0;
+      for(var i = 0; i < items.length; i++) {
+        total += items[i].price * parseInt(cart[i].quantity);
+      }
+      return total;
+    }
+
     const TAX_RATE = 0.13;
+    const invoiceSubtotal = subtotal(cart);
+    const invoiceTaxes = TAX_RATE * invoiceSubtotal;
+    const invoiceTotal = invoiceSubtotal + invoiceTaxes;
 
     return (
       <React.Fragment>
@@ -67,7 +83,7 @@ export default function CartMenu(props) {
             disableAutoFocusItem
           >
             { cart && cart.length > 0 ? 
-            <React.Fragment>
+            <div>
             <TableContainer component={Paper}>
               <Table className={classes.table} aria-label="spanning table">
                 <TableHead>
@@ -90,17 +106,17 @@ export default function CartMenu(props) {
                   <TableRow>
                     <TableCell rowSpan={3}/>
                     <TableCell>Subtotal</TableCell>
-                    <TableCell align="left">{12}</TableCell>
+                    <TableCell align="left">{ccyFormat(invoiceSubtotal)}</TableCell>
                     <TableCell/>
                   </TableRow>
                   <TableRow>
                     <TableCell>Tax - {`${(TAX_RATE * 100).toFixed(0)} %`}</TableCell>
-                    <TableCell align="left">7.49</TableCell>
+                  <TableCell align="left">{ccyFormat(invoiceTaxes)}</TableCell>
                     <TableCell/>
                   </TableRow>
                   <TableRow>
                     <TableCell>Total</TableCell>
-                    <TableCell align="left">200</TableCell>
+                  <TableCell align="left">{ccyFormat(invoiceTotal)}</TableCell>
                     <TableCell/>
                   </TableRow>  
                 </TableBody>
@@ -115,8 +131,8 @@ export default function CartMenu(props) {
             >
               CHECKOUT
               <VerifiedUser className={classes.sendButtonIcon} />
-            </Fab>
-            </React.Fragment>
+            </Fab> 
+            </div>
             : <div className={classes.emptyCart}>Empty Cart!</div>
           }
           </Menu>          
