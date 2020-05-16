@@ -36,11 +36,23 @@ export default function Catalog(props) {
     const [totalAmount, setTotalAmount] = useState(0);
     */
     const onAddToCart = (selectedProduct) => {
-      setCart(cart => [...cart, selectedProduct]);
+      let sku = selectedProduct.sku;
+      let qty = selectedProduct.quantity;
+      if(checkProduct(sku)) {
+        let index = cart.findIndex(x => x.sku === sku);
+        cart[index].quantity = Number(cart[index].quantity) + Number(qty);
+        setCart(cart => [...cart]);
+      } else {
+        setCart(cart => [...cart, selectedProduct]);
+      }
     }
 
     const onDeleteFromCart = (sku) => {
       setCart(cart.filter(item => item.sku !== sku));
+    }
+
+    const checkProduct = (sku) => {
+      return cart.some(item => item.sku === sku);
     }
 
     /*
