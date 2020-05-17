@@ -112,6 +112,10 @@
                         "type": "string",
                         "title": "Banner Picture Url"
                     },
+                    "taxRate": {
+                        "type": "number",
+                        "title": "Tax Rate Percentage. i.e 13"
+                    },
                     "products": {
                         "type": "array",
                         "title": "Products",

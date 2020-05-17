@@ -18,7 +18,7 @@ export default function CartMenu(props) {
     var classes = props.classes;
     const [cartMenu, setCartMenu] = useState(false);
     var siteDispatch = useSiteDispatch();
-    const { cart, menu } = useSiteState();
+    const { cart, menu, site } = useSiteState();
     const [ cartItems, setCartItems] = useState([]);
 
     useEffect(() => {
@@ -49,9 +49,9 @@ export default function CartMenu(props) {
       return total;
     }
 
-    const TAX_RATE = 0.13;
+    const taxRate = site && site.catalog ? site.catalog.taxRate : 0;
     const invoiceSubtotal = subtotal(cart);
-    const invoiceTaxes = TAX_RATE * invoiceSubtotal;
+    const invoiceTaxes = taxRate * invoiceSubtotal / 100;
     const invoiceTotal = invoiceSubtotal + invoiceTaxes;
 
     return (
@@ -110,7 +110,7 @@ export default function CartMenu(props) {
                     <TableCell/>
                   </TableRow>
                   <TableRow>
-                    <TableCell>Tax - {`${(TAX_RATE * 100).toFixed(0)} %`}</TableCell>
+                    <TableCell>Tax - {`${(taxRate).toFixed(0)} %`}</TableCell>
                   <TableCell align="left">{ccyFormat(invoiceTaxes)}</TableCell>
                     <TableCell/>
                   </TableRow>
