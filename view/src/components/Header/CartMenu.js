@@ -8,12 +8,97 @@ import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
 import Divider from '@material-ui/core/Divider';
+import Button from '@material-ui/core/Button';
+import Radio from '@material-ui/core/Radio';
+import RadioGroup from '@material-ui/core/RadioGroup';
+import TextField from '@material-ui/core/TextField';
+import Form from "@material-ui/core/FormControl";
+import FormControlLabel from '@material-ui/core/FormControlLabel';
+import Grid from "@material-ui/core/Grid";
+import SchemaForm from 'react-schema-form/lib/SchemaForm';
+import utils from 'react-schema-form/lib/utils';
 import { ShoppingCart, VerifiedUser, DeleteForever } from "@material-ui/icons";
 import { useSiteState, useSiteDispatch } from "../../context/SiteContext";
 import { Badge } from "../Wrappers/Wrappers";
+import forms from '../../data/Forms';
 
-function CartTotal(props) {
-  const { step, classes, cart, deleteFromCart, checkOut, taxRate } = props;
+function Payment(props) {
+  const {step, classes}  = props;
+  const [model, setModel] = useState({});
+  const [showErrors, setShowErrors]  = useState(false);
+
+  if(step !==3) {
+    return null;
+  }
+
+  const onModelChange = (key, val, type) => {
+    utils.selectOrSet(key, model, val, type);
+    setModel({...model});  // here we must create a new object to force re-render.
+  };
+
+  let formData = forms['paymentForm'];
+  let title = <h2>{formData.schema.title}</h2>
+
+  return (
+    <div>
+      {title}    
+      <SchemaForm schema={formData.schema} form={formData.form} model={model} showErrors={showErrors} onModelChange={onModelChange} />
+    </div>
+  )  
+
+}
+
+function Delivery(props) {
+  const { step, classes, reviewCart, proceedPayment, schema } = props;
+  const [model, setModel] = useState({});
+  const [showErrors, setShowErrors]  = useState(false);
+
+  if(step !== 2) {
+    return null;
+  }
+
+  let formData = forms['pickupForm'];
+  var buttons = [];
+
+  let defaultDelivery = 'pickup';
+
+  const onModelChange = (key, val, type) => {
+    utils.selectOrSet(key, model, val, type);
+    setModel({...model});  // here we must create a new object to force re-render.
+  };
+
+  const onButtonClick = (item) => {
+    console.log("item = ", item);
+    if(item.action === 'cart') {
+      reviewCart();
+    } else {
+      let validationResult = utils.validateBySchema(formData.schema, model);
+      if(!validationResult.valid) {
+          setShowErrors(true);
+      } else {
+        proceedPayment();
+      }   
+    }
+  }
+
+  
+  formData.actions.map((item, index) => {
+      buttons.push(<Button variant="contained" className={classes.button} color="primary" key={index} onClick={e => onButtonClick(item)}>{item.title}</Button>)
+      return buttons;
+  });
+  let title = <h2>{formData.schema.title}</h2>
+
+  return (
+    <div>
+      {title}    
+      <SchemaForm schema={formData.schema} form={formData.form} model={model} showErrors={showErrors} onModelChange={onModelChange} />
+      {buttons}
+    </div>
+  )  
+}
+
+const CartTotal = (props) => {
+  const { step, classes, cart, deleteFromCart, selectDelivery, taxRate } = props;
 
   const ccyFormat = (num) => {
     return `${num.toFixed(2)}`;
@@ -77,16 +162,7 @@ function CartTotal(props) {
           </TableBody>
         </Table>
       </TableContainer>
-      <Fab
-        variant="extended"
-        color="primary"
-        aria-label="Checkout"
-        onClick={checkOut}
-        className={classes.sendMessageButton}
-      >
-        CHECKOUT
-        <VerifiedUser className={classes.sendButtonIcon} />
-      </Fab> 
+      <Button variant="contained" className={classes.button} color="primary" onClick={e => selectDelivery()}>CHECKOUT</Button>
     </div>
   } else {
     view = <div className={classes.emptyCart}>Empty Cart!</div>
@@ -121,8 +197,19 @@ export default function CartMenu(props) {
 
     const taxRate = site && site.catalog ? site.catalog.taxRate : 0;
 
-    const checkOut = () => {
-      console.log("Checkout is called");
+    const selectDelivery = () => {
+      setStep(2);
+    }
+
+    const reviewCart = () => {
+      setStep(1);
+    }
+
+    const proceedPayment = () => {
+      setStep(3);
+    }
+    const confirmOrder = () => {
+      setStep(4);
     }
 
     return (
@@ -134,7 +221,7 @@ export default function CartMenu(props) {
             color="inherit"
             className={classes.headerMenuButton}
             aria-controls="home-menu"
-            onClick={(e) => setCartMenu(e.currentTarget)}
+            onClick={(e) => {setCartMenu(e.currentTarget); setStep(1);}}
           >
             <Badge
               badgeContent={cart && cart.length > 0 ? cart.length : null}
@@ -153,7 +240,11 @@ export default function CartMenu(props) {
             classes={{ paper: classes.profileMenu }}
             disableAutoFocusItem
           >
-            <CartTotal {...props} step={step} taxRate={taxRate} cart={cart} deleteFromCart={deleteFromCart} checkOut={checkOut} classes = {classes} />
+            <div>
+              <CartTotal step={step} taxRate={taxRate} cart={cart} deleteFromCart={deleteFromCart} selectDelivery={selectDelivery} classes = {classes} />
+              <Delivery {...props} step={step} classes={classes} reviewCart={reviewCart} proceedPayment={proceedPayment}/>
+              <Payment {...props} step={step} classes={classes} selectDelivery={selectDelivery} confirmOrder={confirmOrder}/>
+            </div>
           </Menu>          
           </React.Fragment>
         )

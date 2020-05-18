@@ -1,4 +1,139 @@
 {
+  "paymentForm": {
+    "formId": "paymentForm",
+    "actions": [
+      {
+        "action": "delivery",
+        "title": "Review Delivery"
+      },
+      {
+        "action": "confirm",
+        "title": "Confirm Order"
+      }
+    ],
+    "schema": {
+      "type": "object",
+      "title": "Delivery",
+      "required": [
+        "payment"
+      ],
+      "properties": {
+        "payment": {
+          "title": "Payment Option",
+          "type": "string",
+          "enum": [
+            "Pickup",
+            "Online"
+          ]
+        }
+      }
+    },
+    "form":[
+      {
+        "key": "payment",
+        "type": "select",
+        "titleMap": [
+          {
+            "value": "Pickup",
+            "name": "Pay at Pickup"
+          },
+          {
+            "value": "Online",
+            "name": "Pay Online"
+          }
+        ]
+      }
+    ]
+  },
+  "pickupForm": {
+    "formId": "pickupForm",
+    "actions": [
+      {
+        "action": "cart",
+        "title": "Review Cart"
+      },
+      {
+        "action": "payment",
+        "title": "Payment"
+      }
+    ],
+    "schema": {
+      "type": "object",
+      "title": "Delivery",
+      "required": [
+        "pickupTime"
+      ],
+      "properties": {
+        "pickupTime": {
+          "title": "Pick up Time",
+          "type": "string",
+          "enum": [
+            "0",
+            "5",
+            "10",
+            "20",
+            "30",
+            "60",
+            "120",
+            "240"
+          ]
+        },
+        "instruction": {
+          "title": "Additional Instruction",
+          "type": "string"
+        }
+      }
+    },
+    "form":[
+      {
+        "type": "help",
+        "description": "22 Front Street, Toronto, ON",
+        "align": "left"
+      },
+      {
+        "key": "pickupTime",
+        "type": "select",
+        "titleMap": [
+          {
+            "value": "0",
+            "name": "Now"
+          },
+          {
+            "value": "5",
+            "name": "5 minutes"
+          },
+          {
+            "value": "10",
+            "name": "10 minutes"
+          },
+          {
+            "value": "20",
+            "name": "20 minutes"
+          },
+          {
+            "value": "30",
+            "name": "30 minutes"
+          },
+          {
+            "value": "60",
+            "name": "1 hour"
+          },
+          {
+            "value": "120",
+            "name": "2 hours"
+          },
+          {
+            "value": "240",
+            "name": "4 hours"
+          }
+        ]
+       },
+       {
+         "key": "instruction",
+         "type": "textarea"
+       }
+  ]
+  },
   "restaurantForm": {
     "formId": "restaurantForm",
     "actions": [
