@@ -98,7 +98,7 @@ function Delivery(props) {
 }
 
 const CartTotal = (props) => {
-  const { step, classes, cart, deleteFromCart, selectDelivery, taxRate } = props;
+  const { step, classes, cart, deleteFromCart, selectDelivery, continueShopping, taxRate } = props;
 
   const ccyFormat = (num) => {
     return `${num.toFixed(2)}`;
@@ -162,6 +162,7 @@ const CartTotal = (props) => {
           </TableBody>
         </Table>
       </TableContainer>
+      <Button variant="contained" className={classes.button} color="primary" onClick={e => continueShopping()}>Continue Shopping</Button>
       <Button variant="contained" className={classes.button} color="primary" onClick={e => selectDelivery()}>CHECKOUT</Button>
     </div>
   } else {
@@ -211,7 +212,9 @@ export default function CartMenu(props) {
     const confirmOrder = () => {
       setStep(4);
     }
-
+    const continueShopping = () => {
+      setCartMenu(null);
+    }
     return (
       <React.Fragment>
         { 'catalog' === menu ? (
@@ -241,7 +244,7 @@ export default function CartMenu(props) {
             disableAutoFocusItem
           >
             <div>
-              <CartTotal step={step} taxRate={taxRate} cart={cart} deleteFromCart={deleteFromCart} selectDelivery={selectDelivery} classes = {classes} />
+              <CartTotal step={step} taxRate={taxRate} cart={cart} deleteFromCart={deleteFromCart} selectDelivery={selectDelivery} continueShopping={continueShopping} classes = {classes} />
               <Delivery {...props} step={step} classes={classes} reviewCart={reviewCart} proceedPayment={proceedPayment}/>
               <Payment {...props} step={step} classes={classes} selectDelivery={selectDelivery} confirmOrder={confirmOrder}/>
             </div>
