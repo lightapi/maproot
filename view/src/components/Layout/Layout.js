@@ -21,7 +21,9 @@ import Notifications from "../../pages/notifications";
 import Failure from "../../pages/failure";
 import Success from "../../pages/success";
 import Profile from "../../pages/profile";
+import Payment from "../../pages/profile/Payment";
 import DeleteProfile from "../../pages/profile/DeleteProfile";
+import DeletePayment from "../../pages/profile/DeletePayment";
 import CityRegistry from "../../pages/covid/CityRegistry";
 import CityProfile from "../../pages/covid/CityProfile";
 import DeleteCity from "../../pages/covid/DeleteCity";
@@ -63,7 +65,9 @@ function Layout(props) {
               <Route path="/app/failure" component={Failure} />
               <Route path="/app/success" component={Success} />
               <Route path="/app/profile" component={Profile} />
+              <Route path="/app/payment" component={Payment} />
               <Route path="/app/deleteProfile" component={DeleteProfile} />
+              <Route path="/app/deletePayment" component={DeletePayment} />
               <Route path="/app/notificationDetail" component={NotificationDetail} />
               <Route path="/app/messages" component={Messages} />
 
