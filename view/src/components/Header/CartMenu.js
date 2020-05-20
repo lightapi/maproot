@@ -9,49 +9,147 @@ import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
 import Divider from '@material-ui/core/Divider';
 import Button from '@material-ui/core/Button';
-import Radio from '@material-ui/core/Radio';
-import RadioGroup from '@material-ui/core/RadioGroup';
-import TextField from '@material-ui/core/TextField';
-import Form from "@material-ui/core/FormControl";
-import FormControlLabel from '@material-ui/core/FormControlLabel';
-import Grid from "@material-ui/core/Grid";
+import InputLabel from '@material-ui/core/InputLabel';
+import CircularProgress from '@material-ui/core/CircularProgress';
+import FormControl from '@material-ui/core/FormControl';
+import Select from '@material-ui/core/Select';
 import SchemaForm from 'react-schema-form/lib/SchemaForm';
 import utils from 'react-schema-form/lib/utils';
 import { ShoppingCart, VerifiedUser, DeleteForever } from "@material-ui/icons";
 import { useSiteState, useSiteDispatch } from "../../context/SiteContext";
+import { useUserState } from "../../context/UserContext";
+import { useApiGet } from '../../hooks/useApiGet';
+import { useApiPost } from '../../hooks/useApiPost';
 import { Badge } from "../Wrappers/Wrappers";
 import forms from '../../data/Forms';
 
-function Payment(props) {
-  const {step, classes}  = props;
-  const [model, setModel] = useState({});
-  const [showErrors, setShowErrors]  = useState(false);
+function Summary(props) {
+  const { step, classes, proceedPayment } = props;
+  const { owner, cart, delivery, payment } = useSiteState();
+  const { email } = useUserState();
 
+  // save the order through API
+	const body = {
+		host: 'lightapi.net',
+		service: 'user',
+		action: 'createOrder',
+		version: '0.1.0',
+		data: { 
+      merchantUserId: owner,
+      order: {
+        customerEmail: email,
+        delivery: delivery,
+        items: cart,
+        payment: payment
+      }
+    }
+	};
+	const url = '/portal/command';
+	const headers = {};
+	const { isLoading, data, error } = useApiPost({url, headers, body});
+  console.log(isLoading, data, error);
+	let wait;
+  if(isLoading) {
+		wait = <div><CircularProgress/></div>;
+	} else {
+		wait = (
+		<div>
+	    	<pre>{ data ? JSON.stringify(data, null, 2) : 'Unauthorized' }</pre>
+		</div>
+		)  
+	}	
+
+	return (
+	<div>
+		{wait}
+	</div>
+	);
+}
+
+function Payment(props) {
+  const { step, classes, summarizeOrder }  = props;
+  const { owner } = useSiteState();
+  const [payment, setPayment] = useState();
+  let siteDispatch = useSiteDispatch();
+
+  useEffect(() => {
+    console.log("calling useEffect", payment);
+    siteDispatch({ type: "UPDATE_PAYMENT", payment: payment }); 
+  }, [payment]);
+
+  // retrieve payment options
+  const cmd = {
+    host: 'lightapi.net',
+    service: 'user',
+    action: 'getPaymentById',
+    version: '0.1.0',
+    data: { userId: owner }
+  }
+
+  const url = '/portal/query?cmd=' + encodeURIComponent(JSON.stringify(cmd));
+  const headers = {};
+  const { isLoading, data, error } = useApiGet({url, headers});
+  
+  console.log("data = ", data);
+  
   if(step !==3) {
     return null;
   }
 
-  const onModelChange = (key, val, type) => {
-    utils.selectOrSet(key, model, val, type);
-    setModel({...model});  // here we must create a new object to force re-render.
-  };
+  const onChange = (event) => {
+    console.log("onChange is called", event.target.value);
+    let method = event.target.value;
+    switch (method) {
+      case 'OnPickup': 
+        summarizeOrder();
+        break;
+      case 'Braintree': 
+        break;
+    }
+  }
 
-  let formData = forms['paymentForm'];
-  let title = <h2>{formData.schema.title}</h2>
-
-  return (
-    <div>
-      {title}    
-      <SchemaForm schema={formData.schema} form={formData.form} model={model} showErrors={showErrors} onModelChange={onModelChange} />
-    </div>
-  )  
-
+  let title = <h2>Payment Option</h2>
+  if(isLoading) {
+    return <CircularProgress className={classes.progress} />
+  } else if(data) {
+    let menuItems = [];
+    data.map((payment, index) => {
+      menuItems.push(<MenuItem key={index} value={payment.method}>{payment.method + (payment.sandbox ? '-Sandbox' : '')}</MenuItem>);
+      return menuItems;
+    })
+    return (
+      <div>
+        {title}    
+        <FormControl className={classes.formControl}>
+          <InputLabel id="demo-simple-select-label">Method</InputLabel>        
+          <Select
+            labelId="demo-simple-select-label"
+            id="demo-simple-select"
+            value={''}
+            onChange={onChange}
+          >
+            { menuItems }
+          </Select>
+        </FormControl>
+      </div>
+    )  
+  } else {
+    // error
+    return <div>{ error }</div>
+  }
 }
 
 function Delivery(props) {
   const { step, classes, reviewCart, proceedPayment, schema } = props;
   const [model, setModel] = useState({});
   const [showErrors, setShowErrors]  = useState(false);
+  const [delivery, setDelivery] = useState();
+  let siteDispatch = useSiteDispatch();
+
+  useEffect(() => {
+    console.log("calling useEffect", delivery);
+    siteDispatch({ type: "UPDATE_DELIVERY", delivery: delivery }); 
+  }, [delivery]);
 
   if(step !== 2) {
     return null;
@@ -59,8 +157,6 @@ function Delivery(props) {
 
   let formData = forms['pickupForm'];
   var buttons = [];
-
-  let defaultDelivery = 'pickup';
 
   const onModelChange = (key, val, type) => {
     utils.selectOrSet(key, model, val, type);
@@ -76,6 +172,7 @@ function Delivery(props) {
       if(!validationResult.valid) {
           setShowErrors(true);
       } else {
+        setDelivery({delivery: model})
         proceedPayment();
       }   
     }
@@ -209,7 +306,7 @@ export default function CartMenu(props) {
     const proceedPayment = () => {
       setStep(3);
     }
-    const confirmOrder = () => {
+    const summarizeOrder = () => {
       setStep(4);
     }
     const continueShopping = () => {
@@ -246,7 +343,7 @@ export default function CartMenu(props) {
             <div>
               <CartTotal step={step} taxRate={taxRate} cart={cart} deleteFromCart={deleteFromCart} selectDelivery={selectDelivery} continueShopping={continueShopping} classes = {classes} />
               <Delivery {...props} step={step} classes={classes} reviewCart={reviewCart} proceedPayment={proceedPayment}/>
-              <Payment {...props} step={step} classes={classes} selectDelivery={selectDelivery} confirmOrder={confirmOrder}/>
+              <Payment {...props} step={step} classes={classes} selectDelivery={selectDelivery} summarizeOrder={summarizeOrder}/>
             </div>
           </Menu>          
           </React.Fragment>
