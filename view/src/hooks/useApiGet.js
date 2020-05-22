@@ -4,7 +4,7 @@ import { requestStarted, requestSuccess, requestFailure } from './action';
 import { reducer } from './reducer';
 import Cookies from 'universal-cookie'
 
-export const useApiGet = ({ url, headers }) => {
+export const useApiGet = ({ url, headers, callback }) => {
   const [state, dispatch] = useReducer(reducer, {
     isLoading: true,
     data: null,
@@ -27,6 +27,7 @@ export const useApiGet = ({ url, headers }) => {
 
         const data = await response.json();
         //console.log(data);
+        if(callback) callback(data);
         dispatch(requestSuccess({ data }));  
       } catch (e) {
         // only call dispatch when we know the fetch was not aborted

@@ -16,12 +16,66 @@ import Select from '@material-ui/core/Select';
 import SchemaForm from 'react-schema-form/lib/SchemaForm';
 import utils from 'react-schema-form/lib/utils';
 import { ShoppingCart, VerifiedUser, DeleteForever } from "@material-ui/icons";
+import DropIn from "braintree-web-drop-in-react";
 import { useSiteState, useSiteDispatch } from "../../context/SiteContext";
 import { useUserState } from "../../context/UserContext";
 import { useApiGet } from '../../hooks/useApiGet';
 import { useApiPost } from '../../hooks/useApiPost';
 import { Badge } from "../Wrappers/Wrappers";
 import forms from '../../data/Forms';
+
+function Braintree(props) {
+  const [instance, setInstance] = useState();
+  const [nonce, setNonce] = useState();
+  const [clientToken, setClientToken] = useState(null);
+  const { owner, payment } = useSiteState();
+
+  const { step, classses, completePayment } = props;
+
+  // get clientToken with useApiGet hook.
+  const cmd = {
+    host: 'lightapi.net',
+    service: 'user',
+    action: 'getClientToken',
+    version: '0.1.0',
+    data: { userId: owner, merchantId: payment.merchantId }
+  }
+  const url = '/portal/query?cmd=' + encodeURIComponent(JSON.stringify(cmd));
+  const headers = {};
+  const callback = (data) => {
+    console.log("data = ", data);
+    setClientToken(data.clientToken);
+  }
+  let { isLoading, data, error } = useApiGet({url, headers, callback});
+
+  const onBuy = async () => {
+    console.log("Buy is clicked");
+    const { nonce } = await instance.requestPaymentMethod();
+    console.log("nonce = ", nonce);
+    // send to server with a command API call.
+    completePayment();
+  }
+
+  if(step !==5) {
+    return null;
+  }
+
+  if (!clientToken) {
+    return (
+      <div><CircularProgress/></div>
+    );
+  } else {
+    return (
+      <div>
+        <DropIn
+          options={{ authorization: clientToken }}
+          onInstance={(inst) => (setInstance(inst))}
+        />
+        <button onClick={onBuy}>Buy</button>
+      </div>
+    );
+  }
+}
 
 function Summary(props) {
   const { step, classes, proceedPayment } = props;
@@ -35,7 +89,7 @@ function Summary(props) {
 		action: 'createOrder',
 		version: '0.1.0',
 		data: { 
-      merchantUserId: owner,
+      userId: owner,
       order: {
         customerEmail: email,
         delivery: delivery,
@@ -48,6 +102,11 @@ function Summary(props) {
 	const headers = {};
 	const { isLoading, data, error } = useApiPost({url, headers, body});
   console.log(isLoading, data, error);
+
+  if(step !==4) {
+    return null;
+  }
+
 	let wait;
   if(isLoading) {
 		wait = <div><CircularProgress/></div>;
@@ -67,9 +126,9 @@ function Summary(props) {
 }
 
 function Payment(props) {
-  const { step, classes, summarizeOrder }  = props;
+  const { step, classes, summarizeOrder, startBraintree, completePayment }  = props;
   const { owner } = useSiteState();
-  const [payment, setPayment] = useState();
+  const [payment, setPayment] = useState({});
   let siteDispatch = useSiteDispatch();
 
   useEffect(() => {
@@ -90,20 +149,26 @@ function Payment(props) {
   const headers = {};
   const { isLoading, data, error } = useApiGet({url, headers});
   
-  console.log("data = ", data);
+  //console.log("data = ", data);
   
   if(step !==3) {
     return null;
   }
 
-  const onChange = (event) => {
-    console.log("onChange is called", event.target.value);
+  const onChange = (event, child) => {
+    console.log("onChange is called", event.target.value, child.key);
     let method = event.target.value;
     switch (method) {
       case 'OnPickup': 
+        setPayment({method: 'OnPickup'});  
+        completePayment();
         summarizeOrder();
         break;
       case 'Braintree': 
+        // find the merchantId
+        //setPayment({method: 'Braintree', merchantId: data[child.key].merchantId })
+        siteDispatch({ type: "UPDATE_PAYMENT", payment: {method: 'Braintree', merchantId: data[child.key].merchantId }});      
+        startBraintree();
         break;
     }
   }
@@ -277,6 +342,8 @@ export default function CartMenu(props) {
     var classes = props.classes;
     const [cartMenu, setCartMenu] = useState(false);
     const [step, setStep] = useState(1);
+    const [completedPayment, setCompletedPayment] = useState(false);
+
     var siteDispatch = useSiteDispatch();
     const { cart, menu, site } = useSiteState();
     const [ cartItems, setCartItems] = useState([]);
@@ -306,12 +373,23 @@ export default function CartMenu(props) {
     const proceedPayment = () => {
       setStep(3);
     }
+    
     const summarizeOrder = () => {
       setStep(4);
     }
+
+    const startBraintree = () => {
+      setStep(5);
+    }
+
     const continueShopping = () => {
       setCartMenu(null);
     }
+
+    const completePayment = () => {
+      setCompletedPayment(true);
+    }
+
     return (
       <React.Fragment>
         { 'catalog' === menu ? (
@@ -343,7 +421,9 @@ export default function CartMenu(props) {
             <div>
               <CartTotal step={step} taxRate={taxRate} cart={cart} deleteFromCart={deleteFromCart} selectDelivery={selectDelivery} continueShopping={continueShopping} classes = {classes} />
               <Delivery {...props} step={step} classes={classes} reviewCart={reviewCart} proceedPayment={proceedPayment}/>
-              <Payment {...props} step={step} classes={classes} selectDelivery={selectDelivery} summarizeOrder={summarizeOrder}/>
+              <Payment {...props} step={step} classes={classes} selectDelivery={selectDelivery} summarizeOrder={summarizeOrder} startBraintree={startBraintree} completePayment={completePayment}/>
+              { step === 5 ? <Braintree {...props} step={step} classes={classes} completePayment={completePayment}/> : null }
+              { completedPayment? <Summary {...props} step={step} classes={classes} /> : null }
             </div>
           </Menu>          
           </React.Fragment>

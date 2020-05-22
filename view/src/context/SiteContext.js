@@ -17,6 +17,8 @@ function siteReducer(state, action) {
       return { ...state, cart: action.cart };
     case "UPDATE_DELIVERY":
       return { ...state, delivery: action.delivery };
+    case "UPDATE_PAYMENT":
+      return { ...state, payment: action.payment };
     default: {
       throw new Error(`Unhandled action type: ${action.type}`);
     }
