@@ -3,6 +3,7 @@ import { makeStyles } from '@material-ui/styles';
 import Footer from './catalog/Footer';
 import Products from './catalog/Products';
 import { useSiteDispatch } from "../../context/SiteContext";
+import { useUserState } from "../../context/UserContext";
 
 const useStyles = makeStyles({
   container: {
@@ -24,6 +25,8 @@ export default function Catalog(props) {
 
     const [cart, setCart] = useState([]);
     const siteDispatch = useSiteDispatch();
+    const { isAuthenticated } = useUserState();
+
     //console.log("cart =", cart);
     
     useEffect(() => {
@@ -35,14 +38,19 @@ export default function Catalog(props) {
     const [totalAmount, setTotalAmount] = useState(0);
     */
     const onAddToCart = (selectedProduct) => {
-      let sku = selectedProduct.sku;
-      let qty = selectedProduct.quantity;
-      if(checkProduct(sku)) {
-        let index = cart.findIndex(x => x.sku === sku);
-        cart[index].quantity = Number(cart[index].quantity) + Number(qty);
-        setCart(cart => [...cart]);
+      // check if the user is authenticated. If not, popup a warning window.
+      if(!isAuthenticated) {
+        window.alert("An anonymous user cannot checkout and receive notifications. Please log in first.");
       } else {
-        setCart(cart => [...cart, selectedProduct]);
+        let sku = selectedProduct.sku;
+        let qty = selectedProduct.quantity;
+        if(checkProduct(sku)) {
+          let index = cart.findIndex(x => x.sku === sku);
+          cart[index].quantity = Number(cart[index].quantity) + Number(qty);
+          setCart(cart => [...cart]);
+        } else {
+          setCart(cart => [...cart, selectedProduct]);
+        }
       }
     }
 
