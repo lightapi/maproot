@@ -30,7 +30,7 @@ function Braintree(props) {
   const [clientToken, setClientToken] = useState(null);
   const { owner, payment } = useSiteState();
 
-  const { step, classes, completePayment } = props;
+  const { step, classes, completePayment, proceedPayment, summarizeOrder } = props;
 
   // get clientToken with useApiGet hook.
   const cmd = {
@@ -52,6 +52,7 @@ function Braintree(props) {
     console.log("Buy is clicked");
     const { nonce } = await instance.requestPaymentMethod();
     console.log("nonce = ", nonce);
+    setNonce(nonce);
     // send to server with a command API call.
     completePayment();
   }
@@ -71,8 +72,9 @@ function Braintree(props) {
           options={{ authorization: clientToken }}
           onInstance={(inst) => (setInstance(inst))}
         />
+        <Button variant="contained" className={classes.button} color="primary" onClick={e => proceedPayment()}>PAYMENT OPTIONS</Button>
         {nonce? null : <Button variant="contained" className={classes.button} color="primary" onClick={e => onBuy()}>BUY</Button>}
-        {nonce? <Button variant="contained" className={classes.button} color="primary" onClick={e => onBuy()}>BUY</Button> : null}
+        {nonce? <Button variant="contained" className={classes.button} color="primary" onClick={e => summarizeOrder()}>SUMMARY</Button> : null}
       </div>
     );
   }
@@ -133,15 +135,10 @@ function Summary(props) {
 }
 
 function Payment(props) {
-  const { step, classes, summarizeOrder, startBraintree, completePayment }  = props;
+  const { step, classes, summarizeOrder, startBraintree, completePayment, selectDelivery }  = props;
   const { owner } = useSiteState();
-  const [payment, setPayment] = useState({});
+  const [payment, setPayment] = useState({method: ""});
   let siteDispatch = useSiteDispatch();
-
-  useEffect(() => {
-    console.log("calling useEffect", payment);
-    siteDispatch({ type: "UPDATE_PAYMENT", payment: payment }); 
-  }, [payment]);
 
   // retrieve payment options
   const cmd = {
@@ -162,20 +159,33 @@ function Payment(props) {
     return null;
   }
 
+  const onPayment = () => {
+    switch (payment.method) {
+      case 'OnPickup': 
+        completePayment();
+        summarizeOrder();
+        break;
+      case 'Braintree':
+        startBraintree();
+        break;
+      default: 
+        window.alert("Please select a payment method.");
+        break;
+    }
+  }
+
   const onChange = (event, child) => {
     console.log("onChange is called", event.target.value, child.key);
     let method = event.target.value;
     switch (method) {
       case 'OnPickup': 
-        setPayment({method: 'OnPickup'});  
-        completePayment();
-        summarizeOrder();
+        setPayment({method: 'OnPickup'});
+        siteDispatch({ type: "UPDATE_PAYMENT", payment: {method: 'OnPickup'}});      
         break;
       case 'Braintree': 
         // find the merchantId
-        //setPayment({method: 'Braintree', merchantId: data[child.key].merchantId })
+        setPayment({method: 'Braintree', merchantId: data[child.key].merchantId })
         siteDispatch({ type: "UPDATE_PAYMENT", payment: {method: 'Braintree', merchantId: data[child.key].merchantId }});      
-        startBraintree();
         break;
     }
   }
@@ -193,15 +203,22 @@ function Payment(props) {
       <div>
         {title}    
         <FormControl className={classes.formControl}>
+          <div>
           <InputLabel id="demo-simple-select-label">Method</InputLabel>        
           <Select
             labelId="demo-simple-select-label"
             id="demo-simple-select"
-            value={''}
+            value={payment.method}
             onChange={onChange}
           >
             { menuItems }
           </Select>
+          </div>
+          <p/>
+          <div>
+          <Button variant="contained" className={classes.button} color="primary" onClick={e => selectDelivery()}>Delivery</Button>
+          <Button variant="contained" className={classes.button} color="primary" onClick={e => onPayment()}>Payment</Button>
+          </div>
         </FormControl>
       </div>
     )  
@@ -429,7 +446,7 @@ export default function CartMenu(props) {
               <CartTotal step={step} taxRate={taxRate} cart={cart} deleteFromCart={deleteFromCart} selectDelivery={selectDelivery} closeCart={closeCart} classes = {classes} />
               <Delivery {...props} step={step} classes={classes} reviewCart={reviewCart} proceedPayment={proceedPayment}/>
               <Payment {...props} step={step} classes={classes} selectDelivery={selectDelivery} summarizeOrder={summarizeOrder} startBraintree={startBraintree} completePayment={completePayment}/>
-              { step === 5 ? <Braintree {...props} step={step} classes={classes} completePayment={completePayment}/> : null }
+              { step === 5 ? <Braintree {...props} step={step} classes={classes} proceedPayment={proceedPayment} completePayment={completePayment} summarizeOrder={summarizeOrder}/> : null }
               { completedPayment? <Summary {...props} step={step} classes={classes} closeCart={closeCart}/> : null }
             </div>
           </Menu>          
