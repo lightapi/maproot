@@ -30,7 +30,7 @@ function Braintree(props) {
   const [clientToken, setClientToken] = useState(null);
   const { owner, payment } = useSiteState();
 
-  const { step, classses, completePayment } = props;
+  const { step, classes, completePayment } = props;
 
   // get clientToken with useApiGet hook.
   const cmd = {
@@ -71,14 +71,15 @@ function Braintree(props) {
           options={{ authorization: clientToken }}
           onInstance={(inst) => (setInstance(inst))}
         />
-        <button onClick={onBuy}>Buy</button>
+        {nonce? null : <Button variant="contained" className={classes.button} color="primary" onClick={e => onBuy()}>BUY</Button>}
+        {nonce? <Button variant="contained" className={classes.button} color="primary" onClick={e => onBuy()}>BUY</Button> : null}
       </div>
     );
   }
 }
 
 function Summary(props) {
-  const { step, classes, proceedPayment } = props;
+  const { step, classes, proceedPayment, closeCart } = props;
   const { owner, cart, delivery, payment } = useSiteState();
   const { email } = useUserState();
 
@@ -97,7 +98,8 @@ function Summary(props) {
         payment: payment
       }
     }
-	};
+  };
+  console.log("body = ", body);
 	const url = '/portal/command';
 	const headers = {};
 	const { isLoading, data, error } = useApiPost({url, headers, body});
@@ -112,9 +114,14 @@ function Summary(props) {
 		wait = <div><CircularProgress/></div>;
 	} else {
 		wait = (
-		<div>
-	    	<pre>{ data ? JSON.stringify(data, null, 2) : 'Unauthorized' }</pre>
-		</div>
+      <React.Fragment>
+        <div className={classes.emptyCart}>
+            <h4>Order Summary</h4>
+            <p>Order Id: {data.orderId}</p>
+            <p>Pass Code: {data.passCode}</p>
+        </div>
+        <Button variant="contained" className={classes.button} color="primary" onClick={e => closeCart()}>Close</Button>
+      </React.Fragment>
 		)  
 	}	
 
@@ -260,7 +267,7 @@ function Delivery(props) {
 }
 
 const CartTotal = (props) => {
-  const { step, classes, cart, deleteFromCart, selectDelivery, continueShopping, taxRate } = props;
+  const { step, classes, cart, deleteFromCart, selectDelivery, closeCart, taxRate } = props;
 
   const ccyFormat = (num) => {
     return `${num.toFixed(2)}`;
@@ -324,7 +331,7 @@ const CartTotal = (props) => {
           </TableBody>
         </Table>
       </TableContainer>
-      <Button variant="contained" className={classes.button} color="primary" onClick={e => continueShopping()}>Continue Shopping</Button>
+      <Button variant="contained" className={classes.button} color="primary" onClick={e => closeCart()}>Continue Shopping</Button>
       <Button variant="contained" className={classes.button} color="primary" onClick={e => selectDelivery()}>CHECKOUT</Button>
     </div>
   } else {
@@ -382,7 +389,7 @@ export default function CartMenu(props) {
       setStep(5);
     }
 
-    const continueShopping = () => {
+    const closeCart = () => {
       setCartMenu(null);
     }
 
@@ -419,11 +426,11 @@ export default function CartMenu(props) {
             disableAutoFocusItem
           >
             <div>
-              <CartTotal step={step} taxRate={taxRate} cart={cart} deleteFromCart={deleteFromCart} selectDelivery={selectDelivery} continueShopping={continueShopping} classes = {classes} />
+              <CartTotal step={step} taxRate={taxRate} cart={cart} deleteFromCart={deleteFromCart} selectDelivery={selectDelivery} closeCart={closeCart} classes = {classes} />
               <Delivery {...props} step={step} classes={classes} reviewCart={reviewCart} proceedPayment={proceedPayment}/>
               <Payment {...props} step={step} classes={classes} selectDelivery={selectDelivery} summarizeOrder={summarizeOrder} startBraintree={startBraintree} completePayment={completePayment}/>
               { step === 5 ? <Braintree {...props} step={step} classes={classes} completePayment={completePayment}/> : null }
-              { completedPayment? <Summary {...props} step={step} classes={classes} /> : null }
+              { completedPayment? <Summary {...props} step={step} classes={classes} closeCart={closeCart}/> : null }
             </div>
           </Menu>          
           </React.Fragment>
