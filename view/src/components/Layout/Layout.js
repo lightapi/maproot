@@ -24,6 +24,7 @@ import Profile from "../../pages/profile";
 import Payment from "../../pages/profile/Payment";
 import DeleteProfile from "../../pages/profile/DeleteProfile";
 import DeletePayment from "../../pages/profile/DeletePayment";
+import UpdateRoles from "../../pages/profile/UpdateRoles";
 import CityRegistry from "../../pages/covid/CityRegistry";
 import CityProfile from "../../pages/covid/CityProfile";
 import DeleteCity from "../../pages/covid/DeleteCity";
@@ -66,6 +67,7 @@ function Layout(props) {
               <Route path="/app/success" component={Success} />
               <Route path="/app/profile" component={Profile} />
               <Route path="/app/payment" component={Payment} />
+              <Route path="/app/updateRoles" component={UpdateRoles} />
               <Route path="/app/deleteProfile" component={DeleteProfile} />
               <Route path="/app/deletePayment" component={DeletePayment} />
               <Route path="/app/notificationDetail" component={NotificationDetail} />

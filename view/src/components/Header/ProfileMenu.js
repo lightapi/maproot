@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useUserDispatch, useUserState, signOut, signUp, changePassword, getProfile, getPayment } from "../../context/UserContext";
+import { useUserDispatch, useUserState, signOut, signUp, changePassword, getProfile, getPayment, updateRoles } from "../../context/UserContext";
 import {
   IconButton,
   Menu,
@@ -15,7 +15,7 @@ export default function ProfileMenu(props) {
     var [profileMenu, setProfileMenu] = useState(null);
     var userDispatch = useUserDispatch();
     var classes = props.classes;
-    var { isAuthenticated, userId } = useUserState();
+    var { isAuthenticated, userId, roles } = useUserState();
 
     //console.log(isAuthenticated);
 
@@ -71,6 +71,18 @@ export default function ProfileMenu(props) {
           >
             <AccountIcon className={classes.profileMenuIcon} /> Payment
           </MenuItem>
+          {roles.includes("admin") ?      
+          <MenuItem
+            className={classNames(
+              classes.profileMenuItem,
+              classes.headerMenuItem,
+            )}
+            onClick={() => {updateRoles(userDispatch, props.history); setProfileMenu(false);}}
+          >
+            <AccountIcon className={classes.profileMenuIcon} /> Update Roles
+          </MenuItem>
+          : null 
+          }
           <MenuItem
             className={classNames(
               classes.profileMenuItem,

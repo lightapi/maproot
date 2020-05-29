@@ -370,18 +370,11 @@ export default function CartMenu(props) {
 
     var siteDispatch = useSiteDispatch();
     const { cart, menu, site } = useSiteState();
-    const [ cartItems, setCartItems] = useState([]);
-
-    useEffect(() => {
-      console.log("calling useEffect");
-      siteDispatch({ type: "UPDATE_CART", cart: cartItems }); 
-    }, [cartItems.length]);
 
     const deleteFromCart = (sku) => {
       console.log("deleteFromCart is called", sku);
-      console.log("cart = ", cart);
-      setCartItems(cart.filter( item => item.sku !== sku))
-      console.log("cartItems = ", cartItems);
+      let newCart = cart.filter( item => item.sku !== sku);
+      siteDispatch({ type: "UPDATE_CART", cart: newCart }); 
     }
 
     const taxRate = site && site.catalog ? site.catalog.taxRate : 0;

@@ -2,7 +2,7 @@ import React, {useState, useEffect} from 'react';
 import { makeStyles } from '@material-ui/styles';
 import Footer from './catalog/Footer';
 import Products from './catalog/Products';
-import { useSiteDispatch } from "../../context/SiteContext";
+import { useSiteDispatch, useSiteState } from "../../context/SiteContext";
 import { useUserState } from "../../context/UserContext";
 
 const useStyles = makeStyles({
@@ -23,15 +23,9 @@ export default function Catalog(props) {
     //console.log("products = ", products)
     //console.log("storeName = ", storeName);
 
-    const [cart, setCart] = useState([]);
+    const { cart } = useSiteState();
     const siteDispatch = useSiteDispatch();
     const { isAuthenticated } = useUserState();
-
-    //console.log("cart =", cart);
-    
-    useEffect(() => {
-      siteDispatch({ type: "UPDATE_CART", cart }); 
-    }, [cart.length]);
 
     /*
     const [totalItems, setTotalItems] = useState(0);
@@ -47,19 +41,16 @@ export default function Catalog(props) {
         if(checkProduct(sku)) {
           let index = cart.findIndex(x => x.sku === sku);
           cart[index].quantity = Number(cart[index].quantity) + Number(qty);
-          setCart(cart => [...cart]);
+          siteDispatch({ type: "UPDATE_CART", cart: [...cart] }); 
         } else {
-          setCart(cart => [...cart, selectedProduct]);
+          siteDispatch({ type: "UPDATE_CART", cart: [...cart, selectedProduct] }); 
         }
       }
     }
 
-    const onDeleteFromCart = (sku) => {
-      setCart(cart.filter(item => item.sku !== sku));
-    }
-
-    const checkProduct = (sku) => {
-      return cart.some(item => item.sku === sku);
+     const checkProduct = (sku) => {
+       console.log("cart = ", cart);
+      return Array.isArray(cart) && cart.some(item => item.sku === sku);
     }
 
     /*

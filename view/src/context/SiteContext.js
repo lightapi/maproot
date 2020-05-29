@@ -62,18 +62,8 @@ function useSiteDispatch() {
   return context;
 }
 
-export { SiteProvider, useSiteState, useSiteDispatch, updateSite, addToCart, deleteFromCart };
+export { SiteProvider, useSiteState, useSiteDispatch, updateSite };
 
 function updateSite(dispatch, site, owner) {
     dispatch({ type: "UPDATE_SITE", site, owner });
 }
-
-
-function addToCart(dispatch, sku) {
-    dispatch({ type: "ADD_TO_CART",  });
-}
-
-function deleteFromCart(dispatch, sku) {
-    dispatch({ type: "DELETE_FROM_CART" });
-}
-

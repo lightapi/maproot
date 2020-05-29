@@ -88,7 +88,7 @@ function useUserDispatch() {
   return context;
 }
 
-export { UserProvider, useUserState, useUserDispatch, loginUser, signOut, signUp, changePassword, getProfile, getPayment };
+export { UserProvider, useUserState, useUserDispatch, loginUser, signOut, signUp, changePassword, getProfile, getPayment, updateRoles };
 
 // ###########################################################
 
@@ -143,4 +143,8 @@ function getProfile(dispatch, history) {
 
 function getPayment(dispatch, history) {
   history.push("/app/payment");
+}
+
+function updateRoles(dispatch, history) {
+  history.push("/app/updateRoles");
 }
