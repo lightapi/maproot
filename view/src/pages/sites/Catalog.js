@@ -41,15 +41,15 @@ export default function Catalog(props) {
         if(checkProduct(sku)) {
           let index = cart.findIndex(x => x.sku === sku);
           cart[index].quantity = Number(cart[index].quantity) + Number(qty);
-          siteDispatch({ type: "UPDATE_CART", cart: [...cart] }); 
+              siteDispatch({ type: "UPDATE_CART", cart: [...cart] }); 
         } else {
           siteDispatch({ type: "UPDATE_CART", cart: [...cart, selectedProduct] }); 
         }
       }
     }
 
-     const checkProduct = (sku) => {
-       console.log("cart = ", cart);
+    const checkProduct = (sku) => {
+      console.log("cart = ", cart);
       return Array.isArray(cart) && cart.some(item => item.sku === sku);
     }
 

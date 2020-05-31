@@ -392,6 +392,7 @@ export default function CartMenu(props) {
     }
     
     const summarizeOrder = () => {
+      siteDispatch({ type: "UPDATE_CART", cart: [] }); 
       setStep(4);
     }
 
