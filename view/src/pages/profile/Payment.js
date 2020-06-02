@@ -30,7 +30,7 @@ export default function Payment(props) {
   };
 
   const updatePayment = () => {
-    props.history.push({pathname: '/app/form/updatePayment', state: { data }});
+    props.history.push({pathname: '/app/form/updatePayment', state: { data: {email, payments: data }}});
   };
 
   let wait;
