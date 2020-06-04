@@ -309,6 +309,29 @@
                     "background": {
                         "type": "string",
                         "title": "Backgroud Picture Url"
+                    },
+                    "buttons": {
+                        "type": "array",
+                        "title": "Menu Buttons",
+                        "minItems": 1,
+                        "maxItems": 4,
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "label": {
+                              "title": "Label",
+                              "type": "string"
+                            },
+                            "menu": {
+                              "title": "Menu",
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "label",
+                            "menu"
+                          ]
+                        }
                     }
                 }
             },
