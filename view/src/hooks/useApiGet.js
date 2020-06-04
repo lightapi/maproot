@@ -22,9 +22,10 @@ export const useApiGet = ({ url, headers, callback }) => {
         const response = await fetch(url, { headers, credentials: 'include', signal: abortController.signal });
         //console.log(response);
         if (!response.ok) {
-          throw response;
+          throw new Error(
+            `${response.status} ${response.statusText}`
+          );
         }
-
         const data = await response.json();
         //console.log(data);
         if(callback) callback(data);
@@ -32,9 +33,8 @@ export const useApiGet = ({ url, headers, callback }) => {
       } catch (e) {
         // only call dispatch when we know the fetch was not aborted
         if (!abortController.signal.aborted) {
-          const error = await e.json();
-          console.log(error);
-          dispatch(requestFailure({ error: error.description }));
+          console.log(e.message);
+          dispatch(requestFailure({ error: e.message }));
         }        
       }
     };

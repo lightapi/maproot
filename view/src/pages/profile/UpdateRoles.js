@@ -6,9 +6,8 @@ import MenuItem from '@material-ui/core/MenuItem';
 import FormControl from '@material-ui/core/FormControl';
 import TextField from '@material-ui/core/TextField';
 import Select from '@material-ui/core/Select';
-import Checkbox from '@material-ui/core/Checkbox';
-import Chip from '@material-ui/core/Chip';
 import { useApiGet } from '../../hooks/useApiGet';
+import { useApiPost } from '../../hooks/useApiPost';
 import { useUserState } from "../../context/UserContext";
 import Widget from "../../components/Widget";
 import CircularProgress from '@material-ui/core/CircularProgress';
@@ -62,19 +61,57 @@ function getStyles(role, roles, theme) {
     };
 }
 
-export default function UpdateRoles(props) {
-  const classes = useStyles();
-  const theme = useTheme();
+
+function EmailInput(props) {
+  const { step, classes, inputRoles } = props;
   const [email, setEmail] = useState();
-  const [roles, setRoles] = useState([]);
-
-
-  const handleChange = (event) => {
-    setRoles(event.target.value);
-  };
+  if(step !== 1) {
+    return null;
+  }
 
   const onEmailChange = (event) => {
     setEmail(event.target.value);
+  };
+
+  return (
+    <div>
+      <FormControl className={classes.formControl}>
+        <TextField id="standard-basic" label="Email" onChange={onEmailChange}/>
+        <p/>
+        <div className={classes.buttons}>
+          <Button variant="contained" className={classes.button} color="primary" onClick={e => inputRoles(email)}>Retrieve Roles</Button>
+        </div>
+      </FormControl>
+    </div>
+  )  
+}
+
+function RolesInput(props) {
+  const { step, classes, email, updateRoles } = props;
+  const [roles, setRoles] = useState([]);
+
+  const cmd = {
+    host: 'lightapi.net',
+    service: 'user',
+    action: 'getRolesByEmail',
+    version: '0.1.0',
+    data: { email }
+  }
+  const url = '/portal/query?cmd=' + encodeURIComponent(JSON.stringify(cmd));
+  const headers = {};
+  const callback = (data) => {
+    //console.log("data = ", data);
+    setRoles(data.roles.split(' '));
+  }
+
+  const { isLoading, data, error } = useApiGet({url, headers, callback});
+
+  if(step !== 2) {
+    return null;
+  }
+
+  const handleChange = (event) => {
+    setRoles(event.target.value);
   };
 
   const handleChangeMultiple = (event) => {
@@ -88,18 +125,10 @@ export default function UpdateRoles(props) {
     setRoles(value);
   };  
 
-  const retrieve = () => {
-    
-  }
-
-  const update = () => {
-
-  }
-
   return (
     <div>
       <FormControl className={classes.formControl}>
-        <TextField id="standard-basic" label="Email" onChange={onEmailChange}/>
+        <TextField disabled id="standard-basic" label="Email" defaultValue={email}/>
         <Select
           labelId="demo-mutiple-name-label"
           id="demo-mutiple-name"
@@ -117,10 +146,75 @@ export default function UpdateRoles(props) {
         </Select>
         <p/>
         <div className={classes.buttons}>
-          <Button variant="contained" className={classes.button} color="primary" onClick={e => retrieve()}>Retrieve Roles</Button>
-          <Button variant="contained" className={classes.button} color="primary" onClick={e => update()}>Update Roles</Button>
+          <Button variant="contained" className={classes.button} color="primary" onClick={e => updateRoles(roles)}>Update Roles</Button>
         </div>
       </FormControl>
+    </div>
+  ) 
+}
+
+function RolesUpdate(props) {
+  const { step, classes, email, roles } = props;
+	const body = {
+		host: 'lightapi.net',
+		service: 'user',
+		action: 'updateRoles',
+		version: '0.1.0',
+		data: { email, roles: roles.join(' ') }
+	};
+	const url = '/portal/command';
+	const headers = {};
+	const { isLoading, data, error } = useApiPost({url, headers, body});
+	console.log(isLoading, data, error);
+	let wait;
+	if(isLoading) {
+		wait = <div><CircularProgress/></div>;
+	} else {
+		wait = (
+		<div>
+	    	<pre>{ data ? JSON.stringify(data, null, 2) : error }</pre>
+		</div>
+		)  
+	}	
+
+  if(step !== 3) {
+    return null;
+  }
+
+  return (
+	<div>
+		{wait}
+	</div>
+	);
+}
+
+export default function UpdateRoles(props) {
+  const classes = useStyles();
+  const theme = useTheme();
+  const [step, setStep] = useState(1);
+  const [email, setEmail] = useState();
+  const [roles, setRoles] = useState([]);
+
+  const inputEmail = () => {
+    setStep(1);
+  }
+
+  const inputRoles = (email) => {
+    //console.log("inputRoles email = ", email);
+    setEmail(email);
+    setStep(2);
+  }
+
+  const updateRoles = (roles) => {
+    setRoles(roles);
+    setStep(3);
+  }
+
+  return (
+    <div>
+      <EmailInput step={step} classes={classes} inputRoles={inputRoles}/>
+      { email? <RolesInput step={step} classes={classes} email={email} inputEmail={inputEmail} updateRoles={updateRoles}/> : null }
+      { step === 3 ? <RolesUpdate step={step} classes={classes} email={email} roles={roles} /> : null}
     </div>
   ) 
 }
