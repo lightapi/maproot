@@ -38,6 +38,8 @@ import PeerStatus from "../../pages/covid/UserIdStatus";
 import NotificationDetail from "../../components/Notification/NotificationDetail";
 import Messages from "../Notification/Messages";
 import UserId from "../../pages/covid/UserId";
+import MerchantOrders from "../../pages/profile/MerchantOrders";
+import UserOrders from "../../pages/profile/UserOrders";
 
 // context
 import { useLayoutState } from "../../context/LayoutContext";
@@ -72,6 +74,8 @@ function Layout(props) {
               <Route path="/app/deletePayment" component={DeletePayment} />
               <Route path="/app/notificationDetail" component={NotificationDetail} />
               <Route path="/app/messages" component={Messages} />
+              <Route path="/app/merchantOrders" component={MerchantOrders} />
+              <Route path="/app/userOrders" component={UserOrders} />
 
               <Route path="/app/covid/cityRegistry" component={CityRegistry} />
               <Route path="/app/covid/cityProfile" component={CityProfile} />

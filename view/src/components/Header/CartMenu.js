@@ -81,9 +81,9 @@ function Braintree(props) {
 }
 
 function Summary(props) {
-  const { step, classes, proceedPayment, closeCart } = props;
+  const { step, classes, proceedPayment, cleanCart } = props;
   const { owner, cart, delivery, payment } = useSiteState();
-  const { email } = useUserState();
+  const { email, userId } = useUserState();
 
   // save the order through API
 	const body = {
@@ -94,7 +94,9 @@ function Summary(props) {
 		data: { 
       userId: owner,
       order: {
+        merchantUserId: owner,
         customerEmail: email,
+        customerUserId: userId,
         delivery: delivery,
         items: cart,
         payment: payment
@@ -122,7 +124,7 @@ function Summary(props) {
             <p>Order Id: {data.orderId}</p>
             <p>Pass Code: {data.passCode}</p>
         </div>
-        <Button variant="contained" className={classes.button} color="primary" onClick={e => closeCart()}>Close</Button>
+        <Button variant="contained" className={classes.button} color="primary" onClick={e => cleanCart()}>Close</Button>
       </React.Fragment>
 		)  
 	}	
@@ -261,7 +263,7 @@ function Delivery(props) {
       if(!validationResult.valid) {
           setShowErrors(true);
       } else {
-        setDelivery({delivery: model})
+        setDelivery(model)
         proceedPayment();
       }   
     }
@@ -392,7 +394,6 @@ export default function CartMenu(props) {
     }
     
     const summarizeOrder = () => {
-      siteDispatch({ type: "UPDATE_CART", cart: [] }); 
       setStep(4);
     }
 
@@ -401,6 +402,11 @@ export default function CartMenu(props) {
     }
 
     const closeCart = () => {
+      setCartMenu(null);
+    }
+
+    const cleanCart = () => {
+      siteDispatch({ type: "UPDATE_CART", cart: [] }); 
       setCartMenu(null);
     }
 
@@ -441,7 +447,7 @@ export default function CartMenu(props) {
               <Delivery {...props} step={step} classes={classes} reviewCart={reviewCart} proceedPayment={proceedPayment}/>
               <Payment {...props} step={step} classes={classes} selectDelivery={selectDelivery} summarizeOrder={summarizeOrder} startBraintree={startBraintree} completePayment={completePayment}/>
               { step === 5 ? <Braintree {...props} step={step} classes={classes} proceedPayment={proceedPayment} completePayment={completePayment} summarizeOrder={summarizeOrder}/> : null }
-              { completedPayment? <Summary {...props} step={step} classes={classes} closeCart={closeCart}/> : null }
+              { completedPayment? <Summary {...props} step={step} classes={classes} cleanCart={cleanCart}/> : null }
             </div>
           </Menu>          
           </React.Fragment>

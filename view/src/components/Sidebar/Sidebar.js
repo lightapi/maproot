@@ -3,6 +3,7 @@ import { Drawer, IconButton, List } from "@material-ui/core";
 import {
   Home as HomeIcon,
   ArrowBack as ArrowBackIcon,
+  Toc as OrderIcon,
 } from "@material-ui/icons";
 
 import AcUnitIcon from '@material-ui/icons/AcUnit';
@@ -38,6 +39,7 @@ const structure = [
   { id: 25, label: "Website", role: "user", link: "/app/covid/publish", icon: <Business/>, },
   { id: 26, label: "Status", role: "user", link: "/app/covid/status", icon: <AddAlert/>, },
   { id: 27, label: "User Id", link: "/app/covid/userId", icon: <AccountBox />},
+  { id: 28, label: "Merchant Orders", role: "merchant", link: "/app/merchantOrders", icon: <OrderIcon/>},
 ];
 
 function Sidebar({ location }) {
