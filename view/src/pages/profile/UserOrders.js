@@ -14,7 +14,7 @@ import CircularProgress from '@material-ui/core/CircularProgress';
 import { timeConversion } from '../../Utils';
 import { useApiGet } from '../../hooks/useApiGet';
 import { useUserState } from "../../context/UserContext";
-import OrderList from "./OrderList";
+import UserOrderList from "./UserOrderList";
 
 const useRowStyles = makeStyles({
     root: {
@@ -59,7 +59,7 @@ export default function UserOrders(props) {
     } else {
         wait = (
           <div>
-            <OrderList {...props} orders={orders}/>
+            <UserOrderList {...props} orders={orders}/>
           </div>
         )
     }
