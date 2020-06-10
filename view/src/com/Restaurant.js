@@ -4,7 +4,7 @@ import Home from "../pages/sites/Home";
 import Catalog from "../pages/sites/Catalog";
 
 export default function Restaurant(props) {
-  //console.log("Restaurant props = ", props);
+  console.log("Restaurant props = ", props);
 
   const { menu } = useSiteState();
   //console.log("menu = ", menu);
@@ -13,7 +13,7 @@ export default function Restaurant(props) {
   	case 'home':
   	  comp = (
 		<div>
-			<Home {...props}/>	    	
+			<Home {...props.site.home}/>	    	
 		</div>
   	  )
  	  break;
@@ -27,7 +27,7 @@ export default function Restaurant(props) {
  	case 'catalog':
  	  comp = (
 		<div>
-	    	<Catalog products={props.site.catalog.products} storeName={props.site.home.name}/>
+	    	<Catalog products={props.site.catalog.products} storeName={props.site.home.name} storeTitle={props.site.home.title}/>
 		</div>
  	  )
  	  break;

@@ -2,6 +2,7 @@ import React, {useState, useEffect} from 'react';
 import { makeStyles } from '@material-ui/styles';
 import Footer from './catalog/Footer';
 import Products from './catalog/Products';
+import CatalogHeader from './catalog/CatalogHeader';
 import { useSiteDispatch, useSiteState } from "../../context/SiteContext";
 import { useUserState } from "../../context/UserContext";
 
@@ -19,18 +20,13 @@ const useStyles = makeStyles({
 
 export default function Catalog(props) {
     //var classes = useStyles();
-    const { products, storeName } = props;
-    //console.log("products = ", products)
-    //console.log("storeName = ", storeName);
+    console.log(props);
+    const { products, storeName, storeTitle } = props;
 
     const { cart } = useSiteState();
     const siteDispatch = useSiteDispatch();
     const { isAuthenticated } = useUserState();
 
-    /*
-    const [totalItems, setTotalItems] = useState(0);
-    const [totalAmount, setTotalAmount] = useState(0);
-    */
     const onAddToCart = (selectedProduct) => {
       // check if the user is authenticated. If not, popup a warning window.
       if(!isAuthenticated) {
@@ -53,18 +49,9 @@ export default function Catalog(props) {
       return Array.isArray(cart) && cart.some(item => item.sku === sku);
     }
 
-    /*
-    const sumTotalAmount = () => {
-      let total = 0;
-      for (var i = 0; i < cart.length; i++) {
-        total += cart[i].price * parseInt(cart[i].quantity);
-      }
-      return total;
-    }
-    */
-
     return (
       <div>
+        <CatalogHeader storeName={storeName} storeTitle={storeTitle}/>
         <Products onAddToCart={onAddToCart} products={products}/>
         <Footer storeName={storeName}/>
       </div>

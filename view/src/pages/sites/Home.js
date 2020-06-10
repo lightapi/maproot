@@ -46,7 +46,7 @@ const useStyles = makeStyles({
 })
 
 export default function Home(props) {
-    const styleProps = { nameSize: props.site.home.nameSize || '110px', titleSize: props.site.home.titleSize || '70px' }
+    const styleProps = { nameSize: props.nameSize || '110px', titleSize: props.titleSize || '70px' }
     var classes = useStyles(styleProps);
     var siteDispatch = useSiteDispatch();
 
@@ -55,13 +55,13 @@ export default function Home(props) {
     }
 
     return (
-        <div className={classes.home} style ={{ backgroundImage: `url(${props.site.home.background})`, backgroundSize: 'cover',  overflow: 'hidden' }}>
+        <div className={classes.home} style ={{ backgroundImage: `url(${props.background})`, backgroundSize: 'cover',  overflow: 'hidden' }}>
             <div className={classes.homeContent}>
-                <div className={classes.homeName}>{props.site.home.name}</div>
-                <div className={classes.homeTitle}>{props.site.home.title}</div>
+                <div className={classes.homeName}>{props.name}</div>
+                <div className={classes.homeTitle}>{props.title}</div>
                 <div>
-                {props.site.home.buttons.map(button => (
-                  <Fab variant="extended" color="primary" onClick={() => onButtonClick(button.menu)}>
+                {props.buttons.map(button => (
+                  <Fab variant="extended" key={button.menu} color="primary" onClick={() => onButtonClick(button.menu)}>
                    {button.label}
                  </Fab>
                 ))}
