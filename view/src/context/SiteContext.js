@@ -9,6 +9,8 @@ function siteReducer(state, action) {
   switch (action.type) {
     case "UPDATE_SITE":
       return { ...state, site: action.site, owner: action.owner };
+    case "UPDATE_INSTRUCTION":
+      return { ...state, delivery: {instruction: action.instruction}}
     case "UPDATE_MENU":
       return { ...state, menu: action.menu };
     case "UPDATE_FILTER":
@@ -34,7 +36,7 @@ function SiteProvider({ children }) {
     delivery: {},
     payment: {},
     filter: null,
-    menu: 'home'
+    menu: 'catalog'
   });
 
   return (
@@ -67,3 +69,5 @@ export { SiteProvider, useSiteState, useSiteDispatch, updateSite };
 function updateSite(dispatch, site, owner) {
     dispatch({ type: "UPDATE_SITE", site, owner });
 }
+
+

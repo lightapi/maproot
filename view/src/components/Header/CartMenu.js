@@ -232,7 +232,7 @@ function Payment(props) {
 
 function Delivery(props) {
   const { step, classes, reviewCart, proceedPayment, schema } = props;
-  const [model, setModel] = useState({});
+  const [model, setModel] = useState({...useSiteState().delivery});
   const [showErrors, setShowErrors]  = useState(false);
   const [delivery, setDelivery] = useState();
   let siteDispatch = useSiteDispatch();

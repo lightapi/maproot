@@ -56,7 +56,7 @@ function Row(props) {
           <TableCell align="left"><ReplyIcon onClick={() => replyMessage(row.merchantUserId, row.orderId)}/>{row.merchantUserId}</TableCell>
           <TableCell align="left">{row.orderId}</TableCell>
           <TableCell align="left">{row.passCode}</TableCell>
-          <TableCell align="left">{row.delivery.pickupTime}</TableCell>
+    <TableCell align="left">{row.delivery.pickupTime} {row.delivery.instruction}</TableCell>
           <TableCell align="left">{row.payment.method}</TableCell>
           <TableCell align="right">
               <CancelIcon onClick={() => console.log("cancel is clicked", row.timestamp, row.merchantUserId, row.orderId)} />

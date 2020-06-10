@@ -31,10 +31,14 @@ const Components = {
 };
 
 export default props => {
+  console.log(props);
   const siteDispatch = useSiteDispatch();
 
   useEffect(() => {
     updateSite(siteDispatch, props.site, props.userId);
+    if(props.instruction) {
+      siteDispatch({ type: "UPDATE_INSTRUCTION", instruction: props.instruction});            
+    }  
   });
 
   const pm = (id) => {
