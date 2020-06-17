@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
-import CancelIcon from '@material-ui/icons/Cancel';
+import CheckIcon from '@material-ui/icons/Check';
 import ReplyIcon from '@material-ui/icons/Reply'
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
@@ -14,7 +14,9 @@ import KeyboardArrowUpIcon from '@material-ui/icons/KeyboardArrowUp';
 import IconButton from '@material-ui/core/IconButton';
 import Collapse from '@material-ui/core/Collapse';
 import Box from '@material-ui/core/Box';
+import Cookies from 'universal-cookie'
 import { timeConversion } from '../../Utils';
+import { useUserState } from "../../context/UserContext";
 
 const useRowStyles = makeStyles({
     root: {
@@ -26,18 +28,58 @@ const useRowStyles = makeStyles({
 
 function Row(props) {
     console.log(props);
+    const [fetching, setFetching] = useState(false);
     const { row } = props;
     const [open, setOpen] = React.useState(false);
     const classes = useRowStyles();
+    var { email } = useUserState();
 
     const replyMessage = (userId, subject) => {
         props.history.push({pathname: '/app/form/privateMessage', state: { data : { userId, subject}}});
     };
 
-    const deleteMessage = () => {
-        if (window.confirm("Are you sure you want to delete the message?")) {
-          console.log("delete the entry here");
+    const deliverOrder = (customerUserId, orderId) => {
+        if (window.confirm("Are you sure you want to mark the order delivered?")) {
+          const body = {
+            host: 'lightapi.net',
+            service: 'user',
+            action: 'deliverOrder',
+            version: '0.1.0',
+            data: { email, customerUserId, orderId }
+          };
+          // use the path defined in the action, default to /portal/command.
+          const url = '/portal/command';
+          const headers = {
+              'Content-Type': 'application/json'
+          };
+          postApi(url, headers, body);
         } 
+    };
+
+    const postApi = async (url, headers, action) => {
+      setFetching(true);
+      try {
+        const cookies = new Cookies();
+        Object.assign(headers, {'X-CSRF-TOKEN': cookies.get('csrf')})
+        const response = await fetch(url, { method: 'POST', body: JSON.stringify(action), headers, credentials: 'include'});
+        // we have tried out best to response json from our APIs; however, some services return text instead like light-oauth2.
+        const s = await response.text();
+        console.log("submit error", s);
+        const data = JSON.parse(s);
+        setFetching(false);
+        if (!response.ok) {
+            // code is not OK.
+            props.history.push({pathname: action.failure, state: { error: data }});  
+        } else {
+            props.history.push({pathname: action.success, state: { data }});
+        }
+      } catch (e) {
+        // network error here.
+        console.log(e);
+        // convert it to json as the failure component can only deal with JSON.
+        const error = { error: e };
+        props.history.push({pathname: action.failure, state: { error }});
+      }
     };
 
     return (
@@ -55,7 +97,7 @@ function Row(props) {
           <TableCell align="left">{row.delivery.pickupTime} {row.delivery.instruction} </TableCell>
           <TableCell align="left">{row.payment.method}</TableCell>
           <TableCell align="right">
-              <CancelIcon onClick={() => console.log("cancel is clicked", row.timestamp, row.merchantUserId, row.orderId)} />
+              <CheckIcon onClick={() => deliverOrder(row.customerUserId, row.orderId)} />
           </TableCell>
         </TableRow>
         <TableRow>
@@ -92,7 +134,7 @@ function Row(props) {
 
 export default function MerchantOrderList(props) {
     const { orders } = props;
-    console.log("orders = ", orders);
+    console.log("props = ", props);
     return (
       <TableContainer component={Paper}>
       <Table aria-label="collapsible table">
@@ -105,7 +147,7 @@ export default function MerchantOrderList(props) {
               <TableCell align="left">Pass Code</TableCell>
               <TableCell align="left">Delivery</TableCell>
               <TableCell align="left">Payment</TableCell>
-              <TableCell align="right">Cancel</TableCell>
+              <TableCell align="right">Deliver</TableCell>
           </TableRow>
           </TableHead>
           <TableBody>

@@ -27,9 +27,9 @@ export default function MerchantOrders(props) {
         <Tab label="Cancelled" />
       </Tabs>
     </Paper>
-    {value === 0 ? <MerchantOrderTab status="Confirmed" /> : null}
-    {value === 1 ? <MerchantOrderTab status="Delivered" /> : null}
-    {value === 2 ? <MerchantOrderTab status="Cancelled" /> : null}
+    {value === 0 ? <MerchantOrderTab {...props} status="Confirmed" /> : null}
+    {value === 1 ? <MerchantOrderTab {...props} status="Delivered" /> : null}
+    {value === 2 ? <MerchantOrderTab {...props} status="Cancelled" /> : null}
     </>
   );
 
