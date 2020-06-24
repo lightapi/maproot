@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useUserDispatch, useUserState, signOut, signUp, changePassword, getProfile, getPayment, updateRoles, getOrders } from "../../context/UserContext";
+import { useUserDispatch, useUserState, signOut, signUp, changePassword, getProfile, getPayment, updateRoles, getOrders, hostForm } from "../../context/UserContext";
 import {
   IconButton,
   Menu,
@@ -91,6 +91,15 @@ export default function ProfileMenu(props) {
             onClick={() => {getOrders(userDispatch, props.history); setProfileMenu(false);}}
           >
             <AccountIcon className={classes.profileMenuIcon} /> Orders
+          </MenuItem>
+          <MenuItem
+            className={classNames(
+              classes.profileMenuItem,
+              classes.headerMenuItem,
+            )}
+            onClick={() => {hostForm(userDispatch, props.history); setProfileMenu(false);}}
+          >
+            <AccountIcon className={classes.profileMenuIcon} /> Host
           </MenuItem>
           <MenuItem
             className={classNames(

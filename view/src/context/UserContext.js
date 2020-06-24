@@ -88,7 +88,7 @@ function useUserDispatch() {
   return context;
 }
 
-export { UserProvider, useUserState, useUserDispatch, loginUser, signOut, signUp, changePassword, getProfile, getPayment, updateRoles, getOrders };
+export { UserProvider, useUserState, useUserDispatch, loginUser, signOut, signUp, changePassword, getProfile, getPayment, updateRoles, getOrders, hostForm };
 
 // ###########################################################
 
@@ -151,4 +151,8 @@ function updateRoles(dispatch, history) {
 
 function getOrders(dispatch, history) {
   history.push("/app/userOrders");
+}
+
+function hostForm(dispatch, history) {
+  history.push("/app/form/hostForm");
 }
