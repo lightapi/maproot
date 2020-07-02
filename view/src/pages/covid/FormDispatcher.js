@@ -74,6 +74,16 @@ export default function FormDispatcher(props) {
 					break;
 		    }
 		    break;
+		case 'service':
+		    switch(props.subcategory) {
+		    	case 'restaurant':
+		            form = 'restaurantForm';
+		            break;
+				default:
+					form = 'websiteForm';
+					break;
+		    }
+		    break;
 		default:
 		    form = 'websiteForm';
 		    break;

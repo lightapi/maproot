@@ -156,4 +156,14 @@ export default makeStyles(theme => ({
   sendButtonIcon: {
     marginLeft: theme.spacing(2),
   },
+  table: {
+    minWidth: 300,
+  },
+  cartImage: {
+    width: "48px",
+    height: "48px",
+  },
+  emptyCart: {
+    textAlign: "center",
+  },
 }));

@@ -20,7 +20,7 @@ export default function UserId(props) {
     setUserId(event.target.value);
   }
   const website = () => {
-    props.history.push({pathname: '/app/covid/website', state: { data : { userId }}});
+    props.history.push({pathname: '/app/website', state: { data : { userId }}});
   };
 
   const status = () => {

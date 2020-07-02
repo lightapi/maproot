@@ -19,7 +19,7 @@ export default function RealEstate(props) {
     const classes = useStyles();
     return (
         <div>
-            {props.ss.map((subject, index) => (
+            {props.site.ss.map((subject, index) => (
             <React.Fragment  key={index}>
             <TableContainer component={Paper}>
                 <Table className={classes.table} aria-label="spanning table">

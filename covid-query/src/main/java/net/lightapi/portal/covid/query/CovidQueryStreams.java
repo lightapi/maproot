@@ -537,9 +537,11 @@ public class CovidQueryStreams implements LightStreams {
                     Map<String, Object> point = catPoints.stream()
                             .filter(p -> userId.equals(((Map<String, Object>)p.get("properties")).get("id")))
                             .findFirst()
-                            .get();
-                    Map<String, Object> properties = (Map<String, Object>)point.get("properties");
-                    properties.put("hasStatus", true);
+                            .orElse(null);
+                    if(point != null) {
+                        Map<String, Object> properties = (Map<String, Object>)point.get("properties");
+                        properties.put("hasStatus", true);
+                    }
                     pc.forward(keyCategory.getBytes(StandardCharsets.UTF_8), JsonMapper.toJson(catMap).getBytes(StandardCharsets.UTF_8), To.child("MapProcessor"));
                 }
 
@@ -550,9 +552,11 @@ public class CovidQueryStreams implements LightStreams {
                     Map<String, Object> point = subPoints.stream()
                             .filter(p -> userId.equals(((Map<String, Object>)p.get("properties")).get("id")))
                             .findFirst()
-                            .get();
-                    Map<String, Object> properties = (Map<String, Object>)point.get("properties");
-                    properties.put("hasStatus", true);
+                            .orElse(null);
+                    if(point != null) {
+                        Map<String, Object> properties = (Map<String, Object>)point.get("properties");
+                        properties.put("hasStatus", true);
+                    }
                     pc.forward(keySubCategory.getBytes(StandardCharsets.UTF_8), JsonMapper.toJson(subMap).getBytes(StandardCharsets.UTF_8), To.child("MapProcessor"));
                 }
                 pc.forward(email.getBytes(StandardCharsets.UTF_8), ByteUtil.longToBytes(nonce + 1), To.child("NonceProcessor"));
@@ -591,9 +595,11 @@ public class CovidQueryStreams implements LightStreams {
                     Map<String, Object> point = catPoints.stream()
                             .filter(p -> userId.equals(((Map<String, Object>)p.get("properties")).get("id")))
                             .findFirst()
-                            .get();
-                    Map<String, Object> properties = (Map<String, Object>)point.get("properties");
-                    properties.put("hasWebsite", true);
+                            .orElse(null);
+                    if(point != null) {
+                        Map<String, Object> properties = (Map<String, Object>)point.get("properties");
+                        properties.put("hasWebsite", true);
+                    }
                     pc.forward(keyCategory.getBytes(StandardCharsets.UTF_8), JsonMapper.toJson(catMap).getBytes(StandardCharsets.UTF_8), To.child("MapProcessor"));
                 }
 
@@ -604,9 +610,11 @@ public class CovidQueryStreams implements LightStreams {
                     Map<String, Object> point = subPoints.stream()
                             .filter(p -> userId.equals(((Map<String, Object>)p.get("properties")).get("id")))
                             .findFirst()
-                            .get();
-                    Map<String, Object> properties = (Map<String, Object>)point.get("properties");
-                    properties.put("hasWebsite", true);
+                            .orElse(null);
+                    if(point != null) {
+                        Map<String, Object> properties = (Map<String, Object>)point.get("properties");
+                        properties.put("hasWebsite", true);
+                    }
                     pc.forward(keySubCategory.getBytes(StandardCharsets.UTF_8), JsonMapper.toJson(subMap).getBytes(StandardCharsets.UTF_8), To.child("MapProcessor"));
                 }
                 pc.forward(email.getBytes(StandardCharsets.UTF_8), ByteUtil.longToBytes(nonce + 1), To.child("NonceProcessor"));
@@ -659,7 +667,7 @@ public class CovidQueryStreams implements LightStreams {
                                     point = catPoints.stream()
                                             .filter(p -> userId.equals(((Map<String, Object>)p.get("properties")).get("id")))
                                             .findFirst()
-                                            .get();
+                                            .orElse(null);
                                     // remove all points if there are multiple. There should only one entry.
                                     catPoints.removeIf(p -> userId.equals(((Map<String, Object>)p.get("properties")).get("id")));
                                     pc.forward(oldKeyCategory.getBytes(StandardCharsets.UTF_8), JsonMapper.toJson(catMap).getBytes(StandardCharsets.UTF_8), To.child("MapProcessor"));
@@ -698,7 +706,7 @@ public class CovidQueryStreams implements LightStreams {
                                     point = subPoints.stream()
                                             .filter(p -> userId.equals(((Map<String, Object>)p.get("properties")).get("id")))
                                             .findFirst()
-                                            .get();
+                                            .orElse(null);
                                     // remove all points if there are multiple. There should only one entry.
                                     subPoints.removeIf(p -> userId.equals(((Map<String, Object>)p.get("properties")).get("id")));
                                     pc.forward(oldKeySubCategory.getBytes(StandardCharsets.UTF_8), JsonMapper.toJson(subMap).getBytes(StandardCharsets.UTF_8), To.child("MapProcessor"));

@@ -61,7 +61,7 @@ export default function LiveMap(props) {
 
   const site = (id) => {
     //console.log("peer website is called", id);
-    props.history.push({pathname: '/app/covid/website', state: { data: { userId: id }}});
+    props.history.push({pathname: '/app/website', state: { data: { userId: id }}});
   };
 
   return (

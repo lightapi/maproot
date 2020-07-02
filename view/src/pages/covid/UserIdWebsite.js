@@ -6,14 +6,15 @@ export default function UserIdWebsite(props) {
     let search = props.location.search;
     let params = new URLSearchParams(search);
     let userId = params.get('userId');
+    let instruction = params.get('instruction');
     if(userId == null && props.location.state) {
       userId = props.location.state.data.userId;
     }
-    console.log("userId = ", userId);
+    //console.log("userId = ", userId);
     let wait;
     if(userId) {
         wait = (
-            <Website {...props} userId = {userId} />
+            <Website {...props} userId = {userId} instruction={instruction} />
         )
     } else {
         wait = (
