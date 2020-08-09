@@ -23,9 +23,8 @@ import java.util.concurrent.BlockingQueue;
 
 import io.undertow.server.HttpServerExchange;
 import net.lightapi.portal.HybridQueryClient;
-import net.lightapi.portal.covid.CovidStatusUpdatedEvent;
+import net.lightapi.portal.PortalConfig;
 import net.lightapi.portal.covid.PeerStatusUpdatedEvent;
-import net.lightapi.portal.covid.command.CovidCommandConfig;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,7 +41,7 @@ import org.slf4j.LoggerFactory;
 @ServiceHandler(id="lightapi.net/covid/updatePeerStatus/0.1.0")
 public class UpdatePeerStatus implements Handler {
     private static final Logger logger = LoggerFactory.getLogger(UpdatePeerStatus.class);
-    private static final CovidCommandConfig config = (CovidCommandConfig) Config.getInstance().getJsonObjectConfig(CovidCommandConfig.CONFIG_NAME, CovidCommandConfig.class);
+    private static final PortalConfig config = (PortalConfig) Config.getInstance().getJsonObjectConfig(PortalConfig.CONFIG_NAME, PortalConfig.class);
 
     private static final String SEND_MESSAGE_EXCEPITON = "ERR11605";
 

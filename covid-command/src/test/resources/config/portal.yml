@@ -1,0 +1,15 @@
+# This is a configuration file for light-portal service
+# Indicate if we need to send out the confirmation email during user registration
+sendEmail: false
+# The event topic for user-command
+topic: portal-event
+# The host of the server that accepts the email confirmation
+cmdHost: https://localhost:8441
+# The command path of the server that accepts the email confirmation
+cmdPath: /portal/command?cmd=
+# The host for password reset. This is usually the login view site.
+resetHost: http://localhost:3000
+# The host for the portal. This is usually the portal view site.
+portalHost: https://localhost:3000
+# Admin user email for the bootstrap
+admin: stevehu@gmail.com

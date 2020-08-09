@@ -18,8 +18,8 @@ import java.util.concurrent.BlockingQueue;
 
 import io.undertow.server.HttpServerExchange;
 import net.lightapi.portal.HybridQueryClient;
+import net.lightapi.portal.PortalConfig;
 import net.lightapi.portal.covid.CityMapCreatedEvent;
-import net.lightapi.portal.covid.command.CovidCommandConfig;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,7 +33,7 @@ import org.slf4j.LoggerFactory;
 @ServiceHandler(id="lightapi.net/covid/createCityMap/0.1.0")
 public class CreateCityMap implements Handler {
     private static final Logger logger = LoggerFactory.getLogger(CreateCityMap.class);
-    private static final CovidCommandConfig config = (CovidCommandConfig) Config.getInstance().getJsonObjectConfig(CovidCommandConfig.CONFIG_NAME, CovidCommandConfig.class);
+    private static final PortalConfig config = (PortalConfig) Config.getInstance().getJsonObjectConfig(PortalConfig.CONFIG_NAME, PortalConfig.class);
 
     private static final String PERMISSION_DENIED = "ERR11620";
     private static final String CITY_REGISTERED = "ERR11621";
