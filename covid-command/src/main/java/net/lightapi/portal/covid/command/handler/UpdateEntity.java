@@ -85,6 +85,7 @@ public class UpdateEntity implements Handler {
             CovidEntityUpdatedEvent event = CovidEntityUpdatedEvent.newBuilder()
                     .setEventId(eventId)
                     .setKey(key)
+                    .setKeyId(0)
                     .setUserId(userId)
                     .setCategory(category)
                     .setSubcategory(subcategory)

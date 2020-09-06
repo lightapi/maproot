@@ -66,6 +66,7 @@ public class DeleteEntity implements Handler {
             CovidEntityDeletedEvent event = CovidEntityDeletedEvent.newBuilder()
                     .setEventId(eventId)
                     .setKey(key)
+                    .setKeyId(0)
                     .setUserId(userId)
                     .setTimestamp(System.currentTimeMillis())
                     .build();

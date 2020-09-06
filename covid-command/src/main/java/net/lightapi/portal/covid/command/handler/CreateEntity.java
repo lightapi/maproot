@@ -85,6 +85,7 @@ public class CreateEntity implements Handler {
             CovidEntityCreatedEvent event = CovidEntityCreatedEvent.newBuilder()
                     .setEventId(eventId)
                     .setKey(key)
+                    .setKeyId(0)
                     .setUserId(userId)
                     .setCategory(category)
                     .setSubcategory(subcategory)

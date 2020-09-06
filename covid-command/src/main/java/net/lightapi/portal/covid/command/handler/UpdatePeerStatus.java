@@ -76,6 +76,7 @@ public class UpdatePeerStatus implements Handler {
             PeerStatusUpdatedEvent event = PeerStatusUpdatedEvent.newBuilder()
                     .setEventId(eventId)
                     .setEmail(ownerEmail)
+                    .setKeyId(0)
                     .setStatus(JsonMapper.toJson(map.get("subjects")))
                     .setTimestamp(System.currentTimeMillis())
                     .build();

@@ -56,6 +56,7 @@ public class UpdateStatus implements Handler {
                     .setEventId(eventId)
                     .setStatus(JsonMapper.toJson(map))
                     .setUserId((String)userMap.get("userId"))
+                    .setKeyId(0)
                     .setCountry((String)userMap.get("country"))
                     .setProvince((String)userMap.get("province"))
                     .setCity((String)userMap.get("city"))

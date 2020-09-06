@@ -47,6 +47,7 @@ public class DeleteStatus implements Handler {
             CovidStatusDeletedEvent event = CovidStatusDeletedEvent.newBuilder()
                     .setEventId(eventId)
                     .setEmail(email)
+                    .setKeyId(0)
                     .setTimestamp(System.currentTimeMillis())
                     .build();
 

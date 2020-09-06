@@ -56,6 +56,7 @@ public class UpdateWebsite implements Handler {
                     .setEventId(eventId)
                     .setWebsite(JsonMapper.toJson(map))
                     .setUserId((String)userMap.get("userId"))
+                    .setKeyId(0)
                     .setCountry((String)userMap.get("country"))
                     .setProvince((String)userMap.get("province"))
                     .setCity((String)userMap.get("city"))

@@ -47,6 +47,7 @@ public class DeleteWebsite implements Handler {
             CovidWebsiteDeletedEvent event = CovidWebsiteDeletedEvent.newBuilder()
                     .setEventId(eventId)
                     .setEmail(email)
+                    .setKeyId(0)
                     .setTimestamp(System.currentTimeMillis())
                     .build();
 
