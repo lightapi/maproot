@@ -2,9 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { withStyles } from '@material-ui/core/styles';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import Button from '@material-ui/core/Button';
-import SchemaForm from 'react-schema-form/lib/SchemaForm';
+import { SchemaForm, utils } from 'react-schema-form';
 import RcSelect from "react-schema-form-rc-select";
-import utils from 'react-schema-form/lib/utils';
 import forms from '../../data/Forms';
 import Cookies from 'universal-cookie'
 

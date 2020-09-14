@@ -9669,7 +9669,7 @@ react-schema-form-rc-select@^0.3.9:
     react-schema-form "^0.8.4"
     tv4 "^1.3.0"
 
-react-schema-form@^0.8.4, react-schema-form@^0.8.7:
+react-schema-form@^0.8.4:
   version "0.8.7"
   resolved "https://registry.yarnpkg.com/react-schema-form/-/react-schema-form-0.8.7.tgz#0549e8b1ec41bdee2b25c4bd6fbe139ca1d7b81e"
   integrity sha512-m30ayI4/I2Ne8SL5ycE6YX9R3tul6U98O5gvGPPGBBBmwi+BxwwBKBJeorsXenS8uCpAwrJQSmKhhHgall9Ifw==
@@ -9678,6 +9678,20 @@ react-schema-form@^0.8.4, react-schema-form@^0.8.7:
     lodash "^4.17.15"
     notevil "^1.3.2"
     objectpath "1.2.2"
+    react-autosuggest "^9.4.3"
+    supports-color "^7.1.0"
+    tv4 "^1.3.0"
+
+react-schema-form@^0.9.0:
+  version "0.9.0"
+  resolved "https://registry.yarnpkg.com/react-schema-form/-/react-schema-form-0.9.0.tgz#1ee77a75025e409145877f8cbc79616c7a1b18ea"
+  integrity sha512-6QptZGxe3dxk+Zn+s8I9L+5rGgAPhyJV0cEiWhojQX6qaK6ZUMAi/n+BOoBxSoXRWOFn8TroqtKDnzmxDreOKA==
+  dependencies:
+    classnames "^2.2.6"
+    lodash "^4.17.15"
+    notevil "^1.3.2"
+    objectpath "1.2.2"
+    prop-types "^15.7.2"
     react-autosuggest "^9.4.3"
     supports-color "^7.1.0"
     tv4 "^1.3.0"
