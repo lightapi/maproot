@@ -2,11 +2,7 @@ package net.lightapi.portal.covid.query;
 
 import com.networknt.config.Config;
 import com.networknt.config.JsonMapper;
-import com.networknt.kafka.common.AvroDeserializer;
-import com.networknt.kafka.common.AvroSerializer;
-import com.networknt.kafka.common.EventId;
-import com.networknt.kafka.common.EventNotification;
-import com.networknt.kafka.streams.KafkaStreamsConfig;
+import com.networknt.kafka.common.*;
 import com.networknt.kafka.streams.LightStreams;
 import com.networknt.utility.StringUtils;
 import net.lightapi.portal.ByteUtil;
