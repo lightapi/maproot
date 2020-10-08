@@ -294,6 +294,12 @@ public class CovidQueryStreams implements LightStreams {
                     if(catString == null) {
                         // we need to create the entries.
                         Map<String, Object> catMap = new HashMap<>();
+                        // the cityString might not be replicated to this node yet. Wait until it is
+                        // in the event-importer procedure.
+                        while(cityString == null) {
+                            try { Thread.sleep(10); } catch (InterruptedException e) {}
+                            cityString = cityStore.get(location);
+                        }
                         catMap.put("map", JsonMapper.string2Map(cityString));
                         List<Map<String, Object>> points = new ArrayList<>();
                         points.add(point);
@@ -313,6 +319,12 @@ public class CovidQueryStreams implements LightStreams {
                     String subString = mapStore.get(keySubCategory);
                     if(subString == null) {
                         Map<String, Object> subMap = new HashMap<>();
+                        // the cityString might not be replicated to this node yet. Wait until it is
+                        // in the event-importer procedure.
+                        while(cityString == null) {
+                            try { Thread.sleep(10); } catch (InterruptedException e) {}
+                            cityString = cityStore.get(location);
+                        }
                         subMap.put("map", JsonMapper.string2Map(cityString));
                         List<Map<String, Object>> points = new ArrayList<>();
                         points.add(point);
