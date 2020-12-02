@@ -472,16 +472,20 @@ public class CovidQueryStreams implements LightStreams {
                     String userId = covidStatusUpdatedEvent.getUserId();
                     String entityId = location + "|" + userId;
                     String entityString = entityStore.get(entityId);
-                    Map<String, Object> entityMap = JsonMapper.string2Map(entityString);
-                    String category = (String)entityMap.get("category");
-                    String subcategory = (String)entityMap.get("subcategory");
-                    String keyCategory = location + "|" + category;
-                    String keySubCategory = keyCategory + "|" + subcategory;
-                    covidStatusUpdatedEvent.setKeyId(1);
-                    covidStatusUpdatedEvent.getEventId().setDerived(true);
-                    pc.forward(keyCategory.getBytes(StandardCharsets.UTF_8), serializer.serialize(covidStatusUpdatedEvent), To.child("EventProcessor"));
-                    covidStatusUpdatedEvent.setKeyId(2);
-                    pc.forward(keySubCategory.getBytes(StandardCharsets.UTF_8), serializer.serialize(covidStatusUpdatedEvent), To.child("EventProcessor"));
+                    if(entityString != null) {
+                        Map<String, Object> entityMap = JsonMapper.string2Map(entityString);
+                        String category = (String)entityMap.get("category");
+                        String subcategory = (String)entityMap.get("subcategory");
+                        String keyCategory = location + "|" + category;
+                        String keySubCategory = keyCategory + "|" + subcategory;
+                        covidStatusUpdatedEvent.setKeyId(1);
+                        covidStatusUpdatedEvent.getEventId().setDerived(true);
+                        pc.forward(keyCategory.getBytes(StandardCharsets.UTF_8), serializer.serialize(covidStatusUpdatedEvent), To.child("EventProcessor"));
+                        covidStatusUpdatedEvent.setKeyId(2);
+                        pc.forward(keySubCategory.getBytes(StandardCharsets.UTF_8), serializer.serialize(covidStatusUpdatedEvent), To.child("EventProcessor"));
+                    } else {
+                        logger.error("Not found in entityStore for entityId " + entityId);
+                    }
                 } else if (keyId == 1) {
                     String keyCategory = new String(key, StandardCharsets.UTF_8);
                     String userId = covidStatusUpdatedEvent.getUserId();
