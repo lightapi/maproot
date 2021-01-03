@@ -5,7 +5,7 @@ import com.networknt.config.JsonMapper;
 import com.networknt.kafka.common.*;
 import com.networknt.kafka.streams.LightStreams;
 import com.networknt.utility.StringUtils;
-import net.lightapi.portal.ByteUtil;
+import com.networknt.utility.ByteUtil;
 import net.lightapi.portal.covid.*;
 import net.lightapi.portal.user.UserDeletedEvent;
 import net.lightapi.portal.user.UserUpdatedEvent;
