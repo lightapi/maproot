@@ -69,7 +69,7 @@ public class GetEntity implements Handler {
             StreamsMetadata metadata = CovidQueryStartup.streams.getEntityStreamsMetadata(email);
             if(logger.isDebugEnabled()) logger.debug("found address in another instance " + metadata.host() + ":" + metadata.port());
             String url = "https://" + metadata.host() + ":" + metadata.port();
-            if(NetUtils.getLocalAddressByDatagram().equals(metadata.host()) && Server.config.getHttpsPort() == metadata.port()) {
+            if(NetUtils.getLocalAddressByDatagram().equals(metadata.host()) && Server.getServerConfig().getHttpsPort() == metadata.port()) {
                 // TODO remove this block if we never seen the following error.
                 logger.error("******Kafka returns the same instance!");
                 return NioUtils.toByteBuffer(getStatus(exchange, ENTITY_NOT_FOUND, email, country, province, city));
