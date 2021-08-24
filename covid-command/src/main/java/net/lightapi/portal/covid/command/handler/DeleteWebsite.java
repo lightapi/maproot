@@ -5,7 +5,7 @@ import com.networknt.config.Config;
 import com.networknt.httpstring.AttachmentConstants;
 import com.networknt.kafka.common.AvroSerializer;
 import com.networknt.kafka.common.EventId;
-import com.networknt.kafka.producer.LightProducer;
+import com.networknt.kafka.producer.QueuedLightProducer;
 import com.networknt.monad.Result;
 import com.networknt.service.SingletonServiceFactory;
 import com.networknt.utility.NioUtils;
@@ -55,7 +55,7 @@ public class DeleteWebsite implements Handler {
             byte[] bytes = serializer.serialize(event);
             // make sure that email is used as the key to put the event into the right partition and query instance.
             ProducerRecord<byte[], byte[]> record = new ProducerRecord<>(config.getTopic(), email.getBytes(StandardCharsets.UTF_8), bytes);
-            LightProducer producer = SingletonServiceFactory.getBean(LightProducer.class);
+            QueuedLightProducer producer = SingletonServiceFactory.getBean(QueuedLightProducer.class);
             BlockingQueue<ProducerRecord<byte[], byte[]>> txQueue = producer.getTxQueue();
             try {
                 txQueue.put(record);

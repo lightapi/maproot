@@ -10,7 +10,7 @@ import com.networknt.config.JsonMapper;
 import com.networknt.httpstring.AttachmentConstants;
 import com.networknt.kafka.common.AvroSerializer;
 import com.networknt.kafka.common.EventId;
-import com.networknt.kafka.producer.LightProducer;
+import com.networknt.kafka.producer.QueuedLightProducer;
 import com.networknt.monad.Result;
 import com.networknt.service.SingletonServiceFactory;
 import com.networknt.utility.NioUtils;
@@ -85,7 +85,7 @@ public class UpdatePeerStatus implements Handler {
             byte[] bytes = serializer.serialize(event);
             // here we have to use the ownerEmail as the key so that they goes to the right partition.
             ProducerRecord<byte[], byte[]> record = new ProducerRecord<>(config.getTopic(), ownerEmail.getBytes(StandardCharsets.UTF_8), bytes);
-            LightProducer producer = SingletonServiceFactory.getBean(LightProducer.class);
+            QueuedLightProducer producer = SingletonServiceFactory.getBean(QueuedLightProducer.class);
             BlockingQueue<ProducerRecord<byte[], byte[]>> txQueue = producer.getTxQueue();
             try {
                 txQueue.put(record);
