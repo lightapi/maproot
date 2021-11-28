@@ -1,46 +1,34 @@
-
 # Singleton service factory configuration/IoC injection
 singletons:
 - com.networknt.registry.URL:
   - com.networknt.registry.URLImpl:
-      protocol: light
+      protocol: https
       host: localhost
       port: 8080
-      path: consul
+      path: direct
       parameters:
-        registryRetryPeriod: '30000'
-- com.networknt.consul.client.ConsulClient:
-  - com.networknt.consul.client.ConsulClientImpl
+        com.networknt.portal.hybrid.query-1.0.0: http://localhost:8080?environment=dev
 - com.networknt.registry.Registry:
-  - com.networknt.consul.ConsulRegistry
+  - com.networknt.registry.support.DirectRegistry
 - com.networknt.balance.LoadBalance:
   - com.networknt.balance.RoundRobinLoadBalance
 - com.networknt.cluster.Cluster:
   - com.networknt.cluster.LightCluster
-# HandlerProvider implementation
-- com.networknt.handler.HandlerProvider:
-  - com.networknt.rpc.router.RpcRouter
 # StartupHookProvider implementations, there are one to many and they are called in the same sequence defined.
 - com.networknt.server.StartupHookProvider:
   # registry all service handlers by from annotations
   - com.networknt.rpc.router.RpcStartupHookProvider
-    # Kafka producer hook
+  # - com.networknt.jaeger.tracing.JaegerStartupHookProvider
+  # If you are using mask module to remove sensitive info before logging, uncomment the following line.
+  # - com.networknt.server.JsonPathStartupHookProvider
+  # Kafka producer hook
   - net.lightapi.portal.command.HybridCommandStartup
-
 # ShutdownHookProvider implementations, there are one to many and they are called in the same sequence defined.
 - com.networknt.server.ShutdownHookProvider:
-   - net.lightapi.portal.command.HybridCommandShutdown
-# MiddlewareHandler implementations, the calling sequence is as defined in the request/response chain.
-- com.networknt.handler.MiddlewareHandler:
-  # Exception Global exception handler that needs to be called first to wrap all middleware handlers and business handlers
-  - com.networknt.exception.ExceptionHandler
-  # Metrics handler to calculate response time accurately, this needs to be the second handler in the chain.
-  - com.networknt.metrics.MetricsHandler
-  # Traceability Put traceabilityId into response header from request header if it exists
-  - com.networknt.traceability.TraceabilityHandler
-  # Correlation Create correlationId if it doesn't exist in the request header and put it into the request header
-  - com.networknt.correlation.CorrelationHandler
-  # SimpleAudit Log important info about the request into audit log
-  - com.networknt.audit.AuditHandler
-- com.networknt.kafka.producer.QueuedLightProducer:
-  - com.networknt.kafka.producer.TransactionalProducer
+  - net.lightapi.portal.command.HybridCommandShutdown
+# Kafka Producer instance
+- com.networknt.kafka.producer.NativeLightProducer:
+  - com.networknt.kafka.producer.SidecarProducer
+# Schema registry client
+- io.confluent.kafka.schemaregistry.client.SchemaRegistryClient:
+  - com.networknt.kafka.common.LightSchemaRegistryClient

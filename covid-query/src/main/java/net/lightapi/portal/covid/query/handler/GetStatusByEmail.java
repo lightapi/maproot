@@ -14,6 +14,8 @@ import java.util.Map;
 import io.undertow.server.HttpServerExchange;
 import net.lightapi.portal.HybridQueryClient;
 import net.lightapi.portal.covid.query.CovidQueryStartup;
+import org.apache.kafka.streams.KeyQueryMetadata;
+import org.apache.kafka.streams.state.HostInfo;
 import org.apache.kafka.streams.state.ReadOnlyKeyValueStore;
 import org.apache.kafka.streams.state.StreamsMetadata;
 import org.slf4j.Logger;
@@ -48,10 +50,11 @@ public class GetStatusByEmail implements Handler {
         if(data != null) {
             return NioUtils.toByteBuffer(data);
         } else {
-            StreamsMetadata metadata = CovidQueryStartup.streams.getStatusStreamsMetadata(email);
-            if(logger.isDebugEnabled()) logger.debug("found address in another instance " + metadata.host() + ":" + metadata.port());
-            String url = "https://" + metadata.host() + ":" + metadata.port();
-            if(NetUtils.getLocalAddressByDatagram().equals(metadata.host()) && Server.getServerConfig().getHttpsPort() == metadata.port()) {
+            KeyQueryMetadata metadata = CovidQueryStartup.streams.getStatusStreamsMetadata(email);
+            HostInfo hostInfo = metadata.activeHost();
+            if(logger.isDebugEnabled()) logger.debug("found address in another instance " + hostInfo.host() + ":" + hostInfo.port());
+            String url = "https://" + hostInfo.host() + ":" + hostInfo.port();
+            if(NetUtils.getLocalAddressByDatagram().equals(hostInfo.host()) && Server.getServerConfig().getHttpsPort() == hostInfo.port()) {
                 // TODO remove this block if we never seen the following error.
                 logger.error("******Kafka returns the same instance!");
                 return NioUtils.toByteBuffer(getStatus(exchange, STATUS_NOT_FOUND, email));

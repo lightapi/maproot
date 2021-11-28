@@ -6,14 +6,13 @@ import com.networknt.kafka.common.*;
 import com.networknt.kafka.streams.LightStreams;
 import com.networknt.utility.StringUtils;
 import com.networknt.utility.ByteUtil;
+import net.lightapi.portal.PortalConfig;
 import net.lightapi.portal.covid.*;
 import net.lightapi.portal.user.UserDeletedEvent;
 import net.lightapi.portal.user.UserUpdatedEvent;
-import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.common.serialization.Serdes;
-import org.apache.kafka.streams.KafkaStreams;
-import org.apache.kafka.streams.StreamsConfig;
-import org.apache.kafka.streams.Topology;
+import org.apache.kafka.streams.*;
+import org.apache.kafka.streams.errors.StreamsUncaughtExceptionHandler;
 import org.apache.kafka.streams.processor.*;
 import org.apache.kafka.streams.state.*;
 import org.slf4j.Logger;
@@ -24,14 +23,9 @@ import java.util.*;
 
 public class CovidQueryStreams implements LightStreams {
     static private final Logger logger = LoggerFactory.getLogger(CovidQueryStreams.class);
-    private static final String APP = "covid";
-    static private Properties streamsProps;
-    static final KafkaStreamsConfig config = (KafkaStreamsConfig) Config.getInstance().getJsonObjectConfig(KafkaStreamsConfig.CONFIG_NAME, KafkaStreamsConfig.class);
-    static {
-        streamsProps = new Properties();
-        streamsProps.put(StreamsConfig.BOOTSTRAP_SERVERS_CONFIG, config.getBootstrapServers());
-        streamsProps.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
-    }
+    private static final String APP = "maproot";
+    static final KafkaStreamsConfig streamsConfig = (KafkaStreamsConfig) Config.getInstance().getJsonObjectConfig(KafkaStreamsConfig.CONFIG_NAME, KafkaStreamsConfig.class);
+    static final PortalConfig portalConfig = (PortalConfig) Config.getInstance().getJsonObjectConfig(PortalConfig.CONFIG_NAME, PortalConfig.class);
 
     private static final String city = "covid-city-store"; // this is a global store
     private static final String map = "covid-map-store"; // this is a local store
@@ -46,43 +40,54 @@ public class CovidQueryStreams implements LightStreams {
     }
 
     public ReadOnlyKeyValueStore<String, String> getCityStore() {
-        return covidStreams.store(city, QueryableStoreTypes.keyValueStore());
+        QueryableStoreType<ReadOnlyKeyValueStore<String, String>> queryableStoreType = QueryableStoreTypes.keyValueStore();
+        StoreQueryParameters<ReadOnlyKeyValueStore<String, String>> sqp = StoreQueryParameters.fromNameAndType(city, queryableStoreType);
+        return covidStreams.store(sqp);
     }
 
     public ReadOnlyKeyValueStore<String, String> getMapStore() {
-        return covidStreams.store(map, QueryableStoreTypes.keyValueStore());
+        QueryableStoreType<ReadOnlyKeyValueStore<String, String>> queryableStoreType = QueryableStoreTypes.keyValueStore();
+        StoreQueryParameters<ReadOnlyKeyValueStore<String, String>> sqp = StoreQueryParameters.fromNameAndType(map, queryableStoreType);
+        return covidStreams.store(sqp);
     }
 
     // the key must be key | category | subcategory so that we can find the right partition for the map.
-    public StreamsMetadata getMapStreamsMetadata(String category) {
-        return covidStreams.metadataForKey(map, category, Serdes.String().serializer());
+    public KeyQueryMetadata getMapStreamsMetadata(String category) {
+
+        return covidStreams.queryMetadataForKey(map, category, Serdes.String().serializer());
     }
 
     public ReadOnlyKeyValueStore<String, String> getEntityStore() {
-        return covidStreams.store(entity, QueryableStoreTypes.keyValueStore());
+        QueryableStoreType<ReadOnlyKeyValueStore<String, String>> queryableStoreType = QueryableStoreTypes.keyValueStore();
+        StoreQueryParameters<ReadOnlyKeyValueStore<String, String>> sqp = StoreQueryParameters.fromNameAndType(entity, queryableStoreType);
+        return covidStreams.store(sqp);
     }
 
     // the key must be email so that we can find the right partition for the status.
-    public StreamsMetadata getEntityStreamsMetadata(String email) {
-        return covidStreams.metadataForKey(entity, email, Serdes.String().serializer());
+    public KeyQueryMetadata getEntityStreamsMetadata(String email) {
+        return covidStreams.queryMetadataForKey(entity, email, Serdes.String().serializer());
     }
 
     public ReadOnlyKeyValueStore<String, String> getStatusStore() {
-        return covidStreams.store(status, QueryableStoreTypes.keyValueStore());
+        QueryableStoreType<ReadOnlyKeyValueStore<String, String>> queryableStoreType = QueryableStoreTypes.keyValueStore();
+        StoreQueryParameters<ReadOnlyKeyValueStore<String, String>> sqp = StoreQueryParameters.fromNameAndType(status, queryableStoreType);
+        return covidStreams.store(sqp);
     }
 
     // the key must be email so that we can find the right partition for the status.
-    public StreamsMetadata getStatusStreamsMetadata(String email) {
-        return covidStreams.metadataForKey(status, email, Serdes.String().serializer());
+    public KeyQueryMetadata getStatusStreamsMetadata(String email) {
+        return covidStreams.queryMetadataForKey(status, email, Serdes.String().serializer());
     }
 
     public ReadOnlyKeyValueStore<String, String> getWebsiteStore() {
-        return covidStreams.store(website, QueryableStoreTypes.keyValueStore());
+        QueryableStoreType<ReadOnlyKeyValueStore<String, String>> queryableStoreType = QueryableStoreTypes.keyValueStore();
+        StoreQueryParameters<ReadOnlyKeyValueStore<String, String>> sqp = StoreQueryParameters.fromNameAndType(website, queryableStoreType);
+        return covidStreams.store(sqp);
     }
 
     // the key must be email so that we can find the right partition for the status.
-    public StreamsMetadata getWebsiteStreamsMetadata(String email) {
-        return covidStreams.metadataForKey(status, email, Serdes.String().serializer());
+    public KeyQueryMetadata getWebsiteStreamsMetadata(String email) {
+        return covidStreams.queryMetadataForKey(status, email, Serdes.String().serializer());
     }
 
     private void startCovidStreams(String ip, int port) {
@@ -125,10 +130,16 @@ public class CovidQueryStreams implements LightStreams {
         topology.addSink("CityProcessor", "portal-city", "CovidEventProcessor");
         topology.addSink("EventProcessor", "portal-event", "CovidEventProcessor");
 
-        streamsProps.put(StreamsConfig.APPLICATION_ID_CONFIG, "covid-query");
+        Properties streamsProps = new Properties();
+        streamsProps.putAll(streamsConfig.getProperties());
+        streamsProps.put(StreamsConfig.APPLICATION_ID_CONFIG, portalConfig.getMaprootApplicationId());
         streamsProps.put(StreamsConfig.APPLICATION_SERVER_CONFIG, ip + ":" + port);
         covidStreams = new KafkaStreams(topology, streamsProps);
-        if(config.isCleanUp()) {
+        covidStreams.setUncaughtExceptionHandler(ex -> {
+            logger.error("Kafka-Streams uncaught exception occurred. Stream will be replaced with new thread", ex);
+            return StreamsUncaughtExceptionHandler.StreamThreadExceptionResponse.REPLACE_THREAD;
+        });
+        if(streamsConfig.isCleanUp()) {
             covidStreams.cleanUp();
         }
         covidStreams.start();

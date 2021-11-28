@@ -14,11 +14,14 @@ import com.networknt.rpc.router.ServiceHandler;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.CountDownLatch;
 
 import io.undertow.server.HttpServerExchange;
 import net.lightapi.portal.HybridQueryClient;
 import net.lightapi.portal.PortalConfig;
+import net.lightapi.portal.command.HybridCommandStartup;
 import net.lightapi.portal.covid.CityMapCreatedEvent;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.slf4j.Logger;
@@ -37,7 +40,8 @@ public class CreateCityMap implements Handler {
 
     private static final String PERMISSION_DENIED = "ERR11620";
     private static final String CITY_REGISTERED = "ERR11621";
-    private static final String SEND_MESSAGE_EXCEPITON = "ERR11605";
+    private static final String SEND_MESSAGE_EXCEPTION = "ERR11605";
+    AvroSerializer serializer = new AvroSerializer();
 
     @Override
     public ByteBuffer handle(HttpServerExchange exchange, Object input)  {
@@ -67,11 +71,11 @@ public class CreateCityMap implements Handler {
                 return NioUtils.toByteBuffer(getStatus(exchange, resultCity.getError()));
             }
         }
-        Result<String> resultNonce = HybridQueryClient.getNonceByEmail(exchange, email);
-        if(resultNonce.isSuccess()) {
+        Result<String> result = HybridQueryClient.getNonceByEmail(exchange, email);
+        if(result.isSuccess()) {
             EventId eventId = EventId.newBuilder()
                     .setId(email)
-                    .setNonce(Long.valueOf(resultNonce.getResult()))
+                    .setNonce(Long.valueOf(result.getResult()))
                     .build();
             CityMapCreatedEvent event = CityMapCreatedEvent.newBuilder()
                     .setEventId(eventId)
@@ -84,21 +88,27 @@ public class CreateCityMap implements Handler {
                     .setTimestamp(System.currentTimeMillis())
                     .build();
 
-            AvroSerializer serializer = new AvroSerializer();
             byte[] bytes = serializer.serialize(event);
-
             ProducerRecord<byte[], byte[]> record = new ProducerRecord<>(config.getTopic(), email.getBytes(StandardCharsets.UTF_8), bytes);
-            QueuedLightProducer producer = SingletonServiceFactory.getBean(QueuedLightProducer.class);
-            BlockingQueue<ProducerRecord<byte[], byte[]>> txQueue = producer.getTxQueue();
+            final CountDownLatch latch = new CountDownLatch(1);
             try {
-                txQueue.put(record);
+                HybridCommandStartup.producer.send(record, (recordMetadata, e) -> {
+                    if (Objects.nonNull(e)) {
+                        logger.error("Exception occurred while pushing the event", e);
+                    } else {
+                        logger.info("Event record pushed successfully. Received Record Metadata is {}",
+                                recordMetadata);
+                    }
+                    latch.countDown();
+                });
+                latch.await();
             } catch (InterruptedException e) {
                 logger.error("Exception:", e);
-                return NioUtils.toByteBuffer(getStatus(exchange, SEND_MESSAGE_EXCEPITON, e.getMessage(), email));
+                return NioUtils.toByteBuffer(getStatus(exchange, SEND_MESSAGE_EXCEPTION, e.getMessage(), email));
             }
-            return NioUtils.toByteBuffer(getStatus(exchange, REQUEST_SUCCESS));
         } else {
-            return NioUtils.toByteBuffer(getStatus(exchange, resultNonce.getError()));
+            return NioUtils.toByteBuffer(getStatus(exchange, result.getError()));
         }
+        return NioUtils.toByteBuffer(getStatus(exchange, REQUEST_SUCCESS));
     }
 }

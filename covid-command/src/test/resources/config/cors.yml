@@ -1,0 +1,11 @@
+description: Cors Http Handler
+enabled: true
+allowedOrigins:
+- https://localhost:3000
+- https://dev.lightapi.net
+- https://dev.maproot.net
+allowedMethods:
+- GET
+- POST
+- PUT
+- DELETE

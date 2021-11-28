@@ -19,10 +19,9 @@
         <version.junit>4.13.1</version.junit>
         <version.undertow>2.2.4.Final</version.undertow>
         <version.json-schema-validator>1.0.63</version.json-schema-validator>
-        <version.fastscanner>2.18.1</version.fastscanner>
-        <version.confluent>5.3.3</version.confluent>
-        <version.kafka>2.5.0</version.kafka>
         <version.avroConverter>0.2.9</version.avroConverter>
+        <version.fastscanner>2.18.1</version.fastscanner>
+
         <versions.maven-version>2.4</versions.maven-version>
         <version.javadoc-packagelist-plugin>1.0.0</version.javadoc-packagelist-plugin>
         <version.maven-javadoc>3.1.0</version.maven-javadoc>
@@ -44,6 +43,21 @@
         <dependency>
             <groupId>com.networknt</groupId>
             <artifactId>metrics</artifactId>
+            <version>${version.light-4j}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.networknt</groupId>
+            <artifactId>jaeger-tracing</artifactId>
+            <version>${version.light-4j}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.networknt</groupId>
+            <artifactId>cors</artifactId>
+            <version>${version.light-4j}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.networknt</groupId>
+            <artifactId>health</artifactId>
             <version>${version.light-4j}</version>
         </dependency>
         <dependency>
@@ -111,16 +125,6 @@
             <groupId>io.undertow</groupId>
             <artifactId>undertow-core</artifactId>
             <version>${version.undertow}</version>
-        </dependency>
-        <dependency>
-            <groupId>io.confluent</groupId>
-            <artifactId>kafka-schema-registry-client</artifactId>
-            <version>${version.confluent}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.kafka</groupId>
-            <artifactId>kafka-streams</artifactId>
-            <version>${version.kafka}</version>
         </dependency>
         <dependency>
             <groupId>tech.allegro.schema.json2avro</groupId>
@@ -243,6 +247,13 @@
         <repository>
             <id>sonatype-snapshots</id>
             <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </repository>
+        <repository>
+            <id>s01-sonatype-snapshots</id>
+            <url>https://s01.oss.sonatype.org/content/repositories/snapshots</url>
             <snapshots>
                 <enabled>true</enabled>
             </snapshots>
