@@ -562,16 +562,21 @@ public class CovidQueryStreams implements LightStreams {
                     String userId = covidWebsiteUpdatedEvent.getUserId();
                     String entityId = location + "|" + userId;
                     String entityString = entityStore.get(entityId);
-                    Map<String, Object> entityMap = JsonMapper.string2Map(entityString);
-                    String category = (String)entityMap.get("category");
-                    String subcategory = (String)entityMap.get("subcategory");
-                    String keyCategory = location + "|" + category;
-                    String keySubCategory = keyCategory + "|" + subcategory;
-                    covidWebsiteUpdatedEvent.setKeyId(1);
-                    covidWebsiteUpdatedEvent.getEventId().setDerived(true);
-                    pc.forward(keyCategory.getBytes(StandardCharsets.UTF_8), serializer.serialize(covidWebsiteUpdatedEvent), To.child("EventProcessor"));
-                    covidWebsiteUpdatedEvent.setKeyId(2);
-                    pc.forward(keySubCategory.getBytes(StandardCharsets.UTF_8), serializer.serialize(covidWebsiteUpdatedEvent), To.child("EventProcessor"));
+                    // chances are the entityString is null, we need to do the null check here.
+                    if(entityString != null) {
+                        Map<String, Object> entityMap = JsonMapper.string2Map(entityString);
+                        String category = (String) entityMap.get("category");
+                        String subcategory = (String) entityMap.get("subcategory");
+                        String keyCategory = location + "|" + category;
+                        String keySubCategory = keyCategory + "|" + subcategory;
+                        covidWebsiteUpdatedEvent.setKeyId(1);
+                        covidWebsiteUpdatedEvent.getEventId().setDerived(true);
+                        pc.forward(keyCategory.getBytes(StandardCharsets.UTF_8), serializer.serialize(covidWebsiteUpdatedEvent), To.child("EventProcessor"));
+                        covidWebsiteUpdatedEvent.setKeyId(2);
+                        pc.forward(keySubCategory.getBytes(StandardCharsets.UTF_8), serializer.serialize(covidWebsiteUpdatedEvent), To.child("EventProcessor"));
+                    } else {
+                        logger.error("Entity not found in entityStore with entityId = " + entityId);
+                    }
                 } else if (keyId == 1) {
                     String keyCategory = new String(key, StandardCharsets.UTF_8);
                     String userId = covidWebsiteUpdatedEvent.getUserId();
